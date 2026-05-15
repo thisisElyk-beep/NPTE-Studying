@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NPTE Flashcards</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500&display=swap');
+
+  :root {
+    --bg: #F2F0EB;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.1);
+    --text: #1a1a1a;
+    --text-secondary: #6b6966;
+    --text-tertiary: #a09d9a;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a1c;
+      --surface: #242426;
+      --border: rgba(255,255,255,0.08);
+      --text: #f2f2f7;
+      --text-secondary: #aeaeb2;
+      --text-tertiary: #6e6e73;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text);
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  header {
+    margin-bottom: 3rem;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 38px;
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .deck-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 2.5rem;
+  }
+
+  .deck-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    transition: transform 0.15s, box-shadow 0.15s;
+    gap: 12px;
+  }
+
+  .deck-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  .deck-card:active {
+    transform: translateY(0);
+  }
+
+  .deck-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .deck-name {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .deck-meta {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .arrow {
+    color: var(--text-tertiary);
+    font-size: 14px;
+  }
+
+  .footer {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    text-align: center;
+    line-height: 1.7;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">NPTE Prep</div>
+    <h1>Flashcard<br>Decks</h1>
+    <p class="subtitle">Progress syncs automatically across devices.</p>
+  </header>
+
+  <div class="section-label">All decks</div>
+
+  <div class="deck-list">
+    <a class="deck-card" href="MSK_Cards.html">
+      <div class="deck-left">
+        <div class="dot" style="background:#E24B4A;"></div>
+        <span class="deck-name">Musculoskeletal</span>
+      </div>
+      <div class="deck-meta"><span class="arrow">→</span></div>
+    </a>
+    <a class="deck-card" href="Neuro_Cards.html">
+      <div class="deck-left">
+        <div class="dot" style="background:#7F77DD;"></div>
+        <span class="deck-name">Neurology</span>
+      </div>
+      <div class="deck-meta"><span class="arrow">→</span></div>
+    </a>
+    <a class="deck-card" href="Cardiopulmonary_Cards.html">
+      <div class="deck-left">
+        <div class="dot" style="background:#D85A30;"></div>
+        <span class="deck-name">Cardiopulmonary</span>
+      </div>
+      <div class="deck-meta"><span class="arrow">→</span></div>
+    </a>
+    <a class="deck-card" href="Integumentary_Cards.html">
+      <div class="deck-left">
+        <div class="dot" style="background:#1D9E75;"></div>
+        <span class="deck-name">Integumentary</span>
+      </div>
+      <div class="deck-meta"><span class="arrow">→</span></div>
+    </a>
+    <a class="deck-card" href="Pediatric_Cards.html">
+      <div class="deck-left">
+        <div class="dot" style="background:#378ADD;"></div>
+        <span class="deck-name">Pediatrics</span>
+      </div>
+      <div class="deck-meta"><span class="arrow">→</span></div>
+    </a>
+    <a class="deck-card" href="Safety_Cards.html">
+      <div class="deck-left">
+        <div class="dot" style="background:#BA7517;"></div>
+        <span class="deck-name">Safety, Research & Documentation</span>
+      </div>
+      <div class="deck-meta"><span class="arrow">→</span></div>
+    </a>
+    <a class="deck-card" href="System_Interactions_Cards.html">
+      <div class="deck-left">
+        <div class="dot" style="background:#D4537E;"></div>
+        <span class="deck-name">System Interactions</span>
+      </div>
+      <div class="deck-meta"><span class="arrow">→</span></div>
+    </a>
+    <a class="deck-card" href="Dermatomes_Myotomes_Brachial_Plexus_Cards.html">
+      <div class="deck-left">
+        <div class="dot" style="background:#993C1D;"></div>
+        <span class="deck-name">Dermatomes, Myotomes & Brachial Plexus</span>
+      </div>
+      <div class="deck-meta"><span class="arrow">→</span></div>
+    </a>
+    <a class="deck-card" href="Cranial_Nerve_Cards.html">
+      <div class="deck-left">
+        <div class="dot" style="background:#534AB7;"></div>
+        <span class="deck-name">Cranial Nerves</span>
+      </div>
+      <div class="deck-meta"><span class="arrow">→</span></div>
+    </a>
+  </div>
+
+  <div class="footer">
+    Bookmark this page for quick access from any device.<br>
+    <a href="https://thisiselyk-beep.github.io/NPTE-Flascards/" style="color:inherit;">thisiselyk-beep.github.io/NPTE-Flascards</a>
+  </div>
+</div>
+</body>
+</html>
