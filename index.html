@@ -14,6 +14,12 @@
     --text: #1a1a1a;
     --text-secondary: #6b6966;
     --text-tertiary: #a09d9a;
+    --green: #0F6E56;
+    --green-bg: #E1F5EE;
+    --amber: #854F0B;
+    --amber-bg: #FAEEDA;
+    --red: #A32D2D;
+    --red-bg: #FCEBEB;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -24,6 +30,9 @@
       --text: #f2f2f7;
       --text-secondary: #aeaeb2;
       --text-tertiary: #6e6e73;
+      --green-bg: #0a2e24;
+      --amber-bg: #2a1f0a;
+      --red-bg: #2e0f0f;
     }
   }
 
@@ -37,14 +46,9 @@
     padding: 3rem 1.5rem 5rem;
   }
 
-  .wrap {
-    max-width: 640px;
-    margin: 0 auto;
-  }
+  .wrap { max-width: 640px; margin: 0 auto; }
 
-  header {
-    margin-bottom: 3rem;
-  }
+  header { margin-bottom: 2.5rem; }
 
   .eyebrow {
     font-size: 11px;
@@ -67,7 +71,20 @@
   .subtitle {
     font-size: 14px;
     color: var(--text-secondary);
-    line-height: 1.6;
+  }
+
+  .summary-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .summary-chip {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-weight: 500;
   }
 
   .section-label {
@@ -89,9 +106,7 @@
   }
 
   .deck-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: block;
     padding: 14px 16px;
     background: var(--surface);
     border: 0.5px solid var(--border);
@@ -99,22 +114,22 @@
     text-decoration: none;
     color: var(--text);
     transition: transform 0.15s, box-shadow 0.15s;
-    gap: 12px;
   }
 
-  .deck-card:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  }
+  .deck-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .deck-card:active { transform: translateY(0); }
 
-  .deck-card:active {
-    transform: translateY(0);
+  .deck-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
   }
 
   .deck-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     min-width: 0;
   }
 
@@ -133,18 +148,36 @@
     text-overflow: ellipsis;
   }
 
-  .deck-meta {
-    font-size: 12px;
-    color: var(--text-tertiary);
-    flex-shrink: 0;
+  .arrow { color: var(--text-tertiary); font-size: 14px; }
+
+  /* progress bar */
+  .prog-track {
+    height: 5px;
+    background: var(--bg);
+    border-radius: 3px;
+    overflow: hidden;
     display: flex;
-    align-items: center;
-    gap: 6px;
+    gap: 1px;
+    margin-bottom: 7px;
   }
 
-  .arrow {
+  .prog-seg { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+
+  .stat-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .stat-chip {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .chip-loading {
+    background: var(--bg);
     color: var(--text-tertiary);
-    font-size: 14px;
   }
 
   .footer {
@@ -153,6 +186,28 @@
     text-align: center;
     line-height: 1.7;
   }
+
+  .sync-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 1.5rem;
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+
+  .sync-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #c8c6c3;
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+
+  .sync-dot.ok { background: #5DCAA5; }
+  .sync-dot.err { background: #F09595; }
+  .sync-dot.pending { background: #EF9F27; }
 </style>
 </head>
 <body>
@@ -160,81 +215,158 @@
   <header>
     <div class="eyebrow">NPTE Prep</div>
     <h1>Flashcard<br>Decks</h1>
-    <p class="subtitle">Progress syncs automatically across devices.</p>
   </header>
+
+  <div class="sync-bar">
+    <div class="sync-dot pending" id="syncDot"></div>
+    <span id="syncTxt">Loading progress...</span>
+  </div>
+
+  <div class="summary-row" id="summaryRow"></div>
 
   <div class="section-label">All decks</div>
 
-  <div class="deck-list">
-    <a class="deck-card" href="MSK_Cards.html">
-      <div class="deck-left">
-        <div class="dot" style="background:#E24B4A;"></div>
-        <span class="deck-name">Musculoskeletal</span>
-      </div>
-      <div class="deck-meta"><span class="arrow">→</span></div>
-    </a>
-    <a class="deck-card" href="Neuro_Cards.html">
-      <div class="deck-left">
-        <div class="dot" style="background:#7F77DD;"></div>
-        <span class="deck-name">Neurology</span>
-      </div>
-      <div class="deck-meta"><span class="arrow">→</span></div>
-    </a>
-    <a class="deck-card" href="Cardiopulmonary_Cards.html">
-      <div class="deck-left">
-        <div class="dot" style="background:#D85A30;"></div>
-        <span class="deck-name">Cardiopulmonary</span>
-      </div>
-      <div class="deck-meta"><span class="arrow">→</span></div>
-    </a>
-    <a class="deck-card" href="Integumentary_Cards.html">
-      <div class="deck-left">
-        <div class="dot" style="background:#1D9E75;"></div>
-        <span class="deck-name">Integumentary</span>
-      </div>
-      <div class="deck-meta"><span class="arrow">→</span></div>
-    </a>
-    <a class="deck-card" href="Pediatric_Cards.html">
-      <div class="deck-left">
-        <div class="dot" style="background:#378ADD;"></div>
-        <span class="deck-name">Pediatrics</span>
-      </div>
-      <div class="deck-meta"><span class="arrow">→</span></div>
-    </a>
-    <a class="deck-card" href="Safety_Cards.html">
-      <div class="deck-left">
-        <div class="dot" style="background:#BA7517;"></div>
-        <span class="deck-name">Safety, Research & Documentation</span>
-      </div>
-      <div class="deck-meta"><span class="arrow">→</span></div>
-    </a>
-    <a class="deck-card" href="System_Interactions_Cards.html">
-      <div class="deck-left">
-        <div class="dot" style="background:#D4537E;"></div>
-        <span class="deck-name">System Interactions</span>
-      </div>
-      <div class="deck-meta"><span class="arrow">→</span></div>
-    </a>
-    <a class="deck-card" href="Dermatomes_Myotomes_Brachial_Plexus_Cards.html">
-      <div class="deck-left">
-        <div class="dot" style="background:#993C1D;"></div>
-        <span class="deck-name">Dermatomes, Myotomes & Brachial Plexus</span>
-      </div>
-      <div class="deck-meta"><span class="arrow">→</span></div>
-    </a>
-    <a class="deck-card" href="Cranial_Nerve_Cards.html">
-      <div class="deck-left">
-        <div class="dot" style="background:#534AB7;"></div>
-        <span class="deck-name">Cranial Nerves</span>
-      </div>
-      <div class="deck-meta"><span class="arrow">→</span></div>
-    </a>
-  </div>
+  <div class="deck-list" id="deckList"></div>
 
   <div class="footer">
-    Bookmark this page for quick access from any device.<br>
-    <a href="https://thisiselyk-beep.github.io/NPTE-Flascards/" style="color:inherit;">thisiselyk-beep.github.io/NPTE-Flascards</a>
+    Bookmark this page for quick access from any device.
   </div>
 </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+window.onload = function() {
+const DECKS = [
+  { key: "msk_cards_v2",              name: "Musculoskeletal",                         dot: "#E24B4A", href: "MSK_Cards.html" },
+  { key: "neuro_cards_v1",            name: "Neurology",                               dot: "#7F77DD", href: "Neuro_Cards.html" },
+  { key: "cardiopulm_cards_v1",       name: "Cardiopulmonary",                         dot: "#D85A30", href: "Cardiopulmonary_Cards.html" },
+  { key: "integumentary_cards_v1",    name: "Integumentary",                           dot: "#1D9E75", href: "Integumentary_Cards.html" },
+  { key: "pediatric_cards_v1",        name: "Pediatrics",                              dot: "#378ADD", href: "Pediatric_Cards.html" },
+  { key: "safety_cards_v1",           name: "Safety, Research & Documentation",        dot: "#BA7517", href: "Safety_Cards.html" },
+  { key: "sysinteractions_cards_v1",  name: "System Interactions",                     dot: "#D4537E", href: "System_Interactions_Cards.html" },
+  { key: "dermamyo_cards_v1",         name: "Dermatomes, Myotomes & Brachial Plexus", dot: "#993C1D", href: "Dermatomes_Myotomes_Brachial_Plexus_Cards.html" },
+  { key: "cranial_nerve_cards_v1",    name: "Cranial Nerves",                          dot: "#534AB7", href: "Cranial_Nerve_Cards.html" },
+];
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA6EjnhyYUOt0iRYUaywCoqZ5POaVQmcsk",
+  authDomain: "npte-flaschcards.firebaseapp.com",
+  databaseURL: "https://npte-flaschcards-default-rtdb.firebaseio.com",
+  projectId: "npte-flaschcards",
+  storageBucket: "npte-flaschcards.firebasestorage.app",
+  messagingSenderId: "429875976159",
+  appId: "1:429875976199:web:04fc0eda2e758c606e966a"
+};
+const USER_ID = "thisisElyk";
+
+function setSyncStatus(state, msg) {
+  const dot = document.getElementById("syncDot");
+  const txt = document.getElementById("syncTxt");
+  dot.className = "sync-dot" + (state ? " " + state : "");
+  txt.textContent = msg;
+}
+
+// Build deck cards with loading state
+const list = document.getElementById("deckList");
+DECKS.forEach(d => {
+  const el = document.createElement("a");
+  el.className = "deck-card";
+  el.href = d.href;
+  el.id = "deck-" + d.key;
+  el.innerHTML = `
+    <div class="deck-top">
+      <div class="deck-left">
+        <div class="dot" style="background:${d.dot};"></div>
+        <span class="deck-name">${d.name}</span>
+      </div>
+      <span class="arrow">→</span>
+    </div>
+    <div class="prog-track" id="prog-${d.key}">
+      <div class="prog-seg" style="background:var(--border);width:100%;border-radius:3px;"></div>
+    </div>
+    <div class="stat-row" id="stats-${d.key}">
+      <span class="stat-chip chip-loading">Loading...</span>
+    </div>`;
+  list.appendChild(el);
+});
+
+function renderDeck(d, state) {
+  const conf = (state && state.confidence) ? state.confidence : {};
+  const removed = new Set((state && state.removedIds) ? state.removedIds : []);
+  let gotit = 0, almost = 0, nope = 0;
+  Object.entries(conf).forEach(([k, v]) => {
+    if (removed.has(k)) return;
+    if (v === "gotit") gotit++;
+    else if (v === "almost") almost++;
+    else if (v === "nope") nope++;
+  });
+  const mastered = removed.size;
+  const totalGotit = gotit + mastered;
+  const rated = totalGotit + almost + nope;
+  const progEl = document.getElementById("prog-" + d.key);
+  const statsEl = document.getElementById("stats-" + d.key);
+  if (rated === 0) {
+    progEl.innerHTML = `<div class="prog-seg" style="background:var(--border);width:100%;border-radius:3px;"></div>`;
+    statsEl.innerHTML = `<span class="stat-chip chip-loading">Not started</span>`;
+    return { gotit: 0, almost: 0, nope: 0 };
+  }
+  const t = rated;
+  const gp = Math.round(totalGotit / t * 100);
+  const ap = Math.round(almost / t * 100);
+  const np = Math.round(nope / t * 100);
+  const up = Math.max(0, 100 - gp - ap - np);
+  progEl.innerHTML =
+    (gp > 0 ? `<div class="prog-seg" style="background:#5DCAA5;width:${gp}%;"></div>` : "") +
+    (ap > 0 ? `<div class="prog-seg" style="background:#EF9F27;width:${ap}%;"></div>` : "") +
+    (np > 0 ? `<div class="prog-seg" style="background:#F09595;width:${np}%;"></div>` : "") +
+    (up > 0 ? `<div class="prog-seg" style="background:var(--border);width:${up}%;"></div>` : "");
+  statsEl.innerHTML =
+    (totalGotit > 0 ? `<span class="stat-chip" style="background:var(--green-bg);color:var(--green);">Got it ${totalGotit}</span>` : "") +
+    (almost > 0 ? `<span class="stat-chip" style="background:var(--amber-bg);color:var(--amber);">Almost ${almost}</span>` : "") +
+    (nope > 0 ? `<span class="stat-chip" style="background:var(--red-bg);color:var(--red);">Nope ${nope}</span>` : "");
+  return { gotit: totalGotit, almost, nope };
+}
+
+if (typeof firebase === "undefined") {
+  setSyncStatus("err", "Firebase failed to load");
+  DECKS.forEach(d => {
+    const s = document.getElementById("stats-" + d.key);
+    if (s) s.innerHTML = `<span class="stat-chip chip-loading">Offline</span>`;
+  });
+  return;
+}
+
+try {
+  if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+} catch(e) {}
+
+const db = firebase.database();
+const userRef = db.ref("users/" + USER_ID);
+
+userRef.once("value").then(snap => {
+  const data = snap.val() || {};
+  let tg = 0, ta = 0, tn = 0;
+  DECKS.forEach(d => {
+    const r = renderDeck(d, data[d.key]);
+    tg += r.gotit; ta += r.almost; tn += r.nope;
+  });
+  const summaryRow = document.getElementById("summaryRow");
+  if (tg + ta + tn > 0) {
+    summaryRow.innerHTML =
+      (tg > 0 ? `<span class="summary-chip" style="background:var(--green-bg);color:var(--green);">Got it ${tg}</span>` : "") +
+      (ta > 0 ? `<span class="summary-chip" style="background:var(--amber-bg);color:var(--amber);">Almost ${ta}</span>` : "") +
+      (tn > 0 ? `<span class="summary-chip" style="background:var(--red-bg);color:var(--red);">Nope ${tn}</span>` : "");
+  }
+  setSyncStatus("ok", "Progress synced");
+}).catch(e => {
+  setSyncStatus("err", "Couldn't load progress — check connection");
+  DECKS.forEach(d => {
+    const s = document.getElementById("stats-" + d.key);
+    if (s) s.innerHTML = `<span class="stat-chip chip-loading">Offline</span>`;
+  });
+});
+}
+</script>
 </body>
 </html>
