@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neuro Flashcards — NPTE</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f4f0;
+    --bg-tertiary: #edecea;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6966;
+    --text-tertiary: #a09d9a;
+    --border: rgba(0,0,0,0.12);
+    --border-md: rgba(0,0,0,0.22);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --purple: #7F77DD;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1c1c1e;
+      --bg-secondary: #2c2c2e;
+      --bg-tertiary: #3a3a3c;
+      --text-primary: #f2f2f7;
+      --text-secondary: #aeaeb2;
+      --text-tertiary: #6e6e73;
+      --border: rgba(255,255,255,0.1);
+      --border-md: rgba(255,255,255,0.2);
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg-tertiary);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem 3rem;color:var(--text-primary);}
+  .wrap{width:100%;max-width:680px;}
+  .page-title{font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:1.5rem;}
+  .stats-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+  .stat{background:var(--bg-secondary);border-radius:var(--radius-md);padding:5px 10px;font-size:12px;color:var(--text-secondary);}
+  .stat span{font-weight:500;color:var(--text-primary);}
+  .prog-wrap{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
+  .prog-bg{flex:1;height:4px;background:var(--bg-secondary);border-radius:2px;}
+  .prog-fill{height:4px;background:var(--purple);border-radius:2px;transition:width 0.3s;}
+  .prog-txt{font-size:13px;color:var(--text-secondary);white-space:nowrap;}
+  .card{border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1rem;cursor:pointer;min-height:280px;display:flex;flex-direction:column;}
+  .card-front{background:var(--bg-primary);border:0.5px solid var(--border);align-items:center;justify-content:center;}
+  .card-back{justify-content:flex-start;}
+  .front-cat{font-size:11px;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:10px;font-weight:500;}
+  .front-title{font-size:26px;font-weight:500;color:var(--text-primary);line-height:1.2;text-align:center;}
+  .hint{font-size:13px;color:var(--text-tertiary);margin-top:1.25rem;}
+  .back-title{font-size:20px;font-weight:500;margin-bottom:8px;}
+  .type-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:500;margin-bottom:16px;}
+  .divider{height:0.5px;margin-bottom:14px;}
+  .blbl{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;font-weight:500;margin-bottom:6px;}
+  .bval{font-size:14px;line-height:1.7;} .bval b{font-weight:600;}
+  .spacer{flex:1;}
+  .confidence-row{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:12px;flex-wrap:wrap;}
+  .conf-lbl{font-size:12px;font-weight:500;margin-right:2px;}
+  .cbtn{font-size:12px;padding:5px 14px;border-radius:999px;border:0.5px solid;cursor:pointer;font-weight:500;}
+  .cbtn-nope{background:#FCEBEB;color:#A32D2D;border-color:#F09595;}
+  .cbtn-almost{background:#FAEEDA;color:#854F0B;border-color:#EF9F27;}
+  .cbtn-gotit{background:#E1F5EE;color:#0F6E56;border-color:#5DCAA5;}
+  .cbtn.selected{outline:2px solid currentColor;outline-offset:1px;}
+  .remove-btn{margin-left:auto;font-size:12px;padding:5px 12px;border-radius:999px;border:0.5px solid #5DCAA5;background:#E1F5EE;color:#0F6E56;cursor:pointer;font-weight:500;}
+  .flip-hint{text-align:center;margin-top:12px;font-size:12px;}
+  .conf-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:500;margin-top:12px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-bottom:8px;}
+  .nbtn{padding:8px 22px;font-size:14px;border-radius:var(--radius-md);border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-primary);cursor:pointer;}
+  .nbtn:hover{background:var(--bg-secondary);}
+  .nbtn.primary{background:#7F77DD;color:#fff;border-color:#7F77DD;}
+  .nbtn.primary:hover{background:#534AB7;}
+  .bottom-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:6px;}
+  .shuf-btn{font-size:13px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;}
+  .reset-btn{font-size:13px;color:#7F77DD;background:none;border:none;cursor:pointer;text-decoration:underline;}
+  .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-secondary);font-size:14px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1rem;background:var(--bg-primary);}
+  .empty-state strong{display:block;font-size:16px;color:var(--text-primary);margin-bottom:8px;font-weight:500;}
+  .filter-section{margin-bottom:1rem;}
+  .filter-group-label{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary);font-weight:500;margin-bottom:6px;}
+  .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+  .fbtn{font-size:12px;padding:4px 12px;border-radius:999px;border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-secondary);cursor:pointer;transition:all 0.15s;font-family:inherit;}
+  .fbtn.active{color:#fff;border-color:transparent;}
+  .filter-actions{display:flex;gap:10px;margin-top:4px;}
+  .faction{font-size:12px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
+  .sync-bar{display:flex;align-items:center;gap:6px;margin-bottom:0.75rem;font-size:12px;color:var(--text-tertiary);}
+  .sync-dot{width:7px;height:7px;border-radius:50%;background:#c8c6c3;flex-shrink:0;transition:background 0.3s;}
+  .sync-dot.ok{background:#5DCAA5;}
+  .sync-dot.err{background:#F09595;}
+  .sync-dot.pending{background:#EF9F27;}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="page-title">Neuro flashcards — NPTE</div>
+  <div class="sync-bar"><div class="sync-dot" id="syncDot"></div><span id="syncTxt">Connecting...</span></div>
+
+  <div class="filter-section">
+    <div class="filter-group-label">Category</div>
+    <div class="filter-row" id="catFilters"></div>
+    <div class="filter-group-label">Confidence</div>
+    <div class="filter-row" id="confFilters"></div>
+    <div class="filter-actions">
+      <button class="faction" onclick="selectAll()">Select all</button>
+      <button class="faction" onclick="clearAll()">Clear all</button>
+    </div>
+  </div>
+  <div class="stats-row" id="statsRow"></div>
+  <div class="prog-wrap">
+    <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-txt" id="progTxt"></div>
+  </div>
+  <div id="cardArea"></div>
+  <div class="btn-row" id="navRow">
+    <button class="nbtn" onclick="go(-1)">← Prev</button>
+    <button class="nbtn primary" onclick="go(1)">Next →</button>
+  </div>
+  <div class="bottom-row">
+    <button class="shuf-btn" onclick="shuffle()">Shuffle deck</button>
+    <button class="reset-btn" onclick="resetDeck()">Reset deck</button>
+  </div>
+</div>
+
+<script>
+const CATS={
+  tract:     {label:"Spinal cord tract",      dot:"#7F77DD",bg:"#EEEDFE",border:"#AFA9EC",text:"#3C3489",badge_bg:"#EEEDFE",badge_color:"#3C3489"},
+  blood:     {label:"Cerebral blood supply",  dot:"#D85A30",bg:"#FAECE7",border:"#F0997B",text:"#712B13",badge_bg:"#FAECE7",badge_color:"#993C1D"},
+  stroke:    {label:"Stroke syndrome",        dot:"#E24B4A",bg:"#FCEBEB",border:"#F09595",text:"#791F1F",badge_bg:"#FCEBEB",badge_color:"#A32D2D"},
+  sci:       {label:"Spinal cord injury",     dot:"#1D9E75",bg:"#E1F5EE",border:"#5DCAA5",text:"#085041",badge_bg:"#E1F5EE",badge_color:"#0F6E56"},
+  tbi:       {label:"TBI / neurotrauma",      dot:"#BA7517",bg:"#FAEEDA",border:"#EF9F27",text:"#633806",badge_bg:"#FAEEDA",badge_color:"#854F0B"},
+  degenerative:{label:"Neurodegenerative",    dot:"#378ADD",bg:"#E6F1FB",border:"#85B7EB",text:"#0C447C",badge_bg:"#E6F1FB",badge_color:"#185FA5"},
+  demyelinating:{label:"Demyelinating",       dot:"#D4537E",bg:"#FBEAF0",border:"#ED93B1",text:"#72243E",badge_bg:"#FBEAF0",badge_color:"#993556"},
+  vestibular:{label:"Vestibular",             dot:"#639922",bg:"#EAF3DE",border:"#97C459",text:"#27500A",badge_bg:"#EAF3DE",badge_color:"#3B6D11"},
+  cerebellar:{label:"Cerebellar",             dot:"#888780",bg:"#F1EFE8",border:"#B4B2A9",text:"#444441",badge_bg:"#F1EFE8",badge_color:"#5F5E5A"},
+  umnlmn:    {label:"UMN vs LMN",             dot:"#534AB7",bg:"#EEEDFE",border:"#7F77DD",text:"#26215C",badge_bg:"#EEEDFE",badge_color:"#534AB7"},
+  periph:    {label:"Peripheral neuropathy",  dot:"#0F6E56",bg:"#E1F5EE",border:"#1D9E75",text:"#04342C",badge_bg:"#E1F5EE",badge_color:"#085041"},
+};
+
+const CARDS=[
+  // ── UMN VS LMN ──
+  {cat:"umnlmn",front:"UMN lesion signs",back:"<b>Signs:</b> spasticity (velocity-dependent), hyperreflexia, clonus, Babinski (upgoing toe), weakness without early atrophy, no fasciculations.<br>Lesion above anterior horn cell — brain or spinal cord."},
+  {cat:"umnlmn",front:"LMN lesion signs",back:"<b>Signs:</b> flaccidity, hyporeflexia/areflexia, early significant atrophy, fasciculations, no Babinski.<br>Lesion at or below anterior horn cell — AHC, nerve root, peripheral nerve, NMJ, or muscle."},
+  {cat:"umnlmn",front:"Babinski sign",back:"Stroke lateral plantar surface heel to toe.<br><b>Abnormal (positive):</b> great toe extension + fanning of other toes = UMN lesion above L4–S2.<br>Normal in infants under 12 months."},
+  {cat:"umnlmn",front:"Clonus",back:"Rhythmic involuntary contraction in response to sustained stretch — tested at ankle (rapid DF).<br><b>Sustained (&gt;3 beats):</b> UMN lesion.<br><b>Unsustained:</b> may be normal or UMN with partial recovery."},
+  {cat:"umnlmn",front:"Spasticity vs rigidity",back:"<b>Spasticity:</b> velocity-dependent, clasp-knife, UMN (stroke, SCI, CP).<br><b>Rigidity:</b> velocity-independent, throughout ROM, lead-pipe or cogwheel.<br>Rigidity = basal ganglia lesion (Parkinson's)."},
+
+  // ── SPINAL CORD TRACTS ──
+  {cat:"tract",front:"Dorsal columns (posterior funiculus)",back:"<b>Carries:</b> ipsilateral fine touch, vibration, proprioception, 2-point discrimination.<br><b>Decussates:</b> at medulla.<br><b>Tested by:</b> tuning fork, Romberg, joint position sense.<br><b>Damaged in:</b> posterior cord syndrome, B12 deficiency, MS, tabes dorsalis."},
+  {cat:"tract",front:"Lateral corticospinal tract",back:"<b>Carries:</b> voluntary motor (contralateral).<br><b>Decussates:</b> at medulla (pyramidal decussation) → travels ipsilaterally in cord.<br><b>Damage:</b> ipsilateral UMN weakness below lesion.<br>(10–15% travel as anterior corticospinal tract without crossing at medulla.)"},
+  {cat:"tract",front:"Lateral spinothalamic tract",back:"<b>Carries:</b> contralateral pain and temperature.<br><b>Decussates:</b> within 1–2 spinal levels via anterior commissure.<br><b>Damage:</b> contralateral loss of pain/temp below lesion.<br>Key tract in anterior cord and Brown-Séquard syndromes."},
+  {cat:"tract",front:"Anterior spinothalamic tract",back:"<b>Carries:</b> contralateral crude touch and pressure.<br><b>Decussates:</b> in spinal cord.<br>Crude touch often partially preserved due to bilateral representation.<br>Less clinically distinct than lateral spinothalamic — often grouped together."},
+  {cat:"tract",front:"Spinocerebellar tracts",back:"<b>Carries:</b> ipsilateral proprioception to cerebellum (unconscious).<br><b>Posterior:</b> lower limb, lateral funiculus. <b>Anterior:</b> crosses twice (net ipsilateral).<br><b>Damage:</b> ipsilateral ataxia and coordination deficits without sensory loss."},
+  {cat:"tract",front:"Tract decussation summary",back:"<b>Cross at medulla:</b> corticospinal (motor), dorsal columns (fine touch/proprioception).<br><b>Cross in cord:</b> spinothalamic (pain/temp — within 1–2 levels).<br><b>Rule:</b> above medulla lesion = ipsilateral motor + sensory. In cord = complex crossed patterns."},
+
+  // ── CEREBRAL BLOOD SUPPLY ──
+  {cat:"blood",front:"Middle cerebral artery (MCA)",back:"<b>Supplies:</b> lateral cortex — motor/sensory cortex (face + UE &gt; LE), Broca's, Wernicke's, internal capsule.<br><b>Most common stroke artery.</b><br><b>Deficits:</b> contralateral hemiplegia (face/arm &gt; leg), aphasia (dominant), neglect (non-dominant), homonymous hemianopia."},
+  {cat:"blood",front:"Anterior cerebral artery (ACA)",back:"<b>Supplies:</b> medial cortex — motor/sensory cortex for LE, prefrontal cortex.<br><b>Deficits:</b> contralateral LE &gt; UE weakness/sensory loss, personality changes, abulia, urinary incontinence.<br>Arm and face typically spared."},
+  {cat:"blood",front:"Posterior cerebral artery (PCA)",back:"<b>Supplies:</b> occipital lobe, thalamus, midbrain.<br><b>Deficits:</b> contralateral homonymous hemianopia (macular sparing), thalamic pain syndrome, memory deficits, CN III palsy.<br>Visual deficits = hallmark."},
+  {cat:"blood",front:"Basilar artery",back:"<b>Supplies:</b> pons, cerebellum (via AICA/PICA), midbrain.<br><b>Occlusion → locked-in syndrome:</b> bilateral pontine infarct — quadriplegia, anarthria, preserved consciousness and vertical eye movement.<br>Most devastating posterior circulation stroke."},
+  {cat:"blood",front:"PICA — Posterior inferior cerebellar artery",back:"<b>Supplies:</b> lateral medulla and inferior cerebellum.<br><b>Occlusion → Wallenberg syndrome:</b><br>Ipsilateral: face pain/temp loss, Horner's, ataxia, dysphagia/hoarseness.<br>Contralateral: body pain/temp loss.<br>No motor weakness."},
+  {cat:"blood",front:"AICA — Anterior inferior cerebellar artery",back:"<b>Supplies:</b> lateral pons, middle cerebellar peduncle, inner ear.<br><b>Occlusion:</b> ipsilateral face pain/temp loss, hearing loss, facial weakness (CN VII/VIII), vertigo, ataxia.<br>Contralateral body pain/temp loss.<br>Similar to Wallenberg but higher — adds hearing loss."},
+  {cat:"blood",front:"Lenticulostriate arteries",back:"Penetrating MCA branches → basal ganglia, internal capsule, thalamus.<br>Most common site of hypertensive hemorrhage.<br><b>Lacunar syndromes:</b> pure motor hemiplegia (posterior limb internal capsule) or pure sensory stroke (thalamus)."},
+  {cat:"blood",front:"Watershed zones",back:"Border zones between major arterial territories — most vulnerable during hypoperfusion (hypotension, cardiac arrest).<br><b>MCA/ACA:</b> proximal arm/leg weakness, face/hand spared ('man in a barrel').<br><b>MCA/PCA:</b> visual and language deficits."},
+
+  // ── STROKE SYNDROMES ──
+  {cat:"stroke",front:"MCA stroke — dominant hemisphere",back:"Contralateral hemiplegia (face/arm &gt; leg), hemisensory loss, homonymous hemianopia.<br><b>Broca's aphasia</b> (frontal): non-fluent, comprehension intact.<br><b>Wernicke's aphasia</b> (temporal): fluent but meaningless, comprehension impaired.<br><b>Global aphasia:</b> total MCA — non-fluent + comprehension impaired."},
+  {cat:"stroke",front:"MCA stroke — non-dominant hemisphere",back:"Contralateral hemiplegia and hemisensory loss.<br><b>Neglect:</b> unilateral spatial neglect — most severe with right hemisphere lesion.<br><b>Anosognosia:</b> denial of deficit.<br><b>Constructional apraxia,</b> flat affect.<br>Neglect often more disabling than dominant side aphasia."},
+  {cat:"stroke",front:"ACA stroke",back:"Contralateral LE &gt; UE weakness and sensory loss — arm and face relatively spared.<br><b>Behavioral:</b> abulia, disinhibition, perseveration.<br>Urinary incontinence, grasp reflex, gait apraxia common."},
+  {cat:"stroke",front:"Lateral medullary syndrome (Wallenberg)",back:"PICA occlusion.<br><b>Ipsilateral:</b> face pain/temp loss, Horner's (ptosis/miosis/anhidrosis), ataxia, dysphagia/hoarseness (CN IX/X).<br><b>Contralateral:</b> body pain/temp loss.<br>No weakness. Crossed sensory = pathognomonic."},
+  {cat:"stroke",front:"Locked-in syndrome",back:"Basilar artery → bilateral ventral pontine infarct.<br><b>Quadriplegia + anarthria + fully preserved consciousness.</b><br>Vertical eye movement and blinking intact (spared by midbrain).<br>Communicate via eye movement. Not vegetative — fully aware."},
+  {cat:"stroke",front:"Pusher syndrome",back:"Strong active pushing toward hemiplegic side — resists correction of alignment.<br><b>Associated with:</b> thalamic or posterior cortical lesions. Not the same as neglect.<br><b>Tx:</b> vertical perception training, weight-bearing to non-paretic side, visual feedback."},
+  {cat:"stroke",front:"Aphasia types — NPTE summary",back:"<b>Broca's:</b> non-fluent, comprehension intact — frontal lobe.<br><b>Wernicke's:</b> fluent but meaningless, comprehension impaired — temporal lobe.<br><b>Global:</b> non-fluent + comprehension impaired — large MCA.<br><b>Anomic:</b> word-finding only. <b>Conduction:</b> poor repetition, intact fluency + comprehension."},
+  {cat:"stroke",front:"Apraxia vs ataxia vs neglect",back:"<b>Apraxia:</b> can't perform purposeful movement despite intact motor/sensory — ideomotor (can't pantomime), ideational (can't sequence).<br><b>Ataxia:</b> incoordination from cerebellar/proprioceptive loss.<br><b>Neglect:</b> failure to attend to contralateral space — not weakness or blindness."},
+  {cat:"stroke",front:"Stroke recovery principles",back:"<b>Recovery order:</b> proximal before distal, gross before fine.<br><b>Brunnstrom stages:</b> flaccidity → spasticity → voluntary movement with spasticity → ↓ spasticity → isolated movement → near normal.<br>Most recovery within 3–6 months; plateau ~12 months but recovery continues beyond."},
+  {cat:"stroke",front:"Hemorrhagic vs ischemic stroke",back:"<b>Ischemic (87%):</b> gradual or sudden onset, no headache, CT negative early, DWI-MRI positive early.<br><b>Hemorrhagic (13%):</b> sudden severe 'thunderclap' headache, hypertension, blood on CT immediately.<br>tPA contraindicated in hemorrhagic stroke."},
+
+  // ── SPINAL CORD INJURY ──
+  {cat:"sci",front:"ASIA Impairment Scale",back:"<b>A:</b> Complete — no motor or sensory below injury level.<br><b>B:</b> Sensory incomplete — sensory but no motor below.<br><b>C:</b> Motor incomplete — &gt;50% key muscles grade &lt;3.<br><b>D:</b> Motor incomplete — &gt;50% key muscles grade ≥3.<br><b>E:</b> Normal.<br>Sacral sparing (S4–S5) defines completeness."},
+  {cat:"sci",front:"Complete vs incomplete SCI",back:"<b>Sacral sparing</b> = any sensation or voluntary motor at S4–S5 (perianal sensation, voluntary anal contraction) → incomplete.<br>Incomplete has better prognosis.<br><b>Zone of partial preservation:</b> segments below NLI with partial function in complete SCI."},
+  {cat:"sci",front:"Anterior cord syndrome",back:"<b>Mechanism:</b> flexion injury, anterior spinal artery occlusion.<br><b>Lost:</b> bilateral motor (corticospinal) + pain/temp (spinothalamic).<br><b>Preserved:</b> dorsal columns (fine touch, vibration, proprioception).<br>Worst prognosis of incomplete SCI syndromes."},
+  {cat:"sci",front:"Posterior cord syndrome",back:"<b>Mechanism:</b> hyperextension, posterior spinal artery occlusion (rare).<br><b>Lost:</b> ipsilateral dorsal columns — fine touch, vibration, proprioception.<br><b>Preserved:</b> motor, pain, temperature.<br>Presents as profound ataxia with relatively preserved strength."},
+  {cat:"sci",front:"Central cord syndrome",back:"Most common incomplete SCI.<br><b>Mechanism:</b> hyperextension in older adults with pre-existing cervical stenosis.<br><b>Deficits:</b> UE &gt; LE weakness (central cord fibers are cervical), bladder dysfunction, variable sensory loss.<br>Best prognosis of incomplete syndromes."},
+  {cat:"sci",front:"Brown-Séquard syndrome",back:"<b>Mechanism:</b> cord hemisection (penetrating trauma).<br><b>Ipsilateral:</b> motor loss (corticospinal) + dorsal column loss (proprioception, vibration, fine touch).<br><b>Contralateral:</b> pain/temp loss (spinothalamic crosses within 1–2 levels).<br>Best prognosis overall for incomplete SCI."},
+  {cat:"sci",front:"Cauda equina syndrome",back:"Injury below L1 — LMN injury (nerve roots, not cord).<br><b>Signs:</b> flaccid paralysis, areflexia, atrophy, saddle anesthesia (S3–S5), flaccid bowel/bladder (overflow incontinence, retention).<br><b>Emergency:</b> decompress within 48 hours."},
+  {cat:"sci",front:"Neurogenic vs spinal shock",back:"<b>Spinal shock:</b> transient areflexia + flaccidity immediately after SCI — lasts days to weeks. Ends when bulbocavernosus reflex returns.<br><b>Neurogenic shock:</b> hypotension + bradycardia from loss of sympathetic tone — T6 and above. Treat with fluids + vasopressors."},
+  {cat:"sci",front:"Autonomic dysreflexia",back:"T6 and above SCI — massive sympathetic response to noxious stimulus below injury.<br><b>Signs:</b> SBP &gt;150 mmHg, pounding headache, bradycardia, diaphoresis above injury, flushing.<br><b>Most common cause:</b> bladder (check catheter), then bowel, skin.<br>Sit up, find and remove stimulus. Medical emergency."},
+  {cat:"sci",front:"Functional expectations by level",back:"<b>C1–C3:</b> ventilator dependent, power chair (head control).<br><b>C4:</b> power chair (chin/sip-and-puff). <b>C5:</b> feed self with equipment.<br><b>C6:</b> independent with equipment, may drive. <b>C7:</b> independent manual WC, transfers.<br><b>T1–T6:</b> independent WC. <b>L1–L2:</b> community ambulation with KAFO."},
+  {cat:"sci",front:"SCI — pressure injury prevention",back:"<b>WC:</b> relieve pressure every 30 minutes (push-up or lean).<br><b>Bed:</b> reposition every 2 hours.<br><b>High-risk sites:</b> sacrum, ischial tuberosities, greater trochanters, heels, malleoli.<br>Insensate skin cannot signal distress — patient education is the primary intervention."},
+
+  // ── TBI ──
+  {cat:"tbi",front:"TBI classification",back:"<b>Mild</b> (GCS 13–15): LOC &lt;30 min, PTA &lt;24 hrs.<br><b>Moderate</b> (GCS 9–12): LOC 30 min–6 hrs, PTA 1–7 days.<br><b>Severe</b> (GCS 3–8): LOC &gt;6 hrs, PTA &gt;7 days.<br><b>GCS:</b> Eye (1–4) + Verbal (1–5) + Motor (1–6) = 3–15."},
+  {cat:"tbi",front:"Glasgow Coma Scale (GCS)",back:"<b>Eye:</b> 4=spontaneous | 3=to voice | 2=to pain | 1=none.<br><b>Verbal:</b> 5=oriented | 4=confused | 3=words | 2=sounds | 1=none.<br><b>Motor:</b> 6=obeys | 5=localizes | 4=withdraws | 3=decorticate (flexion) | 2=decerebrate (extension) | 1=none."},
+  {cat:"tbi",front:"Decorticate vs decerebrate posturing",back:"<b>Decorticate (flexor):</b> arms flexed, legs extended — lesion above red nucleus (cortex/internal capsule).<br><b>Decerebrate (extensor):</b> arms extended and pronated, legs extended — lesion at/below red nucleus (brainstem).<br>Decerebrate = worse prognosis."},
+  {cat:"tbi",front:"Rancho Los Amigos Scale",back:"<b>I:</b> No response. <b>II:</b> Generalized. <b>III:</b> Localized. <b>IV:</b> Confused-agitated. <b>V:</b> Confused-inappropriate. <b>VI:</b> Confused-appropriate. <b>VII:</b> Automatic-appropriate. <b>VIII:</b> Purposeful-appropriate.<br>Used to guide rehab approach and prognosis."},
+  {cat:"tbi",front:"TBI — Rancho IV management",back:"Confused-agitated: reduce stimulation, calm consistent approach, short simple commands, redirection over confrontation.<br>Avoid restraints if possible. Ensure safety.<br>No complex task training. Caregiver education critical."},
+  {cat:"tbi",front:"Diffuse axonal injury (DAI)",back:"Most common pathology in closed TBI — shearing of axons at gray-white matter junctions from rotational acceleration-deceleration.<br><b>CT often normal</b> — MRI (gradient echo/SWI) more sensitive.<br><b>Presents:</b> prolonged coma, vegetative state, diffuse cognitive/motor deficits. No discrete focal lesion."},
+  {cat:"tbi",front:"Post-concussion syndrome",back:"Symptoms &gt;4 weeks post-MTBI: headache (most common), dizziness, fatigue, cognitive fog, sleep disturbance, mood changes, light/noise sensitivity.<br><b>PT role:</b> graded return to activity, vestibular rehab (if dizziness), cervicogenic headache treatment, pacing education."},
+  {cat:"tbi",front:"Second impact syndrome",back:"Second concussion before first resolves → rapid cerebral swelling, herniation, death or severe disability.<br>Rare but catastrophic. Adolescents most vulnerable.<br>Return to play only after full symptom resolution — absolute contraindication while symptomatic."},
+
+  // ── NEURODEGENERATIVE ──
+  {cat:"degenerative",front:"Parkinson's disease — cardinal signs",back:"<b>TRAP:</b> Tremor (resting, pill-rolling, 4–6 Hz), Rigidity (cogwheel/lead-pipe), Akinesia/Bradykinesia, Postural instability (late).<br>Asymmetric onset. Dopamine depletion in substantia nigra.<br>Festinating gait, masked facies, hypophonia, micrographia."},
+  {cat:"degenerative",front:"Parkinson's disease — PT interventions",back:"<b>LSVT BIG:</b> high-amplitude movement training — ↑ gait, transfers, UE function.<br><b>Treadmill + cues:</b> ↑ gait speed and stride length.<br><b>RAS</b> (rhythmic auditory stimulation): addresses festination.<br>Dual-task training for fall prevention. Avoid prone (spinal extension)."},
+  {cat:"degenerative",front:"Parkinson's disease — gait and FOG",back:"<b>Festinating gait:</b> shuffling short steps, forward lean, ↓ arm swing, en bloc turns.<br><b>Freezing of gait (FOG):</b> transient inability to initiate/continue stepping.<br><b>Strategies:</b> visual floor cues (lines), auditory cues, weight shift. Falls risk highest with FOG."},
+  {cat:"degenerative",front:"Huntington's disease",back:"Autosomal dominant CAG repeat on chromosome 4. Onset 30–50 years.<br><b>Triad:</b> chorea (involuntary writhing), cognitive decline (dementia), psychiatric symptoms (depression, irritability).<br>Progressive, no disease-modifying treatment. PT: fall prevention, mobility, caregiver training."},
+  {cat:"degenerative",front:"ALS — features",back:"<b>Hallmark:</b> both UMN and LMN involvement.<br><b>UMN:</b> spasticity, hyperreflexia. <b>LMN:</b> atrophy, fasciculations, weakness.<br><b>Bulbar:</b> dysarthria, dysphagia (aspiration risk).<br><b>Spares:</b> sensation, eye movements, bowel/bladder (until late).<br>Death from respiratory failure."},
+  {cat:"degenerative",front:"ALS — PT principles",back:"Avoid overwork fatigue — submaximal exercise only (RPE ≤5/10).<br>Avoid eccentric resistance. Aquatic therapy well-tolerated.<br><b>Respiratory:</b> monitor FVC, refer when &lt;50%.<br>Positioning/seating critical as weakness progresses. Advance directives part of goals conversation."},
+  {cat:"degenerative",front:"Alzheimer's disease — PT relevance",back:"Cognitive decline affects motor learning — use <b>implicit learning</b> (repetition, errorless), not explicit instruction.<br>Dual-task training contraindicated early (↑ fall risk).<br>Physical activity slows functional decline. Caregiver training essential.<br>Primary safety concerns: wandering, falls."},
+
+  // ── DEMYELINATING ──
+  {cat:"demyelinating",front:"Multiple sclerosis — types",back:"<b>RRMS</b> (85%): discrete attacks with recovery — most common.<br><b>SPMS:</b> RRMS → gradual progression.<br><b>PPMS:</b> gradual decline from onset, no relapses.<br><b>Progressive relapsing:</b> rare — progressive with acute relapses."},
+  {cat:"demyelinating",front:"Multiple sclerosis — clinical features",back:"<b>Optic neuritis:</b> painful vision loss, afferent pupillary defect.<br><b>Lhermitte's sign:</b> electric shock with neck flexion (posterior column).<br><b>Fatigue:</b> most common/disabling symptom.<br><b>Uhthoff's phenomenon:</b> heat sensitivity worsens symptoms.<br>Also: spasticity, bladder dysfunction, ataxia, cognitive changes."},
+  {cat:"demyelinating",front:"Multiple sclerosis — PT approach",back:"<b>Fatigue:</b> energy conservation, cooling vests, avoid heat.<br><b>Exercise:</b> aerobic + resistance safe and beneficial — does NOT cause relapse.<br><b>Spasticity:</b> stretching, positioning, aquatic therapy.<br><b>Ataxia:</b> weighted vests, coordination training.<br>Fall prevention critical."},
+  {cat:"demyelinating",front:"Guillain-Barré syndrome (GBS)",back:"Acute inflammatory demyelinating polyneuropathy — ascending flaccid paralysis, LMN pattern, areflexia.<br>Follows infection (Campylobacter, viral). Autonomic instability (BP fluctuations, arrhythmia).<br><b>Monitor FVC</b> — nadir at 4 weeks, then plateau, then recovery."},
+  {cat:"demyelinating",front:"GBS — PT management",back:"<b>Acute:</b> monitor FVC (&lt;20 mL/kg = ventilation threshold), avoid fatigue, PROM, positioning, edema control.<br><b>Recovery:</b> progressive strengthening — avoid overwork fatigue. Proximal to distal recovery pattern.<br>Full recovery in most; 20% have residual deficits."},
+
+  // ── VESTIBULAR ──
+  {cat:"vestibular",front:"BPPV",back:"Most common cause of vertigo. Otoconia displaced into semicircular canal (posterior canal most common).<br><b>Signs:</b> brief vertigo (&lt;1 min) with head position change. Dix-Hallpike positive.<br><b>Tx:</b> Epley maneuver (posterior canal), Semont. High recurrence rate."},
+  {cat:"vestibular",front:"Vestibular neuritis vs labyrinthitis",back:"<b>Neuritis:</b> viral — vertigo, nausea, unsteady, <b>no hearing loss</b>.<br><b>Labyrinthitis:</b> cochlea also involved — adds unilateral hearing loss + tinnitus.<br><b>Both:</b> spontaneous nystagmus toward unaffected ear, positive head impulse test.<br>Tx: vestibular rehab after acute phase."},
+  {cat:"vestibular",front:"Nystagmus — peripheral vs central",back:"<b>Peripheral</b> (BPPV, neuritis): horizontal or horizontal-torsional, direction-fixed, suppressed by fixation, latency, fatigues.<br><b>Central</b> (stroke, tumor, MS): purely vertical or direction-changing, not suppressed by fixation, no latency, does not fatigue.<br>Central nystagmus = urgent referral."},
+  {cat:"vestibular",front:"Vestibular rehab — key exercises",back:"<b>Gaze stabilization:</b> VOR x1 (head moves, target fixed).<br><b>Habituation:</b> repeated exposure to provocative movements.<br><b>Balance training:</b> reduce sensory conflict, progress surface + visual conditions.<br>Epley for BPPV only — not generic vestibular rehab."},
+  {cat:"vestibular",front:"Head impulse test (HIT)",back:"Head moved rapidly to one side → patient fixates on examiner's nose.<br><b>Positive (abnormal):</b> corrective saccade back to target = peripheral vestibular hypofunction on the side of head movement.<br>Positive HIT in acute vertigo = peripheral, not central."},
+  {cat:"vestibular",front:"HINTS exam",back:"Differentiates stroke from peripheral vertigo in acute vestibular syndrome.<br><b>H</b>ead Impulse (abnormal = peripheral) | <b>N</b>ystagmus (direction-changing = central) | <b>T</b>est of Skew (vertical skew = central).<br>HINTS more sensitive than early MRI for posterior fossa stroke. Central = urgent imaging."},
+
+  // ── CEREBELLAR ──
+  {cat:"cerebellar",front:"Cerebellar dysfunction signs",back:"<b>DANISH:</b><br>Dysdiadochokinesia (impaired rapid alternating movements)<br>Ataxia (wide-based, lurching gait)<br>Nystagmus (horizontal, direction of gaze)<br>Intention tremor (worsens approaching target)<br>Scanning dysarthria (irregular rhythm, slurred)<br>Hypotonia<br>Deficits ipsilateral to lesion."},
+  {cat:"cerebellar",front:"Cerebellar lesion localization",back:"<b>Vermis (midline):</b> truncal + gait ataxia, minimal limb ataxia.<br><b>Hemispheres:</b> ipsilateral limb ataxia, dysmetria, intention tremor.<br><b>Flocculonodular lobe:</b> vertigo, nystagmus, balance disorders without limb ataxia."},
+  {cat:"cerebellar",front:"Cerebellar ataxia — PT approach",back:"Focus: movement accuracy, not strength.<br><b>Strategies:</b> slow movement down, reduce degrees of freedom (proximal stabilization first), weighted cuffs/utensils (↓ intention tremor), visual feedback, rhythmic cueing.<br><b>Frenkel exercises:</b> progressive precision tasks using vision to compensate. Avoid fatigue."},
+
+  // ── PERIPHERAL NEUROPATHY ──
+  {cat:"periph",front:"Peripheral neuropathy — patterns",back:"<b>Length-dependent</b> (most common — diabetic): stocking-glove, distal first.<br><b>Mononeuropathy:</b> single nerve (CTS, ulnar).<br><b>Mononeuritis multiplex:</b> multiple individual nerves (vasculitis, diabetes).<br><b>Polyradiculopathy:</b> multiple nerve roots.<br>Pattern narrows the differential."},
+  {cat:"periph",front:"Charcot-Marie-Tooth (CMT)",back:"Most common hereditary neuropathy. Demyelinating (CMT1) or axonal (CMT2).<br><b>Presentation:</b> progressive distal weakness — peroneal muscles first (foot drop, steppage gait), hammertoes, pes cavus, ↓ DTRs.<br><b>PT:</b> AFO, proximal strengthening, balance training, footwear modification."},
+  {cat:"periph",front:"Common peroneal nerve palsy",back:"Most commonly injured peripheral nerve at the knee — fibular head.<br><b>Mechanism:</b> prolonged crossed-leg sitting, cast, direct trauma.<br><b>Deficits:</b> foot drop (↓ DF + eversion), lateral lower leg and dorsal foot sensory loss.<br>vs L5 radiculopathy: no back pain, no SLR, normal hip abduction."},
+  {cat:"periph",front:"Ulnar nerve entrapment",back:"Most common site: cubital tunnel (medial elbow).<br><b>Sensory:</b> ring and small finger, medial palm.<br><b>Motor:</b> interossei, hypothenar, medial 2 lumbricals → claw hand (4th/5th digits).<br><b>Wartenberg sign:</b> small finger resting abduction. <b>Froment's sign:</b> IP flexion when pinching."},
+  {cat:"periph",front:"Median nerve — carpal tunnel vs pronator teres",back:"<b>Carpal tunnel:</b> wrist level, worse at night + wrist flexion, Phalen's + Tinel's at wrist, spares pronation/wrist flexion.<br><b>Pronator teres syndrome:</b> proximal forearm, reproduced by resisted pronation, no nocturnal pattern, Tinel's at forearm.<br>Both: thumb/index/middle/radial ring numbness."},
+  {cat:"periph",front:"Thoracic outlet syndrome (TOS)",back:"Compression of brachial plexus/subclavian vessels between clavicle and first rib.<br><b>Neurogenic</b> (most common): C8/T1 — ulnar side, hand weakness.<br><b>Arterial:</b> Raynaud's, pallor, coldness. <b>Venous:</b> swelling, cyanosis.<br><b>Tests:</b> Adson's, Roos, Wright's. PT: posture, scalene stretching, first rib mobilization."},
+];
+
+const CONF_COLORS={gotit:{bg:'#E1F5EE',color:'#0F6E56'},almost:{bg:'#FAEEDA',color:'#854F0B'},nope:{bg:'#FCEBEB',color:'#A32D2D'}};
+const CONF_LABELS={gotit:'Got it',almost:'Almost',nope:'Nope'};
+const CONF_FILTER_OPTIONS={
+  nope:   {label:'Nope',   bg:'#FCEBEB',color:'#A32D2D',border:'#F09595'},
+  almost: {label:'Almost', bg:'#FAEEDA',color:'#854F0B',border:'#EF9F27'},
+  gotit:  {label:'Got it', bg:'#E1F5EE',color:'#0F6E56',border:'#5DCAA5'},
+  unrated:{label:'Unrated',bg:'#f5f4f0',color:'#6b6966',border:'#c8c6c3'},
+};
+
+
+
+CARDS.forEach((c,i)=>c._id='card_'+i);
+function cid(c){return c._id;}
+
+const FIREBASE_CONFIG={apiKey:"AIzaSyA6EjnhyYUOt0iRYUaywCoqZ5POaVQmcsk",authDomain:"npte-flaschcards.firebaseapp.com",databaseURL:"https://npte-flaschcards-default-rtdb.firebaseio.com",projectId:"npte-flaschcards",storageBucket:"npte-flaschcards.firebasestorage.app",messagingSenderId:"429875976159",appId:"1:429875976159:web:04fc0eda2e758c606e966a"};
+const USER_ID='thisisElyk';
+
+// Firebase loaded via CDN
+let _db=null;
+let _fbRef=null;
+let _pendingSave=null;
+let _saveTimer=null;
+
+function initFirebase(storageKey){
+  if(typeof firebase==='undefined'){setSyncStatus('err','Firebase failed to load');return;}
+  firebase.initializeApp(FIREBASE_CONFIG);
+  _db=firebase.database();
+  _fbRef=_db.ref('users/'+USER_ID+'/'+storageKey);
+  setSyncStatus('pending','Connecting...');
+}
+
+function setSyncStatus(state,msg){
+  const dot=document.getElementById('syncDot');
+  const txt=document.getElementById('syncTxt');
+  if(!dot||!txt)return;
+  dot.className='sync-dot'+(state?' '+state:'');
+  txt.textContent=msg;
+}
+
+function saveState(stateObj){
+  // Always save to localStorage as offline fallback
+  try{localStorage.setItem('neuro_cards_v1',JSON.stringify(stateObj));}catch(e){}
+  // Debounce Firebase writes (300ms)
+  if(_saveTimer)clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(()=>{
+    if(!_fbRef){return;}
+    setSyncStatus('pending','Saving...');
+    _fbRef.set(stateObj)
+      .then(()=>setSyncStatus('ok','Synced'))
+      .catch(e=>{setSyncStatus('err','Sync failed');console.warn('Firebase save error:',e);});
+  },300);
+}
+
+function loadState(storageKey,callback){
+  // Try localStorage immediately for fast start
+  let localState=null;
+  try{const r=localStorage.getItem(storageKey);if(r)localState=JSON.parse(r);}catch(e){}
+
+  if(localState)callback(localState);
+
+  // Then fetch from Firebase and update if newer/different
+  initFirebase(storageKey);
+  if(!_fbRef){callback(localState);return;}
+  _fbRef.once('value')
+    .then(snap=>{
+      const fbState=snap.val();
+      if(fbState){
+        // Update localStorage with Firebase state
+        try{localStorage.setItem(storageKey,JSON.stringify(fbState));}catch(e){}
+        setSyncStatus('ok','Synced');
+        callback(fbState);
+      } else {
+        setSyncStatus('ok','Synced');
+        if(!localState)callback(null);
+      }
+    })
+    .catch(e=>{
+      setSyncStatus('err','Offline — using local data');
+      console.warn('Firebase load error:',e);
+      if(!localState)callback(null);
+    });
+}
+
+let _initDone=false;
+let activeCats,activeRegions,activeSystems,activeSubs,activeConf,deck=[],removedIds=new Set(),confidence={},idx=0,revealed=false;
+
+let _firstLoad=true;
+
+function initDeck(saved){
+activeCats=new Set(saved?saved.activeCats:Object.keys(CATS));
+activeConf=new Set(saved?saved.activeConf:Object.keys(CONF_FILTER_OPTIONS));
+  removedIds=new Set(saved&&saved.removedIds?saved.removedIds:[]);
+  confidence=saved&&saved.confidence?saved.confidence:{};
+  idx=saved&&saved.idx?saved.idx:0;
+  if(!_initDone){_initDone=true;buildFilters();rebuildDeck();}
+  else{buildFilters();rebuildDeck();}
+}
+
+loadState('neuro_cards_v1',initDeck);
+
+function confKey(c){return confidence[cid(c)]||'unrated';}
+function filteredCards(){
+  return CARDS.filter(c=>!removedIds.has(cid(c))&&activeCats.has(c.cat)&&activeConf.has(confKey(c)));
+}
+
+function rebuildDeck(){
+  deck=filteredCards();
+  if(_firstLoad){_firstLoad=false;if(idx>=deck.length)idx=Math.max(0,deck.length-1);}
+  else{idx=0;}
+  revealed=false;render();
+}
+
+
+function getState(){
+  return {
+    confidence,
+    removedIds:[...removedIds],
+    activeCats:typeof activeCats!=='undefined'?[...activeCats]:[],
+    activeRegions:typeof activeRegions!=='undefined'?[...activeRegions]:[],
+    activeSystems:typeof activeSystems!=='undefined'?[...activeSystems]:[],
+    activeSubs:typeof activeSubs!=='undefined'?[...activeSubs]:[],
+    activeConf:typeof activeConf!=='undefined'?[...activeConf]:[],
+    idx
+  };
+}
+
+function buildFilters(){
+  const catEl=document.getElementById('catFilters');
+  catEl.innerHTML='';
+  Object.entries(CATS).forEach(([k,v])=>{
+    const b=document.createElement('button');
+    b.className='fbtn'+(activeCats.has(k)?' active':'');
+    if(activeCats.has(k))b.style.background=v.dot;
+    b.textContent=v.label;
+    b.onclick=()=>{activeCats.has(k)?activeCats.delete(k):activeCats.add(k);buildFilters();rebuildDeck();saveState(getState());};
+    catEl.appendChild(b);
+  });
+  const confEl=document.getElementById('confFilters');
+  confEl.innerHTML='';
+  Object.entries(CONF_FILTER_OPTIONS).forEach(([k,v])=>{
+    const count=CARDS.filter(c=>!removedIds.has(cid(c))&&activeCats.has(c.cat)&&confKey(c)===k).length;
+    const b=document.createElement('button');
+    const isActive=activeConf.has(k);
+    b.className='fbtn'+(isActive?' active':'');
+    if(isActive)b.style.cssText='background:'+v.bg+';color:'+v.color+';border-color:'+v.border+';';
+    b.textContent=v.label+' ('+count+')';
+    b.onclick=()=>{activeConf.has(k)?activeConf.delete(k):activeConf.add(k);buildFilters();rebuildDeck();saveState(getState());};
+    confEl.appendChild(b);
+  });
+}
+
+function selectAll(){
+  activeCats=new Set(Object.keys(CATS));
+  activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
+  buildFilters();rebuildDeck();saveState(getState());
+}
+function clearAll(){
+  activeCats.clear();activeConf.clear();
+  buildFilters();rebuildDeck();saveState(getState());
+}
+
+function render(){
+  updateStats();
+  const area=document.getElementById('cardArea');
+  const navRow=document.getElementById('navRow');
+  if(deck.length===0){
+    let msg;
+    if(activeCats.size===0||activeConf.size===0){
+      msg='No filters selected — select at least one option in each row above.';
+    } else {
+      const allRemoved=CARDS.filter(c=>activeCats.has(c.cat)).every(c=>removedIds.has(cid(c)));
+      msg=allRemoved
+        ?'All cards mastered! Hit "Reset deck" to bring them back.'
+        :'No cards match the current confidence filter. Adjust the Confidence filter above or hit "Reset deck".';
+    }
+    area.innerHTML='<div class="empty-state"><strong>'+msg+'</strong></div>';
+    navRow.style.display='none';
+    document.getElementById('progFill').style.width='0%';
+    document.getElementById('progTxt').textContent='0 cards';
+    return;
+  }
+  navRow.style.display='flex';
+  if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+  const c=deck[idx];
+  const id=cid(c);
+  const conf=confidence[id]||null;
+  const pct=Math.round(((idx+1)/deck.length)*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=(idx+1)+' / '+deck.length;
+  const cat=CATS[c.cat];
+  const canRemove=conf==='gotit';
+
+  if(!revealed){
+    const confBadge=conf?'<span class="conf-badge" style="background:'+CONF_COLORS[conf].bg+';color:'+CONF_COLORS[conf].color+';">'+CONF_LABELS[conf]+'</span>':'';
+    area.innerHTML=`<div class="card card-front" onclick="toggle()">
+      <div class="front-cat" style="color:${cat.dot};">${cat.label}</div>
+      <div class="front-title">${c.front}</div>
+      ${confBadge}
+      <div class="hint">Tap to reveal</div>
+    </div>`;
+  } else {
+    const removeBtn=canRemove?'<button class="remove-btn" onclick="removeCard()">Remove</button>':'';
+    area.innerHTML=`<div class="card card-back" style="background:${cat.bg};border:0.5px solid ${cat.border};" onclick="handleBackClick(event)">
+      <div class="back-title" style="color:${cat.text};">${c.front}</div>
+      <span class="type-badge" style="background:${cat.badge_bg};color:${cat.badge_color};">${cat.label}</span>
+      <div class="divider" style="background:${cat.border};"></div>
+      <div class="blbl" style="color:${cat.dot};">Key facts</div>
+      <div class="bval" style="color:${cat.text};">${c.back}</div>
+      <div class="spacer"></div>
+      <div class="confidence-row" style="border-top:0.5px solid ${cat.border};" onclick="event.stopPropagation()">
+        <span class="conf-lbl" style="color:${cat.dot};">Confidence:</span>
+        <button class="cbtn cbtn-nope${conf==='nope'?' selected':''}" onclick="rate('nope')">Nope</button>
+        <button class="cbtn cbtn-almost${conf==='almost'?' selected':''}" onclick="rate('almost')">Almost</button>
+        <button class="cbtn cbtn-gotit${conf==='gotit'?' selected':''}" onclick="rate('gotit')">Got it</button>
+        ${removeBtn}
+      </div>
+      <div class="flip-hint" style="color:${cat.dot};">Tap card to flip back</div>
+    </div>`;
+  }
+}
+
+function handleBackClick(e){if(!e.target.closest('.confidence-row'))toggle();}
+function toggle(){revealed=!revealed;render();}
+function rate(val){
+  confidence[cid(deck[idx])]=val;
+  if(!activeConf.has(val)){
+    deck=filteredCards();
+    if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+    revealed=false;
+  }
+  saveState(getState());buildFilters();render();
+}
+function removeCard(){
+  const id=cid(deck[idx]);
+  removedIds.add(id);
+  deck=filteredCards();
+  if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+  revealed=false;saveState(getState());buildFilters();render();
+}
+function resetDeck(){
+  removedIds.clear();confidence={};
+  activeCats=new Set(Object.keys(CATS));
+  activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
+  idx=0;revealed=false;saveState(getState());buildFilters();rebuildDeck();
+}
+function updateStats(){
+  const removed=CARDS.filter(c=>removedIds.has(cid(c))).length;
+  const gotit=deck.filter(c=>confidence[cid(c)]==='gotit').length;
+  const almost=deck.filter(c=>confidence[cid(c)]==='almost').length;
+  const nope=deck.filter(c=>confidence[cid(c)]==='nope').length;
+  document.getElementById('statsRow').innerHTML=
+    '<div class="stat">Active <span>'+deck.length+'</span></div>'+
+    '<div class="stat">Mastered <span>'+removed+'</span></div>'+
+    '<div class="stat">Got it <span style="color:#0F6E56;">'+gotit+'</span></div>'+
+    '<div class="stat">Almost <span style="color:#854F0B;">'+almost+'</span></div>'+
+    '<div class="stat">Nope <span style="color:#A32D2D;">'+nope+'</span></div>';
+}
+function go(dir){const next=idx+dir;if(next<0||next>=deck.length)return;idx=next;revealed=false;saveState(getState());render();}
+function shuffle(){
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+  idx=0;revealed=false;saveState(getState());render();
+}
+</script>
+</body>
+</html>

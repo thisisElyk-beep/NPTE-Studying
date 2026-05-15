@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardiopulmonary Flashcards — NPTE</title>
+<style>
+  :root {
+    --bg-primary:#ffffff;--bg-secondary:#f5f4f0;--bg-tertiary:#edecea;
+    --text-primary:#1a1a1a;--text-secondary:#6b6966;--text-tertiary:#a09d9a;
+    --border:rgba(0,0,0,0.12);--border-md:rgba(0,0,0,0.22);
+    --radius-md:8px;--radius-lg:12px;--purple:#7F77DD;
+  }
+  @media(prefers-color-scheme:dark){
+    :root{
+      --bg-primary:#1c1c1e;--bg-secondary:#2c2c2e;--bg-tertiary:#3a3a3c;
+      --text-primary:#f2f2f7;--text-secondary:#aeaeb2;--text-tertiary:#6e6e73;
+      --border:rgba(255,255,255,0.1);--border-md:rgba(255,255,255,0.2);
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg-tertiary);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem 3rem;color:var(--text-primary);}
+  .wrap{width:100%;max-width:680px;}
+  .page-title{font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:1.25rem;}
+  .filter-section{margin-bottom:1rem;}
+  .filter-group-label{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary);font-weight:500;margin-bottom:6px;}
+  .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+  .fbtn{font-size:12px;padding:4px 12px;border-radius:999px;border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-secondary);cursor:pointer;transition:all 0.15s;font-family:inherit;}
+  .fbtn.active{color:#fff;border-color:transparent;}
+  .filter-actions{display:flex;gap:10px;margin-top:4px;}
+  .faction{font-size:12px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
+  .stats-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+  .stat{background:var(--bg-secondary);border-radius:var(--radius-md);padding:5px 10px;font-size:12px;color:var(--text-secondary);}
+  .stat span{font-weight:500;color:var(--text-primary);}
+  .prog-wrap{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
+  .prog-bg{flex:1;height:4px;background:var(--bg-secondary);border-radius:2px;}
+  .prog-fill{height:4px;background:var(--purple);border-radius:2px;transition:width 0.3s;}
+  .prog-txt{font-size:13px;color:var(--text-secondary);white-space:nowrap;}
+  .card{border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1rem;cursor:pointer;min-height:280px;display:flex;flex-direction:column;}
+  .card-front{background:var(--bg-primary);border:0.5px solid var(--border);align-items:center;justify-content:center;}
+  .card-back{justify-content:flex-start;}
+  .front-cat{font-size:11px;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:6px;font-weight:500;}
+  .front-sys{font-size:11px;letter-spacing:0.04em;margin-bottom:10px;opacity:0.7;}
+  .front-title{font-size:24px;font-weight:500;color:var(--text-primary);line-height:1.2;text-align:center;}
+  .hint{font-size:13px;color:var(--text-tertiary);margin-top:1.25rem;}
+  .back-title{font-size:19px;font-weight:500;margin-bottom:6px;}
+  .badge-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .type-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:500;}
+  .sys-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;background:var(--bg-secondary);color:var(--text-secondary);}
+  .divider{height:0.5px;margin-bottom:14px;}
+  .blbl{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;font-weight:500;margin-bottom:6px;}
+  .bval{font-size:14px;line-height:1.7;} .bval b{font-weight:600;}
+  .spacer{flex:1;}
+  .confidence-row{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:12px;flex-wrap:wrap;}
+  .conf-lbl{font-size:12px;font-weight:500;margin-right:2px;}
+  .cbtn{font-size:12px;padding:5px 14px;border-radius:999px;border:0.5px solid;cursor:pointer;font-weight:500;font-family:inherit;}
+  .cbtn-nope{background:#FCEBEB;color:#A32D2D;border-color:#F09595;}
+  .cbtn-almost{background:#FAEEDA;color:#854F0B;border-color:#EF9F27;}
+  .cbtn-gotit{background:#E1F5EE;color:#0F6E56;border-color:#5DCAA5;}
+  .cbtn.selected{outline:2px solid currentColor;outline-offset:1px;}
+  .remove-btn{margin-left:auto;font-size:12px;padding:5px 12px;border-radius:999px;border:0.5px solid #5DCAA5;background:#E1F5EE;color:#0F6E56;cursor:pointer;font-weight:500;font-family:inherit;}
+  .flip-hint{text-align:center;margin-top:12px;font-size:12px;}
+  .conf-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:500;margin-top:10px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-bottom:8px;}
+  .nbtn{padding:8px 22px;font-size:14px;border-radius:var(--radius-md);border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-primary);cursor:pointer;font-family:inherit;}
+  .nbtn:hover{background:var(--bg-secondary);}
+  .nbtn.primary{background:#7F77DD;color:#fff;border-color:#7F77DD;}
+  .nbtn.primary:hover{background:#534AB7;}
+  .bottom-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:6px;}
+  .shuf-btn{font-size:13px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
+  .reset-btn{font-size:13px;color:#7F77DD;background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
+  .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-secondary);font-size:14px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1rem;background:var(--bg-primary);}
+  .empty-state strong{display:block;font-size:16px;color:var(--text-primary);margin-bottom:8px;font-weight:500;}
+  .sync-bar{display:flex;align-items:center;gap:6px;margin-bottom:0.75rem;font-size:12px;color:var(--text-tertiary);}
+  .sync-dot{width:7px;height:7px;border-radius:50%;background:#c8c6c3;flex-shrink:0;transition:background 0.3s;}
+  .sync-dot.ok{background:#5DCAA5;}
+  .sync-dot.err{background:#F09595;}
+  .sync-dot.pending{background:#EF9F27;}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="page-title">Cardiopulmonary flashcards — NPTE</div>
+  <div class="sync-bar"><div class="sync-dot" id="syncDot"></div><span id="syncTxt">Connecting...</span></div>
+
+  <div class="filter-section">
+    <div class="filter-group-label">Category</div>
+    <div class="filter-row" id="catFilters"></div>
+    <div class="filter-group-label">System</div>
+    <div class="filter-row" id="sysFilters"></div>
+    <div class="filter-group-label">Confidence</div>
+    <div class="filter-row" id="confFilters"></div>
+    <div class="filter-actions">
+      <button class="faction" onclick="selectAll()">Select all</button>
+      <button class="faction" onclick="clearAll()">Clear all</button>
+    </div>
+  </div>
+  <div class="stats-row" id="statsRow"></div>
+  <div class="prog-wrap">
+    <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-txt" id="progTxt"></div>
+  </div>
+  <div id="cardArea"></div>
+  <div class="btn-row" id="navRow">
+    <button class="nbtn" onclick="go(-1)">← Prev</button>
+    <button class="nbtn primary" onclick="go(1)">Next →</button>
+  </div>
+  <div class="bottom-row">
+    <button class="shuf-btn" onclick="shuffle()">Shuffle deck</button>
+    <button class="reset-btn" onclick="resetDeck()">Reset deck</button>
+  </div>
+</div>
+<script>
+const CATS={
+  pathology: {label:"Pathology",       dot:"#E24B4A",bg:"#FCEBEB",border:"#F09595",text:"#791F1F",badge_bg:"#FCEBEB",badge_color:"#A32D2D"},
+  pft:       {label:"PFT / values",    dot:"#7F77DD",bg:"#EEEDFE",border:"#AFA9EC",text:"#3C3489",badge_bg:"#EEEDFE",badge_color:"#534AB7"},
+  ecg:       {label:"ECG",             dot:"#D85A30",bg:"#FAECE7",border:"#F0997B",text:"#712B13",badge_bg:"#FAECE7",badge_color:"#993C1D"},
+  rehab:     {label:"Cardiac rehab",   dot:"#1D9E75",bg:"#E1F5EE",border:"#5DCAA5",text:"#085041",badge_bg:"#E1F5EE",badge_color:"#0F6E56"},
+  assessment:{label:"Assessment",      dot:"#378ADD",bg:"#E6F1FB",border:"#85B7EB",text:"#0C447C",badge_bg:"#E6F1FB",badge_color:"#185FA5"},
+  pharm:     {label:"Pharmacology",    dot:"#BA7517",bg:"#FAEEDA",border:"#EF9F27",text:"#633806",badge_bg:"#FAEEDA",badge_color:"#854F0B"},
+};
+const SYSTEMS={cardiac:"Cardiac",pulmonary:"Pulmonary",both:"Both"};
+const SYS_COLORS={cardiac:"#E24B4A",pulmonary:"#378ADD",both:"#7F77DD"};
+
+const CARDS=[
+  // ── CARDIAC PATHOLOGY ──
+  {cat:"pathology",sys:"cardiac",front:"Myocardial infarction (MI)",back:"<b>STEMI:</b> complete occlusion, ST elevation, troponin ↑ — PCI within 90 min.<br><b>NSTEMI:</b> partial occlusion, no ST elevation, troponin ↑.<br><b>PT:</b> sit day 1, ambulate day 2 if stable. Monitor HR, BP, RPE, symptoms."},
+  {cat:"pathology",sys:"cardiac",front:"Heart failure — systolic vs diastolic",back:"<b>HFrEF (systolic):</b> EF &lt;40%, dilated ventricle, ↓ contractility.<br><b>HFpEF (diastolic):</b> EF &gt;50%, stiff ventricle, impaired filling.<br><b>Both:</b> dyspnea, fatigue, fluid retention.<br><b>Stop if:</b> weight gain &gt;2 lbs/day, worsening dyspnea, new S3."},
+  {cat:"pathology",sys:"cardiac",front:"Heart failure — signs and symptoms",back:"<b>Left HF:</b> dyspnea on exertion, orthopnea, PND, basal crackles, S3.<br><b>Right HF:</b> JVD, pitting edema, hepatomegaly, ascites.<br><b>NYHA I–IV:</b> grades functional limitation.<br><b>Stop exercise:</b> worsening dyspnea, desaturation, chest pain, arrhythmia."},
+  {cat:"pathology",sys:"cardiac",front:"Coronary artery disease (CAD)",back:"<b>Stable angina:</b> predictable exertional chest pain, relieved by rest or nitrates within 5 min.<br><b>Unstable angina:</b> new, worsening, or rest pain — medical emergency.<br><b>Equivalents:</b> jaw pain, left arm, dyspnea, diaphoresis.<br><b>PT:</b> stop exercise → NTG if prescribed → EMS if no relief in 5 min."},
+  {cat:"pathology",sys:"cardiac",front:"Hypertension — PT implications",back:"<b>Normal:</b> &lt;120/80 &nbsp; <b>Stage 1:</b> 130–139/80–89 &nbsp; <b>Stage 2:</b> ≥140/90<br><b>Crisis:</b> &gt;180/120 — do not exercise, refer urgently.<br><b>Withhold exercise:</b> SBP &gt;180 or DBP &gt;110 at rest.<br><b>Beta-blockers:</b> blunt HR — use RPE for intensity."},
+  {cat:"pathology",sys:"cardiac",front:"Peripheral artery disease (PAD)",back:"<b>Symptom:</b> intermittent claudication — calf/buttock pain with walking, relieved by rest.<br><b>ABI:</b> normal ≥1.0 | mild 0.7–0.9 | moderate 0.4–0.7 | severe &lt;0.4 | incompressible &gt;1.3<br><b>Best PT Rx:</b> supervised walking to claudication pain then rest — 3×/week, 12+ weeks."},
+  {cat:"pathology",sys:"cardiac",front:"Deep vein thrombosis (DVT)",back:"<b>Virchow's triad:</b> stasis, hypercoagulability, endothelial injury.<br><b>Signs:</b> unilateral calf swelling, warmth, erythema, tenderness.<br><b>Homan's sign:</b> poor sensitivity/specificity — do not rely on it.<br><b>PT:</b> suspect = do not exercise, refer. Anticoagulated DVT = ambulation safe and encouraged."},
+  {cat:"pathology",sys:"cardiac",front:"Cardiac tamponade",back:"Fluid in pericardial sac → compresses heart → ↓ CO.<br><b>Beck's triad:</b> hypotension + muffled heart sounds + JVD.<br><b>Pulsus paradoxus:</b> SBP drops &gt;10 mmHg on inspiration.<br><b>PT:</b> acute hypotension + JVD + muffled sounds → call EMS immediately."},
+
+  // ── PULMONARY PATHOLOGY ──
+  {cat:"pathology",sys:"pulmonary",front:"COPD — emphysema vs chronic bronchitis",back:"<b>Emphysema (pink puffer):</b> alveolar destruction, barrel chest, pursed-lip breathing, minimal cough.<br><b>Chronic bronchitis (blue bloater):</b> productive cough &gt;3 mo/yr × 2 yrs, hypoxemia, edema.<br><b>Both:</b> obstructive pattern — FEV1/FVC &lt;0.70.<br><b>PT:</b> pulmonary rehab, energy conservation, breathing strategies."},
+  {cat:"pathology",sys:"pulmonary",front:"Asthma",back:"Reversible airway obstruction from bronchospasm and inflammation.<br><b>PFT:</b> obstructive, reverses with bronchodilator (&gt;12% FEV1 improvement).<br><b>PT:</b> exercise beneficial — warm up gradually, pre-exercise bronchodilator if prescribed.<br>Stop with acute bronchospasm. PLB not indicated between attacks."},
+  {cat:"pathology",sys:"pulmonary",front:"Pulmonary embolism (PE)",back:"<b>Signs:</b> sudden dyspnea, pleuritic chest pain, hemoptysis, tachycardia, hypoxemia.<br><b>Massive PE:</b> hypotension, syncope, cardiac arrest.<br><b>Dx:</b> CT pulmonary angiogram = gold standard. D-dimer sensitive but not specific.<br><b>PT:</b> contraindicated until treated. Post-anticoagulation: progressive ambulation safe."},
+  {cat:"pathology",sys:"pulmonary",front:"Pneumonia",back:"Alveoli fill with exudate — consolidation.<br><b>Signs:</b> fever, productive cough, pleuritic chest pain, dullness to percussion, bronchial breath sounds.<br><b>PT:</b> position good lung down (↑ perfusion to healthier lung). Airway clearance. Early mobilization reduces complications."},
+  {cat:"pathology",sys:"pulmonary",front:"Pulmonary fibrosis (ILD)",back:"Progressive lung scarring — restrictive pattern.<br><b>PFT:</b> ↓ FVC, FEV1/FVC normal or ↑, ↓ DLCO.<br><b>Signs:</b> fine Velcro crackles at bases, clubbing.<br><b>PT:</b> desaturation common — supplement O2 as needed. Pulmonary rehab improves QOL but does not slow progression."},
+  {cat:"pathology",sys:"pulmonary",front:"Pneumothorax",back:"Air in pleural space → lung collapses.<br><b>Tension:</b> one-way valve → ↑ pressure, mediastinal shift, hypotension, tracheal deviation — emergency.<br><b>Signs:</b> absent breath sounds, hyperresonance, sudden dyspnea.<br><b>PT:</b> no chest PT or positive pressure if tension pneumothorax suspected."},
+  {cat:"pathology",sys:"pulmonary",front:"Cystic fibrosis",back:"CFTR mutation → thick mucus → airway obstruction, chronic infection, pancreatic insufficiency.<br><b>Common bug:</b> Pseudomonas aeruginosa.<br><b>PT (primary Rx):</b> airway clearance — ACBT, autogenic drainage, PEP, oscillating PEP, vest therapy. Daily, lifelong.<br>Exercise improves mucus clearance."},
+
+  // ── PFT / VALUES ──
+  {cat:"pft",sys:"pulmonary",front:"Spirometry — obstructive vs restrictive",back:"<b>Obstructive</b> (COPD, asthma): FEV1/FVC &lt;70%, ↑ TLC and RV (air trapping).<br><b>Restrictive</b> (fibrosis, neuromuscular): ↓ FVC, FEV1/FVC normal or ↑, ↓ TLC.<br><b>Mixed:</b> FEV1/FVC &lt;70% AND ↓ TLC."},
+  {cat:"pft",sys:"pulmonary",front:"Lung volumes — key values",back:"<b>TLC</b> ~6L &nbsp; <b>VC</b> ~4.8L &nbsp; <b>FRC</b> ~2.4L &nbsp; <b>RV</b> ~1.2L &nbsp; <b>TV</b> ~500 mL<br><b>Dead space:</b> ~150 mL (anatomical).<br><b>Alveolar ventilation</b> = (TV − dead space) × RR."},
+  {cat:"pft",sys:"pulmonary",front:"FEV1 and COPD severity (GOLD)",back:"Post-bronchodilator FEV1/FVC &lt;0.70 confirms COPD.<br><b>GOLD 1</b> (mild): ≥80% &nbsp; <b>GOLD 2</b> (moderate): 50–79%<br><b>GOLD 3</b> (severe): 30–49% &nbsp; <b>GOLD 4</b> (very severe): &lt;30%<br><b>Pulmonary rehab:</b> indicated GOLD 2–4 with dyspnea or exercise limitation."},
+  {cat:"pft",sys:"pulmonary",front:"Oxygen saturation — clinical thresholds",back:"<b>Normal:</b> 95–100% &nbsp; <b>Mild hypoxemia:</b> 91–94%<br><b>Moderate:</b> 86–90% &nbsp; <b>Severe:</b> &lt;85%<br><b>Stop/reduce exercise:</b> SpO2 &lt;88%.<br><b>Home O2 criteria:</b> resting SpO2 &lt;88%.<br><b>COPD target:</b> 88–92% (avoid over-oxygenating)."},
+  {cat:"pft",sys:"cardiac",front:"Normal resting vital signs",back:"<b>HR:</b> 60–100 bpm &nbsp; <b>BP:</b> &lt;120/80 &nbsp; <b>RR:</b> 12–20/min &nbsp; <b>SpO2:</b> 95–100%<br><b>Withhold exercise if:</b> SBP &gt;180 or DBP &gt;110, HR &gt;100 or &lt;50 (symptomatic), SpO2 &lt;88%."},
+  {cat:"pft",sys:"cardiac",front:"Metabolic equivalents (METs)",back:"1 MET = resting O2 consumption (3.5 mL/kg/min).<br><b>1–2:</b> eating, dressing &nbsp; <b>3–4:</b> walking 3 mph<br><b>5–6:</b> walking 4 mph &nbsp; <b>7–8:</b> jogging &nbsp; <b>&gt;10:</b> running<br><b>Cardiac rehab:</b> targets 3–5 METs early, progresses to work demands."},
+  {cat:"pft",sys:"both",front:"Borg RPE scale",back:"6–20 scale (RPE × 10 ≈ HR).<br><b>Moderate:</b> RPE 12–14 &nbsp; <b>Vigorous:</b> 15–17<br><b>Cardiac rehab target:</b> RPE 11–14.<br><b>Beta-blocker patients:</b> use RPE instead of target HR.<br><b>Stop:</b> RPE &gt;17 or can't speak in sentences."},
+
+  // ── ECG ──
+  {cat:"ecg",sys:"cardiac",front:"Normal sinus rhythm — ECG criteria",back:"<b>Rate:</b> 60–100 bpm &nbsp; <b>Rhythm:</b> regular<br><b>P wave:</b> upright in I, II, aVF — before every QRS<br><b>PR:</b> 0.12–0.20 sec &nbsp; <b>QRS:</b> &lt;0.12 sec &nbsp; <b>QT:</b> &lt;0.44 sec<br><b>HR calc:</b> 300 ÷ large squares between R waves."},
+  {cat:"ecg",sys:"cardiac",front:"Atrial fibrillation",back:"Irregularly irregular rhythm. No distinct P waves — chaotic baseline.<br><b>Rate:</b> variable (60–160+ uncontrolled).<br><b>PT:</b> exercise appropriate if rate-controlled. Do not exercise if ventricular rate &gt;100 at rest or hemodynamically unstable.<br><b>Risk:</b> stroke — anticoagulation required."},
+  {cat:"ecg",sys:"cardiac",front:"Atrial flutter",back:"Regular atrial rate 250–350 bpm — sawtooth flutter waves (best in II, III, aVF).<br><b>Ventricular rate:</b> typically 2:1 block → 150 bpm.<br><b>vs AF:</b> regular rhythm + distinct flutter waves.<br>Similar stroke risk to AF."},
+  {cat:"ecg",sys:"cardiac",front:"Heart blocks — first, second, third degree",back:"<b>1st:</b> PR &gt;0.20 sec, every P conducts — benign.<br><b>2nd Mobitz I (Wenckebach):</b> PR progressively lengthens → dropped QRS — usually benign.<br><b>2nd Mobitz II:</b> constant PR, sudden dropped QRS — may need pacemaker.<br><b>3rd (complete):</b> P and QRS independent — pacemaker required."},
+  {cat:"ecg",sys:"cardiac",front:"ST changes — ischemia vs infarction",back:"<b>ST depression:</b> subendocardial ischemia / NSTEMI.<br><b>ST elevation ≥1mm in 2 contiguous leads:</b> STEMI — call EMS.<br><b>Pathological Q waves:</b> old infarction (permanent).<br><b>During exercise:</b> new ST changes = stop, 12-lead ECG, call EMS."},
+  {cat:"ecg",sys:"cardiac",front:"Ventricular tachycardia (VT)",back:"≥3 ventricular beats at &gt;100 bpm. Wide QRS, regular, no P waves.<br><b>Sustained VT (&gt;30 sec):</b> hemodynamic compromise → cardioversion.<br><b>Torsades:</b> polymorphic VT + prolonged QT.<br><b>PT:</b> stop exercise immediately, call EMS, prepare for defibrillation."},
+  {cat:"ecg",sys:"cardiac",front:"Ventricular fibrillation (VF)",back:"Chaotic ventricular rhythm — no cardiac output. Fatal without immediate defibrillation.<br><b>ECG:</b> irregular chaotic waveforms, no QRS.<br><b>Treatment:</b> CPR + unsynchronized defibrillation.<br><b>PT:</b> CPR → AED. Chain of survival: recognize → EMS → CPR → defibrillate."},
+  {cat:"ecg",sys:"cardiac",front:"PVCs (premature ventricular contractions)",back:"Early, wide (&gt;0.12 sec), bizarre QRS without P wave — compensatory pause follows.<br><b>Bigeminy:</b> every other beat PVC. <b>Trigeminy:</b> every third.<br><b>Isolated PVCs:</b> benign in healthy patients.<br><b>Notify physician + stop:</b> frequent PVCs (&gt;10–30/hr) or R-on-T phenomenon."},
+  {cat:"ecg",sys:"cardiac",front:"Bundle branch blocks",back:"<b>LBBB:</b> wide QRS, broad notched R in I/aVL/V5–V6, deep S in V1.<br><b>RBBB:</b> wide QRS, RSR' (rabbit ears) in V1–V2, wide S in I/V5–V6.<br><b>New LBBB + chest pain:</b> treat as STEMI.<br>Do not use ST changes for ischemia in LBBB."},
+  {cat:"ecg",sys:"cardiac",front:"Graded exercise test (GXT) — termination criteria",back:"<b>Absolute stop:</b> SBP drop &gt;10 mmHg + ischemia, ST elevation &gt;1mm, VT, poor perfusion signs.<br><b>Relative stop:</b> ST depression &gt;2mm, increasing angina, SBP &gt;250/DBP &gt;115, significant arrhythmia.<br><b>Submaximal target:</b> 85% of age-predicted HRmax (220 − age)."},
+
+  // ── CARDIAC REHAB ──
+  {cat:"rehab",sys:"cardiac",front:"Cardiac rehab — 4 phases",back:"<b>Phase I</b> (inpatient): low-intensity ambulation, education, risk stratification.<br><b>Phase II</b> (outpatient): 36 sessions, 3×/wk, 8–12 weeks, ECG monitoring.<br><b>Phase III</b> (community): less monitoring, maintain gains.<br><b>Phase IV</b> (independent): lifelong maintenance. Aerobic primary; resistance added Phase II onward."},
+  {cat:"rehab",sys:"cardiac",front:"Exercise prescription — cardiac rehab",back:"<b>Frequency:</b> 3–5×/week &nbsp; <b>Intensity:</b> 40–80% HRR or RPE 11–14<br><b>Time:</b> 20–60 min &nbsp; <b>Type:</b> walking, cycling, rowing<br><b>Resistance:</b> 40–60% 1RM, 8–15 reps, 2–3 sets — after 4–6 weeks aerobic base.<br><b>Beta-blockers:</b> use RPE."},
+  {cat:"rehab",sys:"cardiac",front:"Karvonen formula (HRR method)",back:"Target HR = [(HRmax − HRrest) × intensity%] + HRrest<br><b>Example:</b> HRmax 160, HRrest 70, 60%: [(160−70) × 0.60] + 70 = <b>124 bpm</b><br><b>No GXT:</b> estimate HRmax = 220 − age.<br><b>Beta-blockers:</b> use RPE or measured HRmax from GXT."},
+  {cat:"rehab",sys:"cardiac",front:"Exercise contraindications — cardiac",back:"<b>Absolute:</b> unstable angina, uncontrolled arrhythmia, decompensated HF, severe aortic stenosis, acute MI &lt;2 days, active pericarditis/myocarditis, acute PE/DVT.<br><b>Relative:</b> SBP &gt;180/DBP &gt;110, resting HR &gt;100, electrolyte abnormalities.<br>Always check vitals before each session."},
+  {cat:"rehab",sys:"cardiac",front:"NYHA functional classification",back:"<b>I:</b> no symptoms with ordinary activity.<br><b>II:</b> slight limitation — symptoms with moderate exertion.<br><b>III:</b> marked limitation — symptoms with minimal exertion.<br><b>IV:</b> symptoms at rest.<br><b>PT:</b> Class I–III benefit from supervised exercise. Class IV: very low-level, symptom-guided."},
+  {cat:"rehab",sys:"cardiac",front:"Post-CABG / sternotomy precautions",back:"<b>Sternal precautions (6–8 weeks):</b> no pushing/pulling &gt;5–10 lbs, no bilateral arm elevation &gt;90° with resistance, no trunk twisting.<br><b>Bed mobility:</b> log roll.<br><b>Coughing:</b> splint sternum with pillow.<br><b>Monitor:</b> wound drainage, redness, dehiscence. Compression stockings for leg graft."},
+  {cat:"rehab",sys:"pulmonary",front:"Pulmonary rehab — key components",back:"<b>Primary:</b> aerobic + resistance exercise training.<br><b>Also includes:</b> education, breathing strategies, energy conservation, exacerbation action plan, psychosocial support.<br><b>Outcomes:</b> ↑ exercise tolerance, ↓ dyspnea, ↑ QOL.<br><b>Note:</b> does NOT change FEV1 or slow disease progression."},
+  {cat:"rehab",sys:"pulmonary",front:"Airway clearance techniques",back:"<b>ACBT:</b> breathing control → thoracic expansion → forced expiration (huff).<br><b>Autogenic drainage:</b> 3-phase breathing — unstick → collect → evacuate.<br><b>PEP:</b> maintains airway patency on expiration.<br><b>Oscillating PEP</b> (Acapella, Flutter, vest): adds vibration to loosen secretions.<br><b>Postural drainage:</b> gravity-assisted positioning."},
+  {cat:"rehab",sys:"pulmonary",front:"Breathing strategies — PT interventions",back:"<b>Pursed lip breathing:</b> slows expiration, ↓ air trapping — indicated in COPD.<br><b>Diaphragmatic breathing:</b> ↑ tidal volume, ↓ accessory muscle use.<br><b>Forward lean (tripod):</b> unloads accessory muscles, optimizes diaphragm.<br><b>Paced breathing:</b> coordinate breathing with activity to ↓ dyspnea."},
+
+  // ── ASSESSMENT ──
+  {cat:"assessment",sys:"cardiac",front:"Auscultation — heart sounds",back:"<b>S1:</b> mitral + tricuspid closure (start of systole).<br><b>S2:</b> aortic + pulmonic closure (end of systole).<br><b>S3:</b> early diastole — volume overload / HF ('Kentucky: lub-dub-ta').<br><b>S4:</b> late diastole — stiff ventricle — HTN, HCM ('Tennessee: ta-lub-dub').<br>S3 in adults &gt;40 = pathological."},
+  {cat:"assessment",sys:"cardiac",front:"Auscultation — murmurs",back:"<b>Systolic</b> (S1→S2): aortic stenosis (harsh, radiates to neck), mitral regurg (holosystolic, apex to axilla), MVP (late systolic click).<br><b>Diastolic</b> (S2→S1): aortic regurg (blowing, decrescendo), mitral stenosis (low rumble).<br>Diastolic murmurs = always pathological."},
+  {cat:"assessment",sys:"pulmonary",front:"Auscultation — breath sounds",back:"<b>Vesicular:</b> normal (most lung fields) — soft, low-pitched.<br><b>Bronchial:</b> over trachea — loud, expiration &gt; inspiration.<br><b>Decreased/absent:</b> pneumothorax, pleural effusion, obesity.<br><b>Bronchial sounds in periphery:</b> consolidation (pneumonia)."},
+  {cat:"assessment",sys:"pulmonary",front:"Adventitious breath sounds",back:"<b>Fine crackles:</b> early inspiration — fibrosis, early HF.<br><b>Coarse crackles:</b> inspiration + expiration — secretions, pneumonia.<br><b>Wheeze:</b> expiratory, high-pitched — asthma, COPD.<br><b>Stridor:</b> inspiratory, high-pitched — upper airway obstruction (emergency).<br><b>Rhonchi:</b> low gurgling — large airway secretions (clears with cough)."},
+  {cat:"assessment",sys:"pulmonary",front:"Percussion — chest",back:"<b>Resonant:</b> normal lung.<br><b>Dull:</b> consolidation, pleural effusion, mass.<br><b>Hyperresonant:</b> pneumothorax, emphysema.<br><b>Flat:</b> large effusion, atelectasis.<br><b>Technique:</b> finger on chest, tap middle phalanx — compare bilaterally at same levels."},
+  {cat:"assessment",sys:"cardiac",front:"Jugular venous distension (JVD)",back:"Estimated right atrial pressure via internal jugular vein.<br><b>Measure:</b> patient at 45°, pulsation above clavicle.<br><b>Normal:</b> &lt;3–4 cm above sternal angle.<br><b>JVD &gt;4 cm:</b> ↑ CVP — right HF, tamponade, tension pneumothorax.<br><b>Hepatojugular reflux:</b> liver pressure → ↑ JVD = right HF."},
+  {cat:"assessment",sys:"both",front:"Dyspnea scales — MRC and mBorg",back:"<b>MRC (0–4):</b> 0=none except strenuous | 1=hurrying/hills | 2=slower than peers | 3=stops after 100m | 4=too breathless to leave house.<br><b>Modified Borg (0–10):</b> used during exercise — target ≤3 for moderate intensity.<br>Both guide exercise intensity and monitor treatment response."},
+  {cat:"assessment",sys:"cardiac",front:"Ankle-brachial index (ABI)",back:"ABI = ankle SBP ÷ highest brachial SBP.<br><b>Normal:</b> 1.0–1.4 &nbsp; <b>Borderline:</b> 0.9–1.0 &nbsp; <b>Mild PAD:</b> 0.7–0.9<br><b>Moderate:</b> 0.4–0.7 &nbsp; <b>Severe:</b> &lt;0.4 &nbsp; <b>Non-compressible:</b> &gt;1.4<br>ABI &lt;0.9 confirms PAD."},
+  {cat:"assessment",sys:"pulmonary",front:"Clubbing",back:"Bulbous fingertips — loss of normal nail-bed angle (Schamroth's sign: diamond gap disappears).<br><b>Associated with:</b> chronic hypoxemia (COPD, CF, bronchiectasis), pulmonary fibrosis, lung cancer, cyanotic heart disease.<br>Not reversible. Indicates significant chronic cardiopulmonary disease."},
+  {cat:"assessment",sys:"pulmonary",front:"Cyanosis — central vs peripheral",back:"<b>Central:</b> bluish lips/tongue/mucosa — significant hypoxemia (SpO2 &lt;85%), cardiopulmonary disease.<br><b>Peripheral:</b> bluish hands/feet, normal central — vasoconstriction, cold, venous stasis.<br><b>PT:</b> central cyanosis = stop, check SpO2, O2, notify physician."},
+
+  // ── PHARMACOLOGY ──
+  {cat:"pharm",sys:"cardiac",front:"Beta-blockers — PT implications",back:"<b>Examples:</b> metoprolol, atenolol, carvedilol.<br><b>Use:</b> HTN, HF, angina, post-MI, arrhythmia.<br><b>Effect:</b> blunts HR and BP response to exercise.<br><b>PT:</b> use RPE — not target HR. Resting bradycardia expected. Do NOT stop abruptly (rebound angina risk)."},
+  {cat:"pharm",sys:"cardiac",front:"Nitrates — PT implications",back:"<b>Examples:</b> nitroglycerin (SL), isosorbide.<br><b>Effect:</b> venodilation → ↓ preload → ↓ myocardial O2 demand.<br><b>Angina protocol:</b> stop → rest → 1 tab SL q5 min × 3 → EMS if no relief.<br><b>Side effects:</b> orthostatic hypotension, headache."},
+  {cat:"pharm",sys:"cardiac",front:"Diuretics — PT implications",back:"<b>Types:</b> furosemide (loop), HCTZ (thiazide), spironolactone (K-sparing).<br><b>Use:</b> HF, HTN, edema.<br><b>PT:</b> orthostatic hypotension risk — check BP with position change. Loop/thiazide → hypokalemia → arrhythmia risk. Schedule PT around morning diuresis."},
+  {cat:"pharm",sys:"cardiac",front:"Anticoagulants — PT implications",back:"<b>Types:</b> warfarin (INR), heparin, NOACs (apixaban, rivaroxaban).<br><b>Use:</b> AF, DVT, PE, mechanical valves.<br><b>PT:</b> ↑ bleeding risk — falls prevention critical. Monitor for bleeding signs (bruising, hematuria). DVT on anticoagulation: ambulation encouraged."},
+  {cat:"pharm",sys:"cardiac",front:"Statins — PT implications",back:"<b>Examples:</b> atorvastatin, rosuvastatin, simvastatin.<br><b>Use:</b> hyperlipidemia, CAD prevention.<br><b>PT:</b> monitor for statin myopathy — unexplained muscle pain, weakness, dark urine. Elevated CK + symptoms = notify MD, hold exercise. Worsened by high-intensity exercise."},
+];
+
+CARDS.forEach((c,i)=>c._id='card_'+i);
+function cid(c){return c._id;}
+
+const CONF_COLORS={gotit:{bg:'#E1F5EE',color:'#0F6E56'},almost:{bg:'#FAEEDA',color:'#854F0B'},nope:{bg:'#FCEBEB',color:'#A32D2D'}};
+const CONF_LABELS={gotit:'Got it',almost:'Almost',nope:'Nope'};
+const CONF_FILTER_OPTIONS={
+  nope:   {label:'Nope',   bg:'#FCEBEB',color:'#A32D2D',border:'#F09595'},
+  almost: {label:'Almost', bg:'#FAEEDA',color:'#854F0B',border:'#EF9F27'},
+  gotit:  {label:'Got it', bg:'#E1F5EE',color:'#0F6E56',border:'#5DCAA5'},
+  unrated:{label:'Unrated',bg:'#f5f4f0',color:'#6b6966',border:'#c8c6c3'},
+};
+
+
+
+const FIREBASE_CONFIG={apiKey:"AIzaSyA6EjnhyYUOt0iRYUaywCoqZ5POaVQmcsk",authDomain:"npte-flaschcards.firebaseapp.com",databaseURL:"https://npte-flaschcards-default-rtdb.firebaseio.com",projectId:"npte-flaschcards",storageBucket:"npte-flaschcards.firebasestorage.app",messagingSenderId:"429875976159",appId:"1:429875976159:web:04fc0eda2e758c606e966a"};
+const USER_ID='thisisElyk';
+
+// Firebase loaded via CDN
+let _db=null;
+let _fbRef=null;
+let _pendingSave=null;
+let _saveTimer=null;
+
+function initFirebase(storageKey){
+  if(typeof firebase==='undefined'){setSyncStatus('err','Firebase failed to load');return;}
+  firebase.initializeApp(FIREBASE_CONFIG);
+  _db=firebase.database();
+  _fbRef=_db.ref('users/'+USER_ID+'/'+storageKey);
+  setSyncStatus('pending','Connecting...');
+}
+
+function setSyncStatus(state,msg){
+  const dot=document.getElementById('syncDot');
+  const txt=document.getElementById('syncTxt');
+  if(!dot||!txt)return;
+  dot.className='sync-dot'+(state?' '+state:'');
+  txt.textContent=msg;
+}
+
+function saveState(stateObj){
+  // Always save to localStorage as offline fallback
+  try{localStorage.setItem('cardiopulm_cards_v1',JSON.stringify(stateObj));}catch(e){}
+  // Debounce Firebase writes (300ms)
+  if(_saveTimer)clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(()=>{
+    if(!_fbRef){return;}
+    setSyncStatus('pending','Saving...');
+    _fbRef.set(stateObj)
+      .then(()=>setSyncStatus('ok','Synced'))
+      .catch(e=>{setSyncStatus('err','Sync failed');console.warn('Firebase save error:',e);});
+  },300);
+}
+
+function loadState(storageKey,callback){
+  // Try localStorage immediately for fast start
+  let localState=null;
+  try{const r=localStorage.getItem(storageKey);if(r)localState=JSON.parse(r);}catch(e){}
+
+  if(localState)callback(localState);
+
+  // Then fetch from Firebase and update if newer/different
+  initFirebase(storageKey);
+  if(!_fbRef){callback(localState);return;}
+  _fbRef.once('value')
+    .then(snap=>{
+      const fbState=snap.val();
+      if(fbState){
+        // Update localStorage with Firebase state
+        try{localStorage.setItem(storageKey,JSON.stringify(fbState));}catch(e){}
+        setSyncStatus('ok','Synced');
+        callback(fbState);
+      } else {
+        setSyncStatus('ok','Synced');
+        if(!localState)callback(null);
+      }
+    })
+    .catch(e=>{
+      setSyncStatus('err','Offline — using local data');
+      console.warn('Firebase load error:',e);
+      if(!localState)callback(null);
+    });
+}
+
+let _initDone=false;
+let activeCats,activeRegions,activeSystems,activeSubs,activeConf,deck=[],removedIds=new Set(),confidence={},idx=0,revealed=false;
+
+let _firstLoad=true;
+
+function initDeck(saved){
+activeCats=new Set(saved?saved.activeCats:Object.keys(CATS));
+activeSystems=new Set(saved?saved.activeSystems:Object.keys(SYSTEMS));
+activeConf=new Set(saved?saved.activeConf:Object.keys(CONF_FILTER_OPTIONS));
+  removedIds=new Set(saved&&saved.removedIds?saved.removedIds:[]);
+  confidence=saved&&saved.confidence?saved.confidence:{};
+  idx=saved&&saved.idx?saved.idx:0;
+  if(!_initDone){_initDone=true;buildFilters();rebuildDeck();}
+  else{buildFilters();rebuildDeck();}
+}
+
+loadState('cardiopulm_cards_v1',initDeck);
+
+function confKey(c){return confidence[cid(c)]||'unrated';}
+function filteredCards(){
+  return CARDS.filter(c=>
+    !removedIds.has(cid(c)) &&
+    activeCats.has(c.cat) &&
+    (activeSystems.has(c.sys)||(c.sys==='both'&&(activeSystems.has('cardiac')||activeSystems.has('pulmonary')))) &&
+    activeConf.has(confKey(c))
+  );
+}
+
+function rebuildDeck(){
+  deck=filteredCards();
+  if(_firstLoad){_firstLoad=false;if(idx>=deck.length)idx=Math.max(0,deck.length-1);}
+  else{idx=0;}
+  revealed=false;render();
+}
+
+
+function getState(){
+  return {
+    confidence,
+    removedIds:[...removedIds],
+    activeCats:typeof activeCats!=='undefined'?[...activeCats]:[],
+    activeRegions:typeof activeRegions!=='undefined'?[...activeRegions]:[],
+    activeSystems:typeof activeSystems!=='undefined'?[...activeSystems]:[],
+    activeSubs:typeof activeSubs!=='undefined'?[...activeSubs]:[],
+    activeConf:typeof activeConf!=='undefined'?[...activeConf]:[],
+    idx
+  };
+}
+
+function buildFilters(){
+  const catEl=document.getElementById('catFilters');
+  catEl.innerHTML='';
+  Object.entries(CATS).forEach(([k,v])=>{
+    const b=document.createElement('button');
+    b.className='fbtn'+(activeCats.has(k)?' active':'');
+    if(activeCats.has(k))b.style.background=v.dot;
+    b.textContent=v.label;
+    b.onclick=()=>{activeCats.has(k)?activeCats.delete(k):activeCats.add(k);buildFilters();rebuildDeck();saveState(getState());};
+    catEl.appendChild(b);
+  });
+  const sysEl=document.getElementById('sysFilters');
+  sysEl.innerHTML='';
+  Object.entries(SYSTEMS).forEach(([k,v])=>{
+    const b=document.createElement('button');
+    b.className='fbtn'+(activeSystems.has(k)?' active':'');
+    if(activeSystems.has(k))b.style.background=SYS_COLORS[k];
+    b.textContent=v;
+    b.onclick=()=>{activeSystems.has(k)?activeSystems.delete(k):activeSystems.add(k);buildFilters();rebuildDeck();saveState(getState());};
+    sysEl.appendChild(b);
+  });
+  const confEl=document.getElementById('confFilters');
+  confEl.innerHTML='';
+  Object.entries(CONF_FILTER_OPTIONS).forEach(([k,v])=>{
+    const count=CARDS.filter(c=>
+      !removedIds.has(cid(c))&&activeCats.has(c.cat)&&
+      (activeSystems.has(c.sys)||(c.sys==='both'&&(activeSystems.has('cardiac')||activeSystems.has('pulmonary'))))&&
+      confKey(c)===k
+    ).length;
+    const b=document.createElement('button');
+    const isActive=activeConf.has(k);
+    b.className='fbtn'+(isActive?' active':'');
+    if(isActive)b.style.cssText='background:'+v.bg+';color:'+v.color+';border-color:'+v.border+';';
+    b.textContent=v.label+' ('+count+')';
+    b.onclick=()=>{activeConf.has(k)?activeConf.delete(k):activeConf.add(k);buildFilters();rebuildDeck();saveState(getState());};
+    confEl.appendChild(b);
+  });
+}
+
+function selectAll(){
+  activeCats=new Set(Object.keys(CATS));
+  activeSystems=new Set(Object.keys(SYSTEMS));
+  activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
+  buildFilters();rebuildDeck();saveState(getState());
+}
+function clearAll(){
+  activeCats.clear();activeSystems.clear();activeConf.clear();
+  buildFilters();rebuildDeck();saveState(getState());
+}
+
+function render(){
+  updateStats();
+  const area=document.getElementById('cardArea');
+  const navRow=document.getElementById('navRow');
+  if(deck.length===0){
+    let msg;
+    if(activeCats.size===0||activeSystems.size===0||activeConf.size===0){
+      msg='No filters selected — select at least one option in each row above.';
+    } else {
+      const allRemoved=CARDS.filter(c=>activeCats.has(c.cat)&&(activeSystems.has(c.sys)||(c.sys==='both'&&(activeSystems.has('cardiac')||activeSystems.has('pulmonary'))))).every(c=>removedIds.has(cid(c)));
+      msg=allRemoved
+        ?'All cards mastered! Hit "Reset deck" to bring them back.'
+        :'No cards match the current confidence filter. Adjust the Confidence filter above or hit "Reset deck".';
+    }
+    area.innerHTML='<div class="empty-state"><strong>'+msg+'</strong></div>';
+    navRow.style.display='none';
+    document.getElementById('progFill').style.width='0%';
+    document.getElementById('progTxt').textContent='0 cards';
+    return;
+  }
+  navRow.style.display='flex';
+  if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+  const c=deck[idx];
+  const id=cid(c);
+  const conf=confidence[id]||null;
+  const pct=Math.round(((idx+1)/deck.length)*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=(idx+1)+' / '+deck.length;
+  const cat=CATS[c.cat];
+  const sysLabel=SYSTEMS[c.sys];
+  const sysColor=SYS_COLORS[c.sys];
+  const canRemove=conf==='gotit';
+
+  if(!revealed){
+    const confBadge=conf?'<span class="conf-badge" style="background:'+CONF_COLORS[conf].bg+';color:'+CONF_COLORS[conf].color+';">'+CONF_LABELS[conf]+'</span>':'';
+    area.innerHTML=`<div class="card card-front" onclick="toggle()">
+      <div class="front-cat" style="color:${cat.dot};">${cat.label}</div>
+      <div class="front-sys" style="color:${sysColor};">${sysLabel}</div>
+      <div class="front-title">${c.front}</div>
+      ${confBadge}
+      <div class="hint">Tap to reveal</div>
+    </div>`;
+  } else {
+    const removeBtn=canRemove?'<button class="remove-btn" onclick="removeCard()">Remove</button>':'';
+    area.innerHTML=`<div class="card card-back" style="background:${cat.bg};border:0.5px solid ${cat.border};" onclick="handleBackClick(event)">
+      <div class="back-title" style="color:${cat.text};">${c.front}</div>
+      <div class="badge-row">
+        <span class="type-badge" style="background:${cat.badge_bg};color:${cat.badge_color};">${cat.label}</span>
+        <span class="sys-badge">${sysLabel}</span>
+      </div>
+      <div class="divider" style="background:${cat.border};"></div>
+      <div class="blbl" style="color:${cat.dot};">Key facts</div>
+      <div class="bval" style="color:${cat.text};">${c.back}</div>
+      <div class="spacer"></div>
+      <div class="confidence-row" style="border-top:0.5px solid ${cat.border};" onclick="event.stopPropagation()">
+        <span class="conf-lbl" style="color:${cat.dot};">Confidence:</span>
+        <button class="cbtn cbtn-nope${conf==='nope'?' selected':''}" onclick="rate('nope')">Nope</button>
+        <button class="cbtn cbtn-almost${conf==='almost'?' selected':''}" onclick="rate('almost')">Almost</button>
+        <button class="cbtn cbtn-gotit${conf==='gotit'?' selected':''}" onclick="rate('gotit')">Got it</button>
+        ${removeBtn}
+      </div>
+      <div class="flip-hint" style="color:${cat.dot};">Tap card to flip back</div>
+    </div>`;
+  }
+}
+
+function handleBackClick(e){if(!e.target.closest('.confidence-row'))toggle();}
+function toggle(){revealed=!revealed;render();}
+function rate(val){
+  confidence[cid(deck[idx])]=val;
+  if(!activeConf.has(val)){
+    deck=filteredCards();
+    if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+    revealed=false;
+  }
+  saveState(getState());buildFilters();render();
+}
+function removeCard(){
+  const id=cid(deck[idx]);
+  removedIds.add(id);
+  deck=filteredCards();
+  if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+  revealed=false;saveState(getState());buildFilters();render();
+}
+function resetDeck(){
+  removedIds.clear();confidence={};
+  activeCats=new Set(Object.keys(CATS));
+  activeSystems=new Set(Object.keys(SYSTEMS));
+  activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
+  idx=0;revealed=false;saveState(getState());buildFilters();rebuildDeck();
+}
+function updateStats(){
+  const removed=CARDS.filter(c=>removedIds.has(cid(c))).length;
+  const gotit=deck.filter(c=>confidence[cid(c)]==='gotit').length;
+  const almost=deck.filter(c=>confidence[cid(c)]==='almost').length;
+  const nope=deck.filter(c=>confidence[cid(c)]==='nope').length;
+  document.getElementById('statsRow').innerHTML=
+    '<div class="stat">Active <span>'+deck.length+'</span></div>'+
+    '<div class="stat">Mastered <span>'+removed+'</span></div>'+
+    '<div class="stat">Got it <span style="color:#0F6E56;">'+gotit+'</span></div>'+
+    '<div class="stat">Almost <span style="color:#854F0B;">'+almost+'</span></div>'+
+    '<div class="stat">Nope <span style="color:#A32D2D;">'+nope+'</span></div>';
+}
+function go(dir){const next=idx+dir;if(next<0||next>=deck.length)return;idx=next;revealed=false;saveState(getState());render();}
+function shuffle(){
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+  idx=0;revealed=false;saveState(getState());render();
+}
+</script>
+</body>
+</html>

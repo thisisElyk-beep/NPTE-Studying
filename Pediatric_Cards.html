@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pediatric Flashcards — NPTE</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f4f0;
+    --bg-tertiary: #edecea;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6966;
+    --text-tertiary: #a09d9a;
+    --border: rgba(0,0,0,0.12);
+    --border-md: rgba(0,0,0,0.22);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --purple: #7F77DD;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1c1c1e;
+      --bg-secondary: #2c2c2e;
+      --bg-tertiary: #3a3a3c;
+      --text-primary: #f2f2f7;
+      --text-secondary: #aeaeb2;
+      --text-tertiary: #6e6e73;
+      --border: rgba(255,255,255,0.1);
+      --border-md: rgba(255,255,255,0.2);
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg-tertiary);
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:2rem 1rem 3rem;
+    color:var(--text-primary);
+  }
+  .wrap{width:100%;max-width:680px;}
+  .page-title{font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:1.5rem;}
+  .stats-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+  .stat{background:var(--bg-secondary);border-radius:var(--radius-md);padding:5px 10px;font-size:12px;color:var(--text-secondary);}
+  .stat span{font-weight:500;color:var(--text-primary);}
+  .prog-wrap{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
+  .prog-bg{flex:1;height:4px;background:var(--bg-secondary);border-radius:2px;}
+  .prog-fill{height:4px;background:var(--purple);border-radius:2px;transition:width 0.3s;}
+  .prog-txt{font-size:13px;color:var(--text-secondary);white-space:nowrap;}
+  .card{border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1rem;cursor:pointer;min-height:280px;display:flex;flex-direction:column;}
+  .card-front{background:var(--bg-primary);border:0.5px solid var(--border);align-items:center;justify-content:center;}
+  .card-back{justify-content:flex-start;}
+  .front-cat{font-size:11px;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:10px;font-weight:500;}
+  .front-title{font-size:28px;font-weight:500;color:var(--text-primary);line-height:1.2;text-align:center;}
+  .hint{font-size:13px;color:var(--text-tertiary);margin-top:1.25rem;}
+  .back-title{font-size:20px;font-weight:500;margin-bottom:8px;}
+  .type-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:500;margin-bottom:16px;}
+  .divider{height:0.5px;margin-bottom:14px;}
+  .blbl{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;font-weight:500;margin-bottom:6px;}
+  .bval{font-size:14px;line-height:1.7;} .bval b{font-weight:600;}
+  .spacer{flex:1;}
+  .confidence-row{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:12px;flex-wrap:wrap;}
+  .conf-lbl{font-size:12px;font-weight:500;margin-right:2px;}
+  .cbtn{font-size:12px;padding:5px 14px;border-radius:999px;border:0.5px solid;cursor:pointer;font-weight:500;}
+  .cbtn-nope{background:#FCEBEB;color:#A32D2D;border-color:#F09595;}
+  .cbtn-almost{background:#FAEEDA;color:#854F0B;border-color:#EF9F27;}
+  .cbtn-gotit{background:#E1F5EE;color:#0F6E56;border-color:#5DCAA5;}
+  .cbtn.selected{outline:2px solid currentColor;outline-offset:1px;}
+  .remove-btn{margin-left:auto;font-size:12px;padding:5px 12px;border-radius:999px;border:0.5px solid #5DCAA5;background:#E1F5EE;color:#0F6E56;cursor:pointer;font-weight:500;}
+  .flip-hint{text-align:center;margin-top:12px;font-size:12px;}
+  .conf-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:500;margin-top:12px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-bottom:8px;}
+  .nbtn{padding:8px 22px;font-size:14px;border-radius:var(--radius-md);border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-primary);cursor:pointer;}
+  .nbtn:hover{background:var(--bg-secondary);}
+  .nbtn.primary{background:#7F77DD;color:#fff;border-color:#7F77DD;}
+  .nbtn.primary:hover{background:#534AB7;}
+  .bottom-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:6px;}
+  .shuf-btn{font-size:13px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;}
+  .reset-btn{font-size:13px;color:#7F77DD;background:none;border:none;cursor:pointer;text-decoration:underline;}
+  .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-secondary);font-size:14px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1rem;background:var(--bg-primary);}
+  .empty-state strong{display:block;font-size:16px;color:var(--text-primary);margin-bottom:8px;font-weight:500;}
+  .filter-section{margin-bottom:1rem;}
+  .filter-group-label{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary);font-weight:500;margin-bottom:6px;}
+  .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+  .fbtn{font-size:12px;padding:4px 12px;border-radius:999px;border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-secondary);cursor:pointer;transition:all 0.15s;font-family:inherit;}
+  .fbtn.active{color:#fff;border-color:transparent;}
+  .filter-actions{display:flex;gap:10px;margin-top:4px;}
+  .faction{font-size:12px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
+  .sync-bar{display:flex;align-items:center;gap:6px;margin-bottom:0.75rem;font-size:12px;color:var(--text-tertiary);}
+  .sync-dot{width:7px;height:7px;border-radius:50%;background:#c8c6c3;flex-shrink:0;transition:background 0.3s;}
+  .sync-dot.ok{background:#5DCAA5;}
+  .sync-dot.err{background:#F09595;}
+  .sync-dot.pending{background:#EF9F27;}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="page-title">Pediatric flashcards — NPTE</div>
+  <div class="sync-bar"><div class="sync-dot" id="syncDot"></div><span id="syncTxt">Connecting...</span></div>
+
+  <div class="filter-section">
+    <div class="filter-group-label">Category</div>
+    <div class="filter-row" id="catFilters"></div>
+    <div class="filter-group-label">Confidence</div>
+    <div class="filter-row" id="confFilters"></div>
+    <div class="filter-actions">
+      <button class="faction" onclick="selectAll()">Select all</button>
+      <button class="faction" onclick="clearAll()">Clear all</button>
+    </div>
+  </div>
+  <div class="stats-row" id="statsRow"></div>
+  <div class="prog-wrap">
+    <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-txt" id="progTxt"></div>
+  </div>
+  <div id="cardArea"></div>
+  <div class="btn-row" id="navRow">
+    <button class="nbtn" onclick="go(-1)">← Prev</button>
+    <button class="nbtn primary" onclick="go(1)">Next →</button>
+  </div>
+  <div class="bottom-row">
+    <button class="shuf-btn" onclick="shuffle()">Shuffle deck</button>
+    <button class="reset-btn" onclick="resetDeck()">Reset deck</button>
+  </div>
+</div>
+
+<script>
+const CATS = {
+  motor:    { label: "Motor milestone",    dot: "#7F77DD", bg: "#EEEDFE", border: "#AFA9EC", text: "#3C3489", badge_bg: "#EEEDFE", badge_color: "#3C3489" },
+  language: { label: "Language milestone", dot: "#1D9E75", bg: "#E1F5EE", border: "#5DCAA5", text: "#085041", badge_bg: "#E1F5EE", badge_color: "#0F6E56" },
+  outcome:  { label: "Outcome measure",    dot: "#D85A30", bg: "#FAECE7", border: "#F0997B", text: "#712B13", badge_bg: "#FAECE7", badge_color: "#993C1D" },
+  condition:{ label: "Condition / dx",     dot: "#378ADD", bg: "#E6F1FB", border: "#85B7EB", text: "#0C447C", badge_bg: "#E6F1FB", badge_color: "#185FA5" },
+  reflex:   { label: "Reflex / reaction",  dot: "#BA7517", bg: "#FAEEDA", border: "#EF9F27", text: "#633806", badge_bg: "#FAEEDA", badge_color: "#854F0B" },
+};
+
+const CARDS = [
+  // ── MOTOR MILESTONES ──
+  { cat:"motor", front:"Head control in prone", back:"<b>2 mo:</b> lifts head 45°.<br><b>4 mo:</b> lifts head 90°, props on forearms.<br><b>6 mo:</b> props on extended arms (push-up position)."},
+  { cat:"motor", front:"Rolling", back:"<b>4–5 mo:</b> prone → supine.<br><b>5–6 mo:</b> supine → prone.<br>Rolling only one direction by 6 months = red flag."},
+  { cat:"motor", front:"Independent sitting", back:"<b>6 mo:</b> sits with hand support (tripod).<br><b>7–8 mo:</b> sits independently, briefly.<br><b>8–9 mo:</b> sits independently with trunk rotation."},
+  { cat:"motor", front:"Crawling and creeping", back:"<b>7–8 mo:</b> belly crawling (commando).<br><b>8–10 mo:</b> hands-and-knees creeping.<br>Skipping creeping: associated with coordination concerns — note but not always pathological."},
+  { cat:"motor", front:"Pulling to stand", back:"<b>8–10 mo:</b> pulls to stand at furniture.<br><b>10–12 mo:</b> cruises along furniture.<br><b>11–12 mo:</b> stands independently."},
+  { cat:"motor", front:"Independent walking", back:"Average 12 months (range 9–15 months).<br><b>Not walking by 15 mo:</b> refer.<br><b>Not walking by 18 mo:</b> developmental delay.<br>Early walkers: wide BOS, arms in high guard, no heel strike initially."},
+  { cat:"motor", front:"Stair negotiation", back:"<b>12–18 mo:</b> stairs with hand support, marking time.<br><b>24 mo:</b> up with rail, alternating feet.<br><b>3 yr:</b> down with rail, alternating feet.<br><b>4 yr:</b> up and down without rail."},
+  { cat:"motor", front:"Running, jumping, hopping", back:"<b>18 mo:</b> runs (stiff, wide BOS). <b>2 yr:</b> jumps with both feet.<br><b>3 yr:</b> hops 1–3 times on one foot. <b>4 yr:</b> hops 4–6 times, skips.<br><b>5 yr:</b> skips smoothly, alternating feet."},
+  { cat:"motor", front:"Ball skills", back:"<b>18 mo:</b> kicks stationary ball.<br><b>2 yr:</b> throws overhand, catches with arms extended.<br><b>3 yr:</b> catches with arms bent.<br><b>4–5 yr:</b> catches with hands only, throws with weight shift."},
+  { cat:"motor", front:"Fine motor — grasp progression", back:"<b>5 mo:</b> palmar grasp (whole hand). <b>7–8 mo:</b> radial-digital grasp.<br><b>9 mo:</b> inferior pincer. <b>12 mo:</b> neat pincer (tip-to-tip).<br><b>18 mo:</b> 2-block tower. <b>2 yr:</b> 6-block tower."},
+  { cat:"motor", front:"Handedness and tool use", back:"Handedness established 18–24 months.<br><b>Strong preference before 12 mo:</b> may indicate contralateral weakness (hemiplegia red flag).<br><b>Spoon:</b> 15–18 mo. <b>Fork:</b> 2 yr."},
+
+  // ── LANGUAGE MILESTONES ──
+  { cat:"language", front:"Early vocalization — birth to 6 months", back:"<b>Birth:</b> cries, startles to sound.<br><b>2 mo:</b> cooing, social smile.<br><b>4 mo:</b> laughs, vocalizes reciprocally.<br><b>6 mo:</b> babbles consonants (ba, da, ma)."},
+  { cat:"language", front:"Babbling and first words — 6–12 months", back:"<b>6–9 mo:</b> canonical babbling (repeating syllables).<br><b>9 mo:</b> gestures (pointing, waving).<br><b>10 mo:</b> mama/dada non-specifically.<br><b>12 mo:</b> 1–3 true words, understands 'no', responds to name."},
+  { cat:"language", front:"Vocabulary explosion — 12–24 months", back:"<b>12 mo:</b> 1–3 words. <b>18 mo:</b> 10–25 words, follows 1-step commands.<br><b>24 mo:</b> 50+ words, 2-word phrases ('more milk').<br>Fewer than 50 words at 24 months = refer."},
+  { cat:"language", front:"Sentences and intelligibility — 2–4 years", back:"<b>2 yr:</b> 2-word phrases, 50% intelligible to strangers.<br><b>3 yr:</b> 3-word sentences, 75% intelligible.<br><b>4 yr:</b> 4–5 word sentences, 100% intelligible, tells stories."},
+  { cat:"language", front:"Language red flags", back:"No babbling by 12 months.<br>No single words by 16 months.<br>No 2-word phrases by 24 months.<br><b>Any loss of previously acquired language at any age = immediate referral.</b> Regression is always a red flag."},
+
+  // ── PRIMITIVE REFLEXES ──
+  { cat:"reflex", front:"Moro reflex", back:"<b>Appears:</b> birth. <b>Integrates:</b> 4–6 months.<br>Sudden head drop → symmetric arm abduction then adduction.<br><b>Asymmetric =</b> brachial plexus injury or hemiplegia.<br>Persistence beyond 6 months = CNS dysfunction."},
+  { cat:"reflex", front:"ATNR (asymmetric tonic neck reflex)", back:"<b>Appears:</b> birth. <b>Integrates:</b> 4–6 months.<br>Head turn → ipsilateral arm/leg extension, contralateral flexion ('fencer pose').<br>Persistence interferes with midline hand use and rolling."},
+  { cat:"reflex", front:"STNR (symmetric tonic neck reflex)", back:"<b>Appears:</b> 6–8 months. <b>Integrates:</b> 8–12 months.<br>Neck flexion → arm flexion + leg extension.<br>Neck extension → arm extension + leg flexion.<br>Persistence interferes with hands-and-knees creeping."},
+  { cat:"reflex", front:"TLR (tonic labyrinthine reflex)", back:"<b>Appears:</b> birth. <b>Integrates:</b> 6 mo (prone), 12 mo (supine).<br>Prone → ↑ flexor tone. Supine → ↑ extensor tone.<br>Persistence causes postural tone problems in CP."},
+  { cat:"reflex", front:"Palmar and plantar grasp", back:"<b>Palmar:</b> birth to 4–6 months — finger contact → hand closure.<br><b>Plantar:</b> birth to 9–12 months — ball of foot pressure → toe flexion.<br>Palmar grasp persistence delays voluntary release and pincer grasp."},
+  { cat:"reflex", front:"Rooting and sucking reflexes", back:"<b>Appears:</b> birth. <b>Integrates:</b> 3–4 mo (rooting), 2–5 mo (sucking becomes voluntary).<br>Absence at birth = CNS depression or prematurity concern.<br>Persistence beyond 6 months = oral motor dysfunction."},
+  { cat:"reflex", front:"Protective reactions — parachute and righting", back:"<b>Landau:</b> 3–4 mo (prone suspension → extension).<br><b>Lateral propping:</b> 6–7 mo.<br><b>Parachute (forward):</b> 6–9 mo — arms extend to protect from fall.<br>Parachute must be present before independent walking is safe. Never fully integrates."},
+  { cat:"reflex", front:"Positive support and stepping reactions", back:"<b>Positive support + stepping reflex:</b> birth to 2 months.<br>Both temporarily disappear, then re-emerge as voluntary skills at 10–12 months.<br>Absence at birth = hypotonia concern."},
+
+  // ── OUTCOME MEASURES ──
+  { cat:"outcome", front:"GMFM (Gross Motor Function Measure)", back:"<b>Population:</b> CP, Down syndrome, TBI.<br><b>Items:</b> 88 across 5 dimensions (lying/rolling, sitting, crawling/kneeling, standing, walking/running/jumping).<br>Higher score = better function. Gold standard for tracking motor change in CP."},
+  { cat:"outcome", front:"GMFCS (Gross Motor Function Classification System)", back:"5-level ordinal scale for CP.<br><b>I:</b> walks without restrictions. <b>II:</b> walks with limitations. <b>III:</b> walks with assistive device. <b>IV:</b> limited self-mobility, may use power chair. <b>V:</b> transported in manual WC.<br>Used for prognosis, not change over time."},
+  { cat:"outcome", front:"Peabody Developmental Motor Scales (PDMS-2)", back:"<b>Age:</b> birth to 5 years.<br><b>Measures:</b> reflexes, stationary, locomotion, object manipulation, grasping, visual-motor integration.<br>Produces standard scores and age equivalents. Used for diagnosis and treatment planning."},
+  { cat:"outcome", front:"Bayley Scales of Infant Development (BSID-4)", back:"<b>Age:</b> 1–42 months.<br><b>Domains:</b> cognitive, language, motor, social-emotional, adaptive.<br>Motor subtests: gross motor and fine motor.<br>Gold standard for developmental delay diagnosis in infants."},
+  { cat:"outcome", front:"Alberta Infant Motor Scale (AIMS)", back:"<b>Age:</b> birth to 18 months.<br>Observational — no handling required. 58 items across 4 positions (prone, supine, sitting, standing).<br>Identifies motor delay and tracks development. Sensitive to early intervention change."},
+  { cat:"outcome", front:"Bruininks-Oseretsky Test (BOT-2)", back:"<b>Age:</b> 4–21 years.<br><b>Measures:</b> fine motor precision, integration, manual dexterity, bilateral coordination, balance, running speed/agility, UE coordination, strength.<br>Used for DCD, learning disabilities, CP."},
+  { cat:"outcome", front:"PEDI-CAT", back:"<b>Age:</b> birth to 20 years.<br><b>Domains:</b> daily activities, mobility, social/cognitive, responsibility.<br>Caregiver-report format. Measures functional skills and caregiver assistance. Used for disability classification and program planning."},
+  { cat:"outcome", front:"WeeFIM", back:"<b>Age:</b> 6 months to 7 years (or older with developmental delay).<br>18 items: self-care, sphincter control, transfers, locomotion, communication, social cognition.<br>7-point scale (total assist → complete independence). Measures burden of care."},
+  { cat:"outcome", front:"6-Minute Walk Test — pediatric", back:"<b>Age:</b> 7+ years. Normative values exist for children.<br><b>Used in:</b> DMD, CP, cystic fibrosis, cardiac conditions.<br>Boys walk farther than girls; distance ↑ with age and height.<br>MDC established: DMD (~35m), CP."},
+
+  // ── CONDITIONS ──
+  { cat:"condition", front:"Cerebral palsy — classification", back:"Non-progressive brain lesion acquired before age 2.<br><b>Types:</b> spastic (most common — UMN), dyskinetic/athetoid (basal ganglia), ataxic (cerebellum), mixed.<br><b>Topography:</b> hemiplegia, diplegia (LE &gt; UE), quadriplegia.<br>Spastic diplegia associated with prematurity."},
+  { cat:"condition", front:"Cerebral palsy — PT by GMFCS level", back:"<b>Level I–II:</b> activity, participation, fitness, secondary complication prevention.<br><b>Level III:</b> walking efficiency, assistive device training, endurance.<br><b>Level IV–V:</b> positioning, ROM, caregiver training, power mobility, prevent contracture and pressure injury."},
+  { cat:"condition", front:"Down syndrome (Trisomy 21)", back:"<b>Key PT concerns:</b> hypotonia, ligamentous laxity, delayed milestones, flat feet, ↓ strength.<br><b>Atlantoaxial instability:</b> screen before contact sports/gymnastics — avoid neck flexion loading until cleared by imaging."},
+  { cat:"condition", front:"Spina bifida — levels and function", back:"<b>L1–L2:</b> hip flexors only, WC dependent.<br><b>L3:</b> knee extension, may ambulate with KAFO.<br><b>L4:</b> ankle DF present, ambulates with AFO.<br><b>L5:</b> partial foot control. <b>S1–S2:</b> near-normal ambulation.<br>Higher lesion = less functional ambulation."},
+  { cat:"condition", front:"Developmental coordination disorder (DCD)", back:"Motor performance substantially below expected for age, affecting daily activities. Not explained by neurological condition.<br><b>Features:</b> clumsy, slow, inaccurate movement.<br><b>Tx:</b> task-oriented approach (CO-OP). BOT-2 used for diagnosis."},
+  { cat:"condition", front:"Duchenne muscular dystrophy (DMD)", back:"X-linked recessive, males only.<br><b>Presents 3–5 yr:</b> proximal weakness, Gowers' sign, calf pseudohypertrophy.<br>Loses ambulation ~10–12 years. Scoliosis after wheelchair use.<br><b>Avoid eccentric exercise</b> — accelerates damage. Focus: function, contracture prevention, respiratory support."},
+  { cat:"condition", front:"Brachial plexus birth injury (Erb's palsy)",back:"<b>C5–C6:</b> 'waiter's tip' — shoulder IR/adduction, elbow extension, forearm pronation, wrist flexion.<br><b>C8–T1 (Klumpke's):</b> hand intrinsic weakness.<br><b>Tx:</b> PROM, positioning, splinting, strengthening.<br>Horner's with Klumpke's = root avulsion (poor prognosis)."},
+  { cat:"condition", front:"Juvenile idiopathic arthritis (JIA)", back:"Chronic arthritis onset before 16 years.<br><b>PT role:</b> maintain ROM and strength, aquatic therapy, splinting, functional mobility.<br><b>Morning stiffness</b> is hallmark — schedule activity after warmup.<br>Avoid high-impact during active flare."},
+  { cat:"condition", front:"ASD — PT considerations", back:"Motor delays and DCD are common comorbidities.<br>Sensory processing differences affect participation.<br><b>Strategies:</b> predictable routines, visual schedules, minimize unexpected sensory input, task-specific practice.<br>Focus on functional motor goals with family involvement."},
+  { cat:"condition", front:"Torticollis (congenital muscular)", back:"SCM shortening → ipsilateral cervical lateral flexion + contralateral rotation.<br>Associated with positional plagiocephaly.<br><b>Tx:</b> PROM into contralateral lateral flexion and ipsilateral rotation, strengthening, repositioning.<br>Refer for helmet if plagiocephaly persists beyond 4 months of conservative care."},
+  { cat:"condition", front:"Gowers' sign", back:"Child 'walks up' thighs with hands to rise from floor — compensates for proximal hip and knee extensor weakness.<br>Classic in DMD but also seen in SMA and other myopathies with significant proximal LE weakness."},
+  { cat:"condition", front:"Legg-Calvé-Perthes disease", back:"AVN of femoral head. Ages 4–8, more common in boys.<br><b>Presents:</b> painless limp, limited hip IR and abduction.<br><b>X-ray:</b> femoral head fragmentation.<br><b>PT:</b> maintain ROM, non-impact activity during avascular phase. Post-op: ROM and gait training."},
+  { cat:"condition", front:"SCFE (slipped capital femoral epiphysis)", back:"Femoral head slips posteriorly/inferiorly off physis. Ages 10–16, obese adolescents.<br><b>Presents:</b> hip or knee pain, obligate hip ER with flexion.<br>Always <b>NWB until surgical fixation</b>. Bilateral in 20–40%."},
+  { cat:"condition", front:"Scoliosis — screening and intervention", back:"<b>Adam's forward bend test</b> screens for structural curve.<br><b>Cobb angle:</b> &lt;10° = normal | 10–25° = monitor | 25–45° = bracing (skeletally immature) | &gt;45° = surgical.<br><b>Schroth method:</b> most evidence-supported PT approach for curve reduction and stabilization."},
+  { cat:"condition", front:"Prematurity and adjusted age", back:"Correct for prematurity until 24 months.<br>Adjusted age = chronological age − weeks premature.<br><b>Example:</b> 6-month-old born 8 weeks early → adjusted age 4 months.<br>Preterm infants at risk for IVH, PVL, CP, sensory deficits."},
+];
+
+const CONF_COLORS={gotit:{bg:'#E1F5EE',color:'#0F6E56'},almost:{bg:'#FAEEDA',color:'#854F0B'},nope:{bg:'#FCEBEB',color:'#A32D2D'}};
+const CONF_LABELS={gotit:'Got it',almost:'Almost',nope:'Nope'};
+const CONF_FILTER_OPTIONS={
+  nope:   {label:'Nope',   bg:'#FCEBEB',color:'#A32D2D',border:'#F09595'},
+  almost: {label:'Almost', bg:'#FAEEDA',color:'#854F0B',border:'#EF9F27'},
+  gotit:  {label:'Got it', bg:'#E1F5EE',color:'#0F6E56',border:'#5DCAA5'},
+  unrated:{label:'Unrated',bg:'#f5f4f0',color:'#6b6966',border:'#c8c6c3'},
+};
+
+
+
+CARDS.forEach((c,i)=>c._id='card_'+i);
+function cid(c){return c._id;}
+
+const FIREBASE_CONFIG={apiKey:"AIzaSyA6EjnhyYUOt0iRYUaywCoqZ5POaVQmcsk",authDomain:"npte-flaschcards.firebaseapp.com",databaseURL:"https://npte-flaschcards-default-rtdb.firebaseio.com",projectId:"npte-flaschcards",storageBucket:"npte-flaschcards.firebasestorage.app",messagingSenderId:"429875976159",appId:"1:429875976159:web:04fc0eda2e758c606e966a"};
+const USER_ID='thisisElyk';
+
+// Firebase loaded via CDN
+let _db=null;
+let _fbRef=null;
+let _pendingSave=null;
+let _saveTimer=null;
+
+function initFirebase(storageKey){
+  if(typeof firebase==='undefined'){setSyncStatus('err','Firebase failed to load');return;}
+  firebase.initializeApp(FIREBASE_CONFIG);
+  _db=firebase.database();
+  _fbRef=_db.ref('users/'+USER_ID+'/'+storageKey);
+  setSyncStatus('pending','Connecting...');
+}
+
+function setSyncStatus(state,msg){
+  const dot=document.getElementById('syncDot');
+  const txt=document.getElementById('syncTxt');
+  if(!dot||!txt)return;
+  dot.className='sync-dot'+(state?' '+state:'');
+  txt.textContent=msg;
+}
+
+function saveState(stateObj){
+  // Always save to localStorage as offline fallback
+  try{localStorage.setItem('pediatric_cards_v1',JSON.stringify(stateObj));}catch(e){}
+  // Debounce Firebase writes (300ms)
+  if(_saveTimer)clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(()=>{
+    if(!_fbRef){return;}
+    setSyncStatus('pending','Saving...');
+    _fbRef.set(stateObj)
+      .then(()=>setSyncStatus('ok','Synced'))
+      .catch(e=>{setSyncStatus('err','Sync failed');console.warn('Firebase save error:',e);});
+  },300);
+}
+
+function loadState(storageKey,callback){
+  // Try localStorage immediately for fast start
+  let localState=null;
+  try{const r=localStorage.getItem(storageKey);if(r)localState=JSON.parse(r);}catch(e){}
+
+  if(localState)callback(localState);
+
+  // Then fetch from Firebase and update if newer/different
+  initFirebase(storageKey);
+  if(!_fbRef){callback(localState);return;}
+  _fbRef.once('value')
+    .then(snap=>{
+      const fbState=snap.val();
+      if(fbState){
+        // Update localStorage with Firebase state
+        try{localStorage.setItem(storageKey,JSON.stringify(fbState));}catch(e){}
+        setSyncStatus('ok','Synced');
+        callback(fbState);
+      } else {
+        setSyncStatus('ok','Synced');
+        if(!localState)callback(null);
+      }
+    })
+    .catch(e=>{
+      setSyncStatus('err','Offline — using local data');
+      console.warn('Firebase load error:',e);
+      if(!localState)callback(null);
+    });
+}
+
+let _initDone=false;
+let activeCats,activeRegions,activeSystems,activeSubs,activeConf,deck=[],removedIds=new Set(),confidence={},idx=0,revealed=false;
+
+let _firstLoad=true;
+
+function initDeck(saved){
+activeCats=new Set(saved?saved.activeCats:Object.keys(CATS));
+activeConf=new Set(saved?saved.activeConf:Object.keys(CONF_FILTER_OPTIONS));
+  removedIds=new Set(saved&&saved.removedIds?saved.removedIds:[]);
+  confidence=saved&&saved.confidence?saved.confidence:{};
+  idx=saved&&saved.idx?saved.idx:0;
+  if(!_initDone){_initDone=true;buildFilters();rebuildDeck();}
+  else{buildFilters();rebuildDeck();}
+}
+
+loadState('pediatric_cards_v1',initDeck);
+
+function confKey(c){return confidence[cid(c)]||'unrated';}
+function filteredCards(){
+  return CARDS.filter(c=>!removedIds.has(cid(c))&&activeCats.has(c.cat)&&activeConf.has(confKey(c)));
+}
+
+function rebuildDeck(){
+  deck=filteredCards();
+  if(_firstLoad){_firstLoad=false;if(idx>=deck.length)idx=Math.max(0,deck.length-1);}
+  else{idx=0;}
+  revealed=false;render();
+}
+
+
+function getState(){
+  return {
+    confidence,
+    removedIds:[...removedIds],
+    activeCats:typeof activeCats!=='undefined'?[...activeCats]:[],
+    activeRegions:typeof activeRegions!=='undefined'?[...activeRegions]:[],
+    activeSystems:typeof activeSystems!=='undefined'?[...activeSystems]:[],
+    activeSubs:typeof activeSubs!=='undefined'?[...activeSubs]:[],
+    activeConf:typeof activeConf!=='undefined'?[...activeConf]:[],
+    idx
+  };
+}
+
+function buildFilters(){
+  const catEl=document.getElementById('catFilters');
+  catEl.innerHTML='';
+  Object.entries(CATS).forEach(([k,v])=>{
+    const b=document.createElement('button');
+    b.className='fbtn'+(activeCats.has(k)?' active':'');
+    if(activeCats.has(k))b.style.background=v.dot;
+    b.textContent=v.label;
+    b.onclick=()=>{activeCats.has(k)?activeCats.delete(k):activeCats.add(k);buildFilters();rebuildDeck();saveState(getState());};
+    catEl.appendChild(b);
+  });
+  const confEl=document.getElementById('confFilters');
+  confEl.innerHTML='';
+  Object.entries(CONF_FILTER_OPTIONS).forEach(([k,v])=>{
+    const count=CARDS.filter(c=>!removedIds.has(cid(c))&&activeCats.has(c.cat)&&confKey(c)===k).length;
+    const b=document.createElement('button');
+    const isActive=activeConf.has(k);
+    b.className='fbtn'+(isActive?' active':'');
+    if(isActive)b.style.cssText='background:'+v.bg+';color:'+v.color+';border-color:'+v.border+';';
+    b.textContent=v.label+' ('+count+')';
+    b.onclick=()=>{activeConf.has(k)?activeConf.delete(k):activeConf.add(k);buildFilters();rebuildDeck();saveState(getState());};
+    confEl.appendChild(b);
+  });
+}
+
+function selectAll(){
+  activeCats=new Set(Object.keys(CATS));
+  activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
+  buildFilters();rebuildDeck();saveState(getState());
+}
+function clearAll(){
+  activeCats.clear();activeConf.clear();
+  buildFilters();rebuildDeck();saveState(getState());
+}
+
+function render(){
+  updateStats();
+  const area=document.getElementById('cardArea');
+  const navRow=document.getElementById('navRow');
+  if(deck.length===0){
+    let msg;
+    if(activeCats.size===0||activeConf.size===0){
+      msg='No filters selected — select at least one option in each row above.';
+    } else {
+      const allRemoved=CARDS.filter(c=>activeCats.has(c.cat)).every(c=>removedIds.has(cid(c)));
+      msg=allRemoved
+        ?'All cards mastered! Hit "Reset deck" to bring them back.'
+        :'No cards match the current confidence filter. Adjust the Confidence filter above or hit "Reset deck".';
+    }
+    area.innerHTML='<div class="empty-state"><strong>'+msg+'</strong></div>';
+    navRow.style.display='none';
+    document.getElementById('progFill').style.width='0%';
+    document.getElementById('progTxt').textContent='0 cards';
+    return;
+  }
+  navRow.style.display='flex';
+  if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+  const c=deck[idx];
+  const id=cid(c);
+  const conf=confidence[id]||null;
+  const pct=Math.round(((idx+1)/deck.length)*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=(idx+1)+' / '+deck.length;
+  const cat=CATS[c.cat];
+  const canRemove=conf==='gotit';
+
+  if(!revealed){
+    const confBadge=conf?'<span class="conf-badge" style="background:'+CONF_COLORS[conf].bg+';color:'+CONF_COLORS[conf].color+';">'+CONF_LABELS[conf]+'</span>':'';
+    area.innerHTML=`<div class="card card-front" onclick="toggle()">
+      <div class="front-cat" style="color:${cat.dot};">${cat.label}</div>
+      <div class="front-title">${c.front}</div>
+      ${confBadge}
+      <div class="hint">Tap to reveal</div>
+    </div>`;
+  } else {
+    const removeBtn=canRemove?'<button class="remove-btn" onclick="removeCard()">Remove</button>':'';
+    area.innerHTML=`<div class="card card-back" style="background:${cat.bg};border:0.5px solid ${cat.border};" onclick="handleBackClick(event)">
+      <div class="back-title" style="color:${cat.text};">${c.front}</div>
+      <span class="type-badge" style="background:${cat.badge_bg};color:${cat.badge_color};">${cat.label}</span>
+      <div class="divider" style="background:${cat.border};"></div>
+      <div class="blbl" style="color:${cat.dot};">Key facts</div>
+      <div class="bval" style="color:${cat.text};">${c.back}</div>
+      <div class="spacer"></div>
+      <div class="confidence-row" style="border-top:0.5px solid ${cat.border};" onclick="event.stopPropagation()">
+        <span class="conf-lbl" style="color:${cat.dot};">Confidence:</span>
+        <button class="cbtn cbtn-nope${conf==='nope'?' selected':''}" onclick="rate('nope')">Nope</button>
+        <button class="cbtn cbtn-almost${conf==='almost'?' selected':''}" onclick="rate('almost')">Almost</button>
+        <button class="cbtn cbtn-gotit${conf==='gotit'?' selected':''}" onclick="rate('gotit')">Got it</button>
+        ${removeBtn}
+      </div>
+      <div class="flip-hint" style="color:${cat.dot};">Tap card to flip back</div>
+    </div>`;
+  }
+}
+
+function handleBackClick(e){if(!e.target.closest('.confidence-row'))toggle();}
+function toggle(){revealed=!revealed;render();}
+function rate(val){
+  confidence[cid(deck[idx])]=val;
+  if(!activeConf.has(val)){
+    deck=filteredCards();
+    if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+    revealed=false;
+  }
+  saveState(getState());buildFilters();render();
+}
+function removeCard(){
+  const id=cid(deck[idx]);
+  removedIds.add(id);
+  deck=filteredCards();
+  if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+  revealed=false;saveState(getState());buildFilters();render();
+}
+function resetDeck(){
+  removedIds.clear();confidence={};
+  activeCats=new Set(Object.keys(CATS));
+  activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
+  idx=0;revealed=false;saveState(getState());buildFilters();rebuildDeck();
+}
+function updateStats(){
+  const removed=CARDS.filter(c=>removedIds.has(cid(c))).length;
+  const gotit=deck.filter(c=>confidence[cid(c)]==='gotit').length;
+  const almost=deck.filter(c=>confidence[cid(c)]==='almost').length;
+  const nope=deck.filter(c=>confidence[cid(c)]==='nope').length;
+  document.getElementById('statsRow').innerHTML=
+    '<div class="stat">Active <span>'+deck.length+'</span></div>'+
+    '<div class="stat">Mastered <span>'+removed+'</span></div>'+
+    '<div class="stat">Got it <span style="color:#0F6E56;">'+gotit+'</span></div>'+
+    '<div class="stat">Almost <span style="color:#854F0B;">'+almost+'</span></div>'+
+    '<div class="stat">Nope <span style="color:#A32D2D;">'+nope+'</span></div>';
+}
+function go(dir){const next=idx+dir;if(next<0||next>=deck.length)return;idx=next;revealed=false;saveState(getState());render();}
+function shuffle(){
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+  idx=0;revealed=false;saveState(getState());render();
+}
+</script>
+</body>
+</html>

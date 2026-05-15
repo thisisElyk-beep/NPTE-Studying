@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dermatomes, Myotomes & Brachial Plexus — NPTE</title>
+<style>
+  :root{--bg-primary:#ffffff;--bg-secondary:#f5f4f0;--bg-tertiary:#edecea;--text-primary:#1a1a1a;--text-secondary:#6b6966;--text-tertiary:#a09d9a;--border:rgba(0,0,0,0.12);--border-md:rgba(0,0,0,0.22);--radius-md:8px;--radius-lg:12px;--purple:#7F77DD;}
+  @media(prefers-color-scheme:dark){:root{--bg-primary:#1c1c1e;--bg-secondary:#2c2c2e;--bg-tertiary:#3a3a3c;--text-primary:#f2f2f7;--text-secondary:#aeaeb2;--text-tertiary:#6e6e73;--border:rgba(255,255,255,0.1);--border-md:rgba(255,255,255,0.2);}}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg-tertiary);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem 3rem;color:var(--text-primary);}
+  .wrap{width:100%;max-width:680px;}
+  .page-title{font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:1.25rem;}
+  .filter-section{margin-bottom:1rem;}
+  .filter-group-label{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary);font-weight:500;margin-bottom:6px;}
+  .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+  .fbtn{font-size:12px;padding:4px 12px;border-radius:999px;border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-secondary);cursor:pointer;transition:all 0.15s;font-family:inherit;}
+  .fbtn.active{color:#fff;border-color:transparent;}
+  .filter-actions{display:flex;gap:10px;margin-top:4px;}
+  .faction{font-size:12px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
+  .stats-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+  .stat{background:var(--bg-secondary);border-radius:var(--radius-md);padding:5px 10px;font-size:12px;color:var(--text-secondary);}
+  .stat span{font-weight:500;color:var(--text-primary);}
+  .prog-wrap{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
+  .prog-bg{flex:1;height:4px;background:var(--bg-secondary);border-radius:2px;}
+  .prog-fill{height:4px;background:var(--purple);border-radius:2px;transition:width 0.3s;}
+  .prog-txt{font-size:13px;color:var(--text-secondary);white-space:nowrap;}
+  .card{border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1rem;cursor:pointer;min-height:280px;display:flex;flex-direction:column;}
+  .card-front{background:var(--bg-primary);border:0.5px solid var(--border);align-items:center;justify-content:center;}
+  .card-back{justify-content:flex-start;}
+  .front-cat{font-size:11px;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:8px;font-weight:500;}
+  .front-num{font-size:52px;font-weight:500;color:var(--text-primary);line-height:1;}
+  .front-sub{font-size:14px;color:var(--text-tertiary);margin-top:6px;}
+  .hint{font-size:13px;color:var(--text-tertiary);margin-top:1.25rem;}
+  .back-title{font-size:20px;font-weight:500;margin-bottom:6px;}
+  .badge-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .type-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:500;}
+  .divider{height:0.5px;margin-bottom:12px;}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:10px;}
+  .grid-1{margin-bottom:10px;}
+  .blbl{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;font-weight:500;margin-bottom:4px;}
+  .bval{font-size:13px;line-height:1.65;} .bval b{font-weight:600;}
+  .spacer{flex:1;}
+  .confidence-row{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:12px;flex-wrap:wrap;}
+  .conf-lbl{font-size:12px;font-weight:500;margin-right:2px;}
+  .cbtn{font-size:12px;padding:5px 14px;border-radius:999px;border:0.5px solid;cursor:pointer;font-weight:500;font-family:inherit;}
+  .cbtn-nope{background:#FCEBEB;color:#A32D2D;border-color:#F09595;}
+  .cbtn-almost{background:#FAEEDA;color:#854F0B;border-color:#EF9F27;}
+  .cbtn-gotit{background:#E1F5EE;color:#0F6E56;border-color:#5DCAA5;}
+  .cbtn.selected{outline:2px solid currentColor;outline-offset:1px;}
+  .remove-btn{margin-left:auto;font-size:12px;padding:5px 12px;border-radius:999px;border:0.5px solid #5DCAA5;background:#E1F5EE;color:#0F6E56;cursor:pointer;font-weight:500;font-family:inherit;}
+  .flip-hint{text-align:center;margin-top:12px;font-size:12px;}
+  .conf-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:500;margin-top:10px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-bottom:8px;}
+  .nbtn{padding:8px 22px;font-size:14px;border-radius:var(--radius-md);border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-primary);cursor:pointer;font-family:inherit;}
+  .nbtn:hover{background:var(--bg-secondary);}
+  .nbtn.primary{background:#7F77DD;color:#fff;border-color:#7F77DD;}
+  .nbtn.primary:hover{background:#534AB7;}
+  .bottom-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:6px;}
+  .shuf-btn{font-size:13px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
+  .reset-btn{font-size:13px;color:#7F77DD;background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
+  .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-secondary);font-size:14px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1rem;background:var(--bg-primary);}
+  .empty-state strong{display:block;font-size:16px;color:var(--text-primary);margin-bottom:8px;font-weight:500;}
+  .sync-bar{display:flex;align-items:center;gap:6px;margin-bottom:0.75rem;font-size:12px;color:var(--text-tertiary);}
+  .sync-dot{width:7px;height:7px;border-radius:50%;background:#c8c6c3;flex-shrink:0;transition:background 0.3s;}
+  .sync-dot.ok{background:#5DCAA5;}
+  .sync-dot.err{background:#F09595;}
+  .sync-dot.pending{background:#EF9F27;}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="page-title">Dermatomes, myotomes & brachial plexus — NPTE</div>
+  <div class="sync-bar"><div class="sync-dot" id="syncDot"></div><span id="syncTxt">Connecting...</span></div>
+
+  <div class="filter-section">
+    <div class="filter-group-label">Category</div>
+    <div class="filter-row" id="catFilters"></div>
+    <div class="filter-group-label">Region</div>
+    <div class="filter-row" id="regionFilters"></div>
+    <div class="filter-group-label">Confidence</div>
+    <div class="filter-row" id="confFilters"></div>
+    <div class="filter-actions">
+      <button class="faction" onclick="selectAll()">Select all</button>
+      <button class="faction" onclick="clearAll()">Clear all</button>
+    </div>
+  </div>
+  <div class="stats-row" id="statsRow"></div>
+  <div class="prog-wrap">
+    <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-txt" id="progTxt"></div>
+  </div>
+  <div id="cardArea"></div>
+  <div class="btn-row" id="navRow">
+    <button class="nbtn" onclick="go(-1)">← Prev</button>
+    <button class="nbtn primary" onclick="go(1)">Next →</button>
+  </div>
+  <div class="bottom-row">
+    <button class="shuf-btn" onclick="shuffle()">Shuffle deck</button>
+    <button class="reset-btn" onclick="resetDeck()">Reset deck</button>
+  </div>
+</div>
+<script>
+const CATS={
+  dermamyo:{label:"Dermatome / myotome",dot:"#7F77DD",bg:"#EEEDFE",border:"#AFA9EC",text:"#3C3489",badge_bg:"#EEEDFE",badge_color:"#534AB7"},
+  brachial: {label:"Brachial plexus",   dot:"#D85A30",bg:"#FAECE7",border:"#F0997B",text:"#712B13",badge_bg:"#FAECE7",badge_color:"#993C1D"},
+};
+const REGIONS={
+  cervical:"Cervical",thoracic:"Thoracic",lumbar:"Lumbar",sacral:"Sacral",plexus:"Plexus"
+};
+const REGION_COLORS={cervical:"#534AB7",thoracic:"#185FA5",lumbar:"#993C1D",sacral:"#0F6E56",plexus:"#D85A30"};
+
+const CARDS=[
+  // ── CERVICAL ──
+  {cat:"dermamyo",region:"cervical",front:"C1",sub:"Cervical",
+   motor:"No functional myotome. Suboccipital muscles via C1 ventral ramus.",
+   sensory:"No dermatome (no sensory component clinically).",
+   reflex:"None.",
+   path:"Jefferson fracture: C1 burst from axial load.<br>Atlantoaxial instability (C1–C2): RA, Down syndrome."},
+  {cat:"dermamyo",region:"cervical",front:"C2",sub:"Cervical",
+   motor:"Neck flexors (longus capitis/colli), SCM (with CN XI).",
+   sensory:"Posterior scalp, upper posterior neck.",
+   reflex:"None.",
+   path:"Occipital neuralgia: C2 irritation → posterior scalp pain.<br>Hangman's fracture: traumatic spondylolisthesis of axis."},
+  {cat:"dermamyo",region:"cervical",front:"C3",sub:"Cervical",
+   motor:"Neck lateral flexors, diaphragm (with C4, phrenic nerve).",
+   sensory:"Lower posterior scalp, lateral neck, angle of jaw.",
+   reflex:"None.",
+   path:"<b>Phrenic nerve = C3–C5.</b> 'C3, 4, 5 keeps the diaphragm alive.'<br>C3–C5 injury → ipsilateral diaphragm paralysis."},
+  {cat:"dermamyo",region:"cervical",front:"C4",sub:"Cervical",
+   motor:"Diaphragm (phrenic C3–C5), upper trapezius (with CN XI), levator scapulae.",
+   sensory:"Top of shoulder (cape distribution), upper anterior chest.",
+   reflex:"None.",
+   path:"C4 SCI: diaphragm partially preserved — may wean from vent.<br>Shoulder tip pain from diaphragmatic irritation (referred via phrenic)."},
+  {cat:"dermamyo",region:"cervical",front:"C5",sub:"Cervical",
+   motor:"Deltoid (shoulder abduction), biceps, supraspinatus, infraspinatus.",
+   sensory:"Lateral arm (deltoid patch / regimental badge area).",
+   reflex:"Biceps (C5, C6).",
+   path:"C5 radiculopathy: lateral arm numbness, deltoid weakness, ↓ biceps reflex.<br><b>Erb's palsy (C5–C6):</b> 'waiter's tip' — shoulder IR/adduction, elbow extension, forearm pronation."},
+  {cat:"dermamyo",region:"cervical",front:"C6",sub:"Cervical",
+   motor:"Wrist extensors (ECRL, ECRB), biceps, brachioradialis, pronator teres.",
+   sensory:"Lateral forearm, thumb and index finger.",
+   reflex:"Brachioradialis (C6), biceps (C5, C6).",
+   path:"C6 radiculopathy: thumb/index numbness, wrist extension weakness, ↓ brachioradialis reflex.<br>Most common cervical radiculopathy level."},
+  {cat:"dermamyo",region:"cervical",front:"C7",sub:"Cervical",
+   motor:"Triceps (elbow extension), wrist flexors, finger extensors.",
+   sensory:"Middle finger.",
+   reflex:"Triceps (C7).",
+   path:"C7 radiculopathy: middle finger numbness, triceps weakness, ↓ triceps reflex.<br>Second most common cervical level. Triceps weakness = C7 until proven otherwise."},
+  {cat:"dermamyo",region:"cervical",front:"C8",sub:"Cervical",
+   motor:"Finger flexors (FDP, FDS), hand intrinsics (partial), thumb extension (EPL).",
+   sensory:"Ring and small finger, medial forearm.",
+   reflex:"None reliable.",
+   path:"C8 radiculopathy: ring/small numbness, grip weakness.<br><b>Klumpke's palsy (C8–T1):</b> claw hand.<br>Thoracic outlet syndrome (lower trunk): C8–T1 distribution."},
+  {cat:"dermamyo",region:"cervical",front:"T1",sub:"Cervical/Thoracic junction",
+   motor:"Hand intrinsics (interossei, lumbricals, hypothenar, thenar).",
+   sensory:"Medial arm (inner upper arm).",
+   reflex:"None reliable.",
+   path:"T1 lesion: intrinsic hand weakness, claw hand.<br><b>Horner's syndrome</b> (ptosis, miosis, anhidrosis) if sympathetic chain involved.<br>Pancoast tumor: apex compresses T1 + sympathetics."},
+
+  // ── THORACIC ──
+  {cat:"dermamyo",region:"thoracic",front:"T2–T6",sub:"Thoracic (upper)",
+   motor:"Intercostals, upper trunk stabilizers. No limb myotome.",
+   sensory:"T2: medial arm/axilla. T4: nipple line. T6: xiphoid process.",
+   reflex:"None.",
+   path:"SCI T2–T6: paraplegia, full UE function, impaired trunk control.<br>Autonomic dysreflexia risk at T6 and above.<br>Shingles follows dermatomal distribution."},
+  {cat:"dermamyo",region:"thoracic",front:"T7–T12",sub:"Thoracic (lower)",
+   motor:"Abdominals (T7–T12), intercostals. Umbilicus = T10.",
+   sensory:"T7: lower costal margin. T10: umbilicus. T12: inguinal ligament.",
+   reflex:"Superficial abdominal reflex T7–T12: scratch abdomen → umbilicus moves toward stimulus. Absent = UMN lesion.",
+   path:"<b>Beevor's sign:</b> umbilicus moves cranially with neck flexion = T10 lesion (lower abdominals weak).<br>T12 SCI: hip flexors may be partially preserved."},
+
+  // ── LUMBAR ──
+  {cat:"dermamyo",region:"lumbar",front:"L1",sub:"Lumbar",
+   motor:"Hip flexors (iliopsoas — primarily L2–L3), groin/cremaster.",
+   sensory:"Groin, upper anterior thigh, scrotum/labia.",
+   reflex:"Cremasteric reflex (L1–L2): inner thigh stroke → ipsilateral testicular elevation.",
+   path:"L1 radiculopathy: groin pain, mimics hip OA.<br><b>Meralgia paresthetica:</b> lateral femoral cutaneous nerve (L2–L3) — burning lateral thigh (not a true nerve root)."},
+  {cat:"dermamyo",region:"lumbar",front:"L2",sub:"Lumbar",
+   motor:"Hip flexors (iliopsoas), hip adductors.",
+   sensory:"Anterior and medial upper thigh.",
+   reflex:"None reliable.",
+   path:"L2 radiculopathy: anterior thigh pain/numbness, hip flexor weakness.<br>Femoral nerve stretch test (prone knee flexion): reproduces anterior thigh pain for L2–L4."},
+  {cat:"dermamyo",region:"lumbar",front:"L3",sub:"Lumbar",
+   motor:"Quadriceps (knee extension), hip adductors, hip flexors.",
+   sensory:"Anterior and medial mid-thigh to medial knee.",
+   reflex:"Patellar (L3–L4).",
+   path:"L3 radiculopathy: anterior thigh to medial knee numbness, quad weakness, ↓ patellar reflex.<br>Femoral nerve (L2–L4): quad weakness + ↓ patellar reflex + anterior thigh sensory loss."},
+  {cat:"dermamyo",region:"lumbar",front:"L4",sub:"Lumbar",
+   motor:"Quadriceps, tibialis anterior (ankle DF), knee flexors (partial).",
+   sensory:"Medial lower leg, medial foot, great toe (medial).",
+   reflex:"Patellar (L3–L4).",
+   path:"L4 radiculopathy: medial lower leg numbness, foot drop (tibialis anterior), ↓ patellar reflex.<br>Tibialis anterior testing isolates L4."},
+  {cat:"dermamyo",region:"lumbar",front:"L5",sub:"Lumbar",
+   motor:"EHL (great toe extension), ankle DF, glute med (hip abduction), peronei (eversion).",
+   sensory:"Lateral lower leg, dorsum of foot, great toe (dorsal), 1st–3rd toes.",
+   reflex:"None reliable (medial hamstring inconsistent).",
+   path:"L5 radiculopathy: foot drop (EHL weakness), dorsal foot numbness, no reflex change.<br>EHL testing isolates L5.<br>vs peroneal nerve palsy: L5 has LBP + positive SLR."},
+  {cat:"dermamyo",region:"lumbar",front:"L4–L5 disc (L5 nerve root)",sub:"Most common level for L5 radiculopathy",
+   motor:"EHL (great toe extension), ankle DF, glute med.",
+   sensory:"Dorsum of foot, 1st–3rd toes, lateral lower leg.",
+   reflex:"None.",
+   path:"Posterolateral herniation at L4–L5 → L5 root compression.<br>Major deficit: foot drop. No reflex to confirm — rely on EHL and sensory.<br>Most common level causing foot drop."},
+
+  // ── SACRAL ──
+  {cat:"dermamyo",region:"sacral",front:"S1",sub:"Sacral",
+   motor:"Plantarflexors (gastroc/soleus), peroneals (eversion), glute max, hamstrings.",
+   sensory:"Posterior lower leg, lateral and plantar foot, small toe.",
+   reflex:"Achilles (S1–S2).",
+   path:"S1 radiculopathy: posterior leg/lateral foot numbness, PF weakness, ↓ Achilles reflex.<br>L5–S1 disc = most common herniation overall.<br>Single leg heel raise tests S1 motor function."},
+  {cat:"dermamyo",region:"sacral",front:"L5–S1 disc (S1 nerve root)",sub:"Most common lumbar disc herniation",
+   motor:"Plantarflexors, evertors, glute max.",
+   sensory:"Posterior calf, lateral and plantar foot, small toe.",
+   reflex:"Achilles (S1–S2) — reduced or absent.",
+   path:"Most common lumbar disc herniation overall.<br>Posterior leg/foot pain and numbness, calf weakness, ↓ Achilles reflex, positive SLR.<br>Single leg heel raise = functional S1 test."},
+  {cat:"dermamyo",region:"sacral",front:"S2",sub:"Sacral",
+   motor:"Plantarflexors (soleus), intrinsic foot muscles, bladder/bowel sphincters (with S3–S4).",
+   sensory:"Posterior thigh, popliteal fossa, back of calf.",
+   reflex:"Achilles (S1–S2).",
+   path:"S2 injury: bladder dysfunction begins.<br>Combined S2–S4: neurogenic bladder and bowel (flaccid type).<br><b>Cauda equina syndrome:</b> S2–S4 involvement = saddle anesthesia + bowel/bladder loss."},
+  {cat:"dermamyo",region:"sacral",front:"S3–S4",sub:"Sacral",
+   motor:"Bladder (detrusor), bowel (external sphincter), perineal muscles.",
+   sensory:"Perineum, perianal, scrotum/labia, inner thighs (saddle area).",
+   reflex:"Bulbocavernosus reflex (S3–S4): glans squeeze or catheter tug → anal sphincter contracts. Return marks end of spinal shock.",
+   path:"<b>Cauda equina syndrome:</b> bilateral saddle anesthesia + bladder retention = surgical emergency. Decompress within 24–48 hrs.<br>Conus medullaris injury (L1–S5): mixed UMN/LMN picture."},
+
+  // ── BRACHIAL PLEXUS ──
+  {cat:"brachial",region:"plexus",front:"Brachial plexus — structure",sub:"Roots → Trunks → Divisions → Cords → Branches",
+   motor:"C5–T1 roots → Upper (C5–C6), Middle (C7), Lower (C8–T1) trunks → Divisions → Lateral (C5–C7), Posterior (C5–T1), Medial (C8–T1) cords → terminal branches.",
+   sensory:"Lateral cord → musculocutaneous + lateral pectoral. Posterior cord → radial + axillary. Medial cord → ulnar + medial cutaneous.",
+   reflex:"Mnemonic: <b>'Remember To Drink Cold Beer'</b> = Roots, Trunks, Divisions, Cords, Branches.",
+   path:"<b>Pre-ganglionic (root avulsion):</b> Horner's syndrome, no regeneration possible.<br><b>Post-ganglionic:</b> distal to DRG, regeneration possible. Track with Tinel's sign."},
+  {cat:"brachial",region:"plexus",front:"Upper trunk (C5–C6) — Erb's palsy",sub:"Brachial plexus",
+   motor:"Deltoid, biceps, brachialis, supraspinatus, infraspinatus, brachioradialis weakened/absent.",
+   sensory:"Lateral arm and forearm, thumb and index finger.",
+   reflex:"Biceps and brachioradialis reduced or absent.",
+   path:"<b>Mechanism:</b> lateral neck flexion + shoulder depression (birth, motorcycle fall).<br><b>Posture:</b> 'waiter's tip' — shoulder IR/adduction, elbow extension, forearm pronation.<br>Better prognosis than lower trunk injury."},
+  {cat:"brachial",region:"plexus",front:"Lower trunk (C8–T1) — Klumpke's palsy",sub:"Brachial plexus",
+   motor:"Hand intrinsics, finger and wrist flexors.",
+   sensory:"Medial forearm, ring and small finger.",
+   reflex:"None reliable.",
+   path:"<b>Mechanism:</b> excessive arm abduction/upward traction (grabbing overhead during fall, birth).<br><b>Posture:</b> claw hand — MCP hyperextension, IP flexion.<br>Horner's syndrome if T1 root avulsed. Poorer prognosis than upper trunk."},
+  {cat:"brachial",region:"plexus",front:"Lateral cord injuries",sub:"C5, C6, C7",
+   motor:"Biceps, brachialis, coracobrachialis (musculocutaneous); wrist flexors, pronator teres (median contribution).",
+   sensory:"Lateral forearm (lateral cutaneous nerve of forearm).",
+   reflex:"Biceps reduced.",
+   path:"Mimics musculocutaneous injury + partial median nerve loss.<br>Elbow flexion and forearm supination weakness.<br>Thenar intrinsics preserved (medial cord contribution intact)."},
+  {cat:"brachial",region:"plexus",front:"Posterior cord injuries",sub:"C5–T1",
+   motor:"Deltoid (axillary), triceps, brachioradialis, wrist and finger extensors, supinator (radial nerve).",
+   sensory:"Lateral arm (axillary), posterior arm/forearm, dorsum of hand (radial).",
+   reflex:"Brachioradialis and triceps reduced or absent.",
+   path:"Largest cord — axillary + radial nerves.<br><b>Mechanisms:</b> shoulder dislocation, crutch palsy, Saturday night palsy.<br>Wrist drop + deltoid weakness = posterior cord until proven otherwise."},
+  {cat:"brachial",region:"plexus",front:"Medial cord injuries",sub:"C8, T1",
+   motor:"Hand intrinsics (ulnar), finger/wrist flexors (ulnar + median contributions), hypothenar.",
+   sensory:"Medial arm and forearm, ring and small finger, medial palm.",
+   reflex:"None reliable.",
+   path:"= ulnar nerve + medial contribution to median nerve.<br>Claw hand most prominent.<br>Thoracic outlet syndrome affects medial cord most."},
+  {cat:"brachial",region:"plexus",front:"Musculocutaneous nerve",sub:"C5, C6",
+   motor:"Biceps brachii, brachialis, coracobrachialis.",
+   sensory:"Lateral forearm (lateral cutaneous nerve of forearm).",
+   reflex:"Biceps (C5–C6).",
+   path:"Isolated injury rare — usually lateral cord lesion.<br>Weakness: elbow flexion (worst in supination) + forearm supination.<br>vs C6 radiculopathy: no neck pain, negative Spurling's, wrist extension preserved."},
+  {cat:"brachial",region:"plexus",front:"Axillary nerve",sub:"C5, C6",
+   motor:"Deltoid (all heads), teres minor.",
+   sensory:"Lateral arm (regimental badge area).",
+   reflex:"None.",
+   path:"<b>Mechanism:</b> anterior shoulder dislocation (most common), surgical neck fracture.<br>Deficit: shoulder abduction weakness + lateral arm numbness.<br>Monitor at 3 months; consider EMG. Usually good recovery if post-ganglionic."},
+  {cat:"brachial",region:"plexus",front:"Radial nerve",sub:"C5–C8",
+   motor:"Triceps, brachioradialis, wrist extensors (ECRL/ECRB), supinator, finger/thumb extensors (via PIN).",
+   sensory:"Posterior arm/forearm, dorsolateral hand, first web space.",
+   reflex:"Triceps (C7), brachioradialis (C6).",
+   path:"<b>Spiral groove</b> (midshaft humerus #): triceps spared, wrist/finger drop.<br><b>PIN entrapment</b> (radial tunnel): finger/thumb drop, no wrist drop, no sensory loss.<br><b>Saturday night palsy:</b> compression at spiral groove → wrist drop."},
+  {cat:"brachial",region:"plexus",front:"Median nerve",sub:"C6–T1",
+   motor:"Pronators, FCR, FDS, FDP (index/middle via AIN), FPL, thenar muscles (LOAF: Lumbricals 1&2, Opponens pollicis, Abductor pollicis brevis, FPB superficial).",
+   sensory:"Thumb, index, middle, radial half of ring (palmar + dorsal fingertips).",
+   reflex:"None specific.",
+   path:"<b>Carpal tunnel:</b> thenar atrophy, LOAF weakness, nocturnal paresthesias.<br><b>AIN:</b> no sensory loss, pinch deformity (can't make OK sign).<br><b>Pronator teres syndrome:</b> reproduced with resisted pronation.<br>Ape hand = complete loss (thenar wasting)."},
+  {cat:"brachial",region:"plexus",front:"Ulnar nerve",sub:"C8, T1",
+   motor:"FCU, FDP (ring/small), hypothenar, all interossei, medial 2 lumbricals, adductor pollicis, FPB (deep head).",
+   sensory:"Medial 1.5 fingers (ring/small), medial palm, medial dorsal hand.",
+   reflex:"None specific.",
+   path:"<b>Cubital tunnel</b> (elbow — most common): ring/small numbness, intrinsic weakness, claw hand (4th/5th).<br><b>Guyon's canal</b> (wrist): hypothenar + intrinsic weakness, palmar sensory loss.<br><b>Froment's sign:</b> IP flexion when pinching (adductor pollicis weak)."},
+];
+
+const CONF_COLORS={gotit:{bg:'#E1F5EE',color:'#0F6E56'},almost:{bg:'#FAEEDA',color:'#854F0B'},nope:{bg:'#FCEBEB',color:'#A32D2D'}};
+const CONF_LABELS={gotit:'Got it',almost:'Almost',nope:'Nope'};
+const CONF_FILTER_OPTIONS={
+  nope:   {label:'Nope',   bg:'#FCEBEB',color:'#A32D2D',border:'#F09595'},
+  almost: {label:'Almost', bg:'#FAEEDA',color:'#854F0B',border:'#EF9F27'},
+  gotit:  {label:'Got it', bg:'#E1F5EE',color:'#0F6E56',border:'#5DCAA5'},
+  unrated:{label:'Unrated',bg:'#f5f4f0',color:'#6b6966',border:'#c8c6c3'},
+};
+
+
+
+CARDS.forEach((c,i)=>c._id='card_'+i);
+function cid(c){return c._id;}
+
+const FIREBASE_CONFIG={apiKey:"AIzaSyA6EjnhyYUOt0iRYUaywCoqZ5POaVQmcsk",authDomain:"npte-flaschcards.firebaseapp.com",databaseURL:"https://npte-flaschcards-default-rtdb.firebaseio.com",projectId:"npte-flaschcards",storageBucket:"npte-flaschcards.firebasestorage.app",messagingSenderId:"429875976159",appId:"1:429875976159:web:04fc0eda2e758c606e966a"};
+const USER_ID='thisisElyk';
+
+// Firebase loaded via CDN
+let _db=null;
+let _fbRef=null;
+let _pendingSave=null;
+let _saveTimer=null;
+
+function initFirebase(storageKey){
+  if(typeof firebase==='undefined'){setSyncStatus('err','Firebase failed to load');return;}
+  firebase.initializeApp(FIREBASE_CONFIG);
+  _db=firebase.database();
+  _fbRef=_db.ref('users/'+USER_ID+'/'+storageKey);
+  setSyncStatus('pending','Connecting...');
+}
+
+function setSyncStatus(state,msg){
+  const dot=document.getElementById('syncDot');
+  const txt=document.getElementById('syncTxt');
+  if(!dot||!txt)return;
+  dot.className='sync-dot'+(state?' '+state:'');
+  txt.textContent=msg;
+}
+
+function saveState(stateObj){
+  // Always save to localStorage as offline fallback
+  try{localStorage.setItem('dermamyo_cards_v1',JSON.stringify(stateObj));}catch(e){}
+  // Debounce Firebase writes (300ms)
+  if(_saveTimer)clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(()=>{
+    if(!_fbRef){return;}
+    setSyncStatus('pending','Saving...');
+    _fbRef.set(stateObj)
+      .then(()=>setSyncStatus('ok','Synced'))
+      .catch(e=>{setSyncStatus('err','Sync failed');console.warn('Firebase save error:',e);});
+  },300);
+}
+
+function loadState(storageKey,callback){
+  // Try localStorage immediately for fast start
+  let localState=null;
+  try{const r=localStorage.getItem(storageKey);if(r)localState=JSON.parse(r);}catch(e){}
+
+  if(localState)callback(localState);
+
+  // Then fetch from Firebase and update if newer/different
+  initFirebase(storageKey);
+  if(!_fbRef){callback(localState);return;}
+  _fbRef.once('value')
+    .then(snap=>{
+      const fbState=snap.val();
+      if(fbState){
+        // Update localStorage with Firebase state
+        try{localStorage.setItem(storageKey,JSON.stringify(fbState));}catch(e){}
+        setSyncStatus('ok','Synced');
+        callback(fbState);
+      } else {
+        setSyncStatus('ok','Synced');
+        if(!localState)callback(null);
+      }
+    })
+    .catch(e=>{
+      setSyncStatus('err','Offline — using local data');
+      console.warn('Firebase load error:',e);
+      if(!localState)callback(null);
+    });
+}
+
+let _initDone=false;
+let activeCats,activeRegions,activeSystems,activeSubs,activeConf,deck=[],removedIds=new Set(),confidence={},idx=0,revealed=false;
+
+let _firstLoad=true;
+
+function initDeck(saved){
+activeCats=new Set(saved?saved.activeCats:Object.keys(CATS));
+activeRegions=new Set(saved?saved.activeRegions:Object.keys(REGIONS));
+activeConf=new Set(saved?saved.activeConf:Object.keys(CONF_FILTER_OPTIONS));
+  removedIds=new Set(saved&&saved.removedIds?saved.removedIds:[]);
+  confidence=saved&&saved.confidence?saved.confidence:{};
+  idx=saved&&saved.idx?saved.idx:0;
+  if(!_initDone){_initDone=true;buildFilters();rebuildDeck();}
+  else{buildFilters();rebuildDeck();}
+}
+
+loadState('dermamyo_cards_v1',initDeck);
+
+function confKey(c){return confidence[cid(c)]||'unrated';}
+function filteredCards(){
+  return CARDS.filter(c=>!removedIds.has(cid(c))&&activeCats.has(c.cat)&&activeRegions.has(c.region)&&activeConf.has(confKey(c)));
+}
+
+function rebuildDeck(){
+  deck=filteredCards();
+  if(_firstLoad){_firstLoad=false;if(idx>=deck.length)idx=Math.max(0,deck.length-1);}
+  else{idx=0;}
+  revealed=false;render();
+}
+
+
+function getState(){
+  return {
+    confidence,
+    removedIds:[...removedIds],
+    activeCats:typeof activeCats!=='undefined'?[...activeCats]:[],
+    activeRegions:typeof activeRegions!=='undefined'?[...activeRegions]:[],
+    activeSystems:typeof activeSystems!=='undefined'?[...activeSystems]:[],
+    activeSubs:typeof activeSubs!=='undefined'?[...activeSubs]:[],
+    activeConf:typeof activeConf!=='undefined'?[...activeConf]:[],
+    idx
+  };
+}
+
+function buildFilters(){
+  const catEl=document.getElementById('catFilters');
+  catEl.innerHTML='';
+  Object.entries(CATS).forEach(([k,v])=>{
+    const b=document.createElement('button');
+    b.className='fbtn'+(activeCats.has(k)?' active':'');
+    if(activeCats.has(k))b.style.background=v.dot;
+    b.textContent=v.label;
+    b.onclick=()=>{activeCats.has(k)?activeCats.delete(k):activeCats.add(k);buildFilters();rebuildDeck();saveState(getState());};
+    catEl.appendChild(b);
+  });
+  const regEl=document.getElementById('regionFilters');
+  regEl.innerHTML='';
+  Object.entries(REGIONS).forEach(([k,v])=>{
+    const b=document.createElement('button');
+    b.className='fbtn'+(activeRegions.has(k)?' active':'');
+    if(activeRegions.has(k))b.style.background=REGION_COLORS[k];
+    b.textContent=v;
+    b.onclick=()=>{activeRegions.has(k)?activeRegions.delete(k):activeRegions.add(k);buildFilters();rebuildDeck();saveState(getState());};
+    regEl.appendChild(b);
+  });
+  const confEl=document.getElementById('confFilters');
+  confEl.innerHTML='';
+  Object.entries(CONF_FILTER_OPTIONS).forEach(([k,v])=>{
+    const count=CARDS.filter(c=>!removedIds.has(cid(c))&&activeCats.has(c.cat)&&activeRegions.has(c.region)&&confKey(c)===k).length;
+    const b=document.createElement('button');
+    const isActive=activeConf.has(k);
+    b.className='fbtn'+(isActive?' active':'');
+    if(isActive)b.style.cssText='background:'+v.bg+';color:'+v.color+';border-color:'+v.border+';';
+    b.textContent=v.label+' ('+count+')';
+    b.onclick=()=>{activeConf.has(k)?activeConf.delete(k):activeConf.add(k);buildFilters();rebuildDeck();saveState(getState());};
+    confEl.appendChild(b);
+  });
+}
+
+function selectAll(){
+  activeCats=new Set(Object.keys(CATS));
+  activeRegions=new Set(Object.keys(REGIONS));
+  activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
+  buildFilters();rebuildDeck();saveState(getState());
+}
+function clearAll(){
+  activeCats.clear();activeRegions.clear();activeConf.clear();
+  buildFilters();rebuildDeck();saveState(getState());
+}
+
+function render(){
+  updateStats();
+  const area=document.getElementById('cardArea');
+  const navRow=document.getElementById('navRow');
+  if(deck.length===0){
+    let msg;
+    if(activeCats.size===0||activeRegions.size===0||activeConf.size===0){
+      msg='No filters selected — select at least one option in each row above.';
+    } else {
+      const allRemoved=CARDS.filter(c=>activeCats.has(c.cat)&&activeRegions.has(c.region)).every(c=>removedIds.has(cid(c)));
+      msg=allRemoved
+        ?'All cards mastered! Hit "Reset deck" to bring them back.'
+        :'No cards match the current confidence filter. Adjust the Confidence filter above or hit "Reset deck".';
+    }
+    area.innerHTML='<div class="empty-state"><strong>'+msg+'</strong></div>';
+    navRow.style.display='none';
+    document.getElementById('progFill').style.width='0%';
+    document.getElementById('progTxt').textContent='0 cards';
+    return;
+  }
+  navRow.style.display='flex';
+  if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+  const c=deck[idx];
+  const id=cid(c);
+  const conf=confidence[id]||null;
+  const pct=Math.round(((idx+1)/deck.length)*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=(idx+1)+' / '+deck.length;
+  const cat=CATS[c.cat];
+  const canRemove=conf==='gotit';
+
+  if(!revealed){
+    const confBadge=conf?'<span class="conf-badge" style="background:'+CONF_COLORS[conf].bg+';color:'+CONF_COLORS[conf].color+';">'+CONF_LABELS[conf]+'</span>':'';
+    area.innerHTML=`<div class="card card-front" onclick="toggle()">
+      <div class="front-cat" style="color:${cat.dot};">${cat.label}</div>
+      <div class="front-num">${c.front}</div>
+      <div class="front-sub">${c.sub}</div>
+      ${confBadge}
+      <div class="hint">Tap to reveal</div>
+    </div>`;
+  } else {
+    const removeBtn=canRemove?'<button class="remove-btn" onclick="removeCard()">Remove</button>':'';
+    area.innerHTML=`<div class="card card-back" style="background:${cat.bg};border:0.5px solid ${cat.border};" onclick="handleBackClick(event)">
+      <div class="back-title" style="color:${cat.text};">${c.front} — ${c.sub}</div>
+      <div class="badge-row">
+        <span class="type-badge" style="background:${cat.badge_bg};color:${cat.badge_color};">${cat.label}</span>
+      </div>
+      <div class="divider" style="background:${cat.border};"></div>
+      <div class="grid-2">
+        <div><div class="blbl" style="color:${cat.dot};">Motor</div><div class="bval" style="color:${cat.text};">${c.motor}</div></div>
+        <div><div class="blbl" style="color:${cat.dot};">Sensory</div><div class="bval" style="color:${cat.text};">${c.sensory}</div></div>
+      </div>
+      <div class="grid-2">
+        <div><div class="blbl" style="color:${cat.dot};">Reflex</div><div class="bval" style="color:${cat.text};">${c.reflex}</div></div>
+        <div><div class="blbl" style="color:${cat.dot};">Clinical / pathology</div><div class="bval" style="color:${cat.text};">${c.path}</div></div>
+      </div>
+      <div class="spacer"></div>
+      <div class="confidence-row" style="border-top:0.5px solid ${cat.border};" onclick="event.stopPropagation()">
+        <span class="conf-lbl" style="color:${cat.dot};">Confidence:</span>
+        <button class="cbtn cbtn-nope${conf==='nope'?' selected':''}" onclick="rate('nope')">Nope</button>
+        <button class="cbtn cbtn-almost${conf==='almost'?' selected':''}" onclick="rate('almost')">Almost</button>
+        <button class="cbtn cbtn-gotit${conf==='gotit'?' selected':''}" onclick="rate('gotit')">Got it</button>
+        ${removeBtn}
+      </div>
+      <div class="flip-hint" style="color:${cat.dot};">Tap card to flip back</div>
+    </div>`;
+  }
+}
+
+function handleBackClick(e){if(!e.target.closest('.confidence-row'))toggle();}
+function toggle(){revealed=!revealed;render();}
+function rate(val){
+  confidence[cid(deck[idx])]=val;
+  if(!activeConf.has(val)){
+    deck=filteredCards();
+    if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+    revealed=false;
+  }
+  saveState(getState());buildFilters();render();
+}
+function removeCard(){
+  const id=cid(deck[idx]);removedIds.add(id);
+  deck=filteredCards();
+  if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+  revealed=false;saveState(getState());buildFilters();render();
+}
+function resetDeck(){
+  removedIds.clear();confidence={};
+  activeCats=new Set(Object.keys(CATS));
+  activeRegions=new Set(Object.keys(REGIONS));
+  activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
+  idx=0;revealed=false;saveState(getState());buildFilters();rebuildDeck();
+}
+function updateStats(){
+  const removed=CARDS.filter(c=>removedIds.has(cid(c))).length;
+  const gotit=deck.filter(c=>confidence[cid(c)]==='gotit').length;
+  const almost=deck.filter(c=>confidence[cid(c)]==='almost').length;
+  const nope=deck.filter(c=>confidence[cid(c)]==='nope').length;
+  document.getElementById('statsRow').innerHTML=
+    '<div class="stat">Active <span>'+deck.length+'</span></div>'+
+    '<div class="stat">Mastered <span>'+removed+'</span></div>'+
+    '<div class="stat">Got it <span style="color:#0F6E56;">'+gotit+'</span></div>'+
+    '<div class="stat">Almost <span style="color:#854F0B;">'+almost+'</span></div>'+
+    '<div class="stat">Nope <span style="color:#A32D2D;">'+nope+'</span></div>';
+}
+function go(dir){const next=idx+dir;if(next<0||next>=deck.length)return;idx=next;revealed=false;saveState(getState());render();}
+function shuffle(){
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+  idx=0;revealed=false;saveState(getState());render();
+}
+</script>
+</body>
+</html>

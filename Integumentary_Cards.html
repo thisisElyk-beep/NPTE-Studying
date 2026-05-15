@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Integumentary Flashcards — NPTE</title>
+<style>
+  :root {
+    --bg-primary:#ffffff;--bg-secondary:#f5f4f0;--bg-tertiary:#edecea;
+    --text-primary:#1a1a1a;--text-secondary:#6b6966;--text-tertiary:#a09d9a;
+    --border:rgba(0,0,0,0.12);--border-md:rgba(0,0,0,0.22);
+    --radius-md:8px;--radius-lg:12px;--purple:#7F77DD;
+  }
+  @media(prefers-color-scheme:dark){
+    :root{
+      --bg-primary:#1c1c1e;--bg-secondary:#2c2c2e;--bg-tertiary:#3a3a3c;
+      --text-primary:#f2f2f7;--text-secondary:#aeaeb2;--text-tertiary:#6e6e73;
+      --border:rgba(255,255,255,0.1);--border-md:rgba(255,255,255,0.2);
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg-tertiary);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem 3rem;color:var(--text-primary);}
+  .wrap{width:100%;max-width:680px;}
+  .page-title{font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:1.25rem;}
+  .filter-section{margin-bottom:1rem;}
+  .filter-group-label{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary);font-weight:500;margin-bottom:6px;}
+  .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+  .fbtn{font-size:12px;padding:4px 12px;border-radius:999px;border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-secondary);cursor:pointer;transition:all 0.15s;font-family:inherit;}
+  .fbtn.active{color:#fff;border-color:transparent;}
+  .filter-actions{display:flex;gap:10px;margin-top:4px;}
+  .faction{font-size:12px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
+  .stats-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+  .stat{background:var(--bg-secondary);border-radius:var(--radius-md);padding:5px 10px;font-size:12px;color:var(--text-secondary);}
+  .stat span{font-weight:500;color:var(--text-primary);}
+  .prog-wrap{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
+  .prog-bg{flex:1;height:4px;background:var(--bg-secondary);border-radius:2px;}
+  .prog-fill{height:4px;background:var(--purple);border-radius:2px;transition:width 0.3s;}
+  .prog-txt{font-size:13px;color:var(--text-secondary);white-space:nowrap;}
+  .card{border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1rem;cursor:pointer;min-height:280px;display:flex;flex-direction:column;}
+  .card-front{background:var(--bg-primary);border:0.5px solid var(--border);align-items:center;justify-content:center;}
+  .card-back{justify-content:flex-start;}
+  .front-cat{font-size:11px;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:10px;font-weight:500;}
+  .front-title{font-size:24px;font-weight:500;color:var(--text-primary);line-height:1.2;text-align:center;}
+  .hint{font-size:13px;color:var(--text-tertiary);margin-top:1.25rem;}
+  .back-title{font-size:19px;font-weight:500;margin-bottom:6px;}
+  .badge-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .type-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:500;}
+  .divider{height:0.5px;margin-bottom:14px;}
+  .blbl{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;font-weight:500;margin-bottom:6px;}
+  .bval{font-size:14px;line-height:1.7;} .bval b{font-weight:600;}
+  .spacer{flex:1;}
+  .confidence-row{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:12px;flex-wrap:wrap;}
+  .conf-lbl{font-size:12px;font-weight:500;margin-right:2px;}
+  .cbtn{font-size:12px;padding:5px 14px;border-radius:999px;border:0.5px solid;cursor:pointer;font-weight:500;font-family:inherit;}
+  .cbtn-nope{background:#FCEBEB;color:#A32D2D;border-color:#F09595;}
+  .cbtn-almost{background:#FAEEDA;color:#854F0B;border-color:#EF9F27;}
+  .cbtn-gotit{background:#E1F5EE;color:#0F6E56;border-color:#5DCAA5;}
+  .cbtn.selected{outline:2px solid currentColor;outline-offset:1px;}
+  .remove-btn{margin-left:auto;font-size:12px;padding:5px 12px;border-radius:999px;border:0.5px solid #5DCAA5;background:#E1F5EE;color:#0F6E56;cursor:pointer;font-weight:500;font-family:inherit;}
+  .flip-hint{text-align:center;margin-top:12px;font-size:12px;}
+  .conf-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:500;margin-top:10px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-bottom:8px;}
+  .nbtn{padding:8px 22px;font-size:14px;border-radius:var(--radius-md);border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-primary);cursor:pointer;font-family:inherit;}
+  .nbtn:hover{background:var(--bg-secondary);}
+  .nbtn.primary{background:#7F77DD;color:#fff;border-color:#7F77DD;}
+  .nbtn.primary:hover{background:#534AB7;}
+  .bottom-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:6px;}
+  .shuf-btn{font-size:13px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
+  .reset-btn{font-size:13px;color:#7F77DD;background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
+  .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-secondary);font-size:14px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1rem;background:var(--bg-primary);}
+  .empty-state strong{display:block;font-size:16px;color:var(--text-primary);margin-bottom:8px;font-weight:500;}
+  .sync-bar{display:flex;align-items:center;gap:6px;margin-bottom:0.75rem;font-size:12px;color:var(--text-tertiary);}
+  .sync-dot{width:7px;height:7px;border-radius:50%;background:#c8c6c3;flex-shrink:0;transition:background 0.3s;}
+  .sync-dot.ok{background:#5DCAA5;}
+  .sync-dot.err{background:#F09595;}
+  .sync-dot.pending{background:#EF9F27;}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="page-title">Integumentary flashcards — NPTE</div>
+  <div class="sync-bar"><div class="sync-dot" id="syncDot"></div><span id="syncTxt">Connecting...</span></div>
+
+  <div class="filter-section">
+    <div class="filter-group-label">Category</div>
+    <div class="filter-row" id="catFilters"></div>
+    <div class="filter-group-label">Confidence</div>
+    <div class="filter-row" id="confFilters"></div>
+    <div class="filter-actions">
+      <button class="faction" onclick="selectAll()">Select all</button>
+      <button class="faction" onclick="clearAll()">Clear all</button>
+    </div>
+  </div>
+  <div class="stats-row" id="statsRow"></div>
+  <div class="prog-wrap">
+    <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-txt" id="progTxt"></div>
+  </div>
+  <div id="cardArea"></div>
+  <div class="btn-row" id="navRow">
+    <button class="nbtn" onclick="go(-1)">← Prev</button>
+    <button class="nbtn primary" onclick="go(1)">Next →</button>
+  </div>
+  <div class="bottom-row">
+    <button class="shuf-btn" onclick="shuffle()">Shuffle deck</button>
+    <button class="reset-btn" onclick="resetDeck()">Reset deck</button>
+  </div>
+</div>
+<script>
+const CATS={
+  classification:{label:"Wound classification",dot:"#E24B4A",bg:"#FCEBEB",border:"#F09595",text:"#791F1F",badge_bg:"#FCEBEB",badge_color:"#A32D2D"},
+  healing:      {label:"Wound healing",       dot:"#7F77DD",bg:"#EEEDFE",border:"#AFA9EC",text:"#3C3489",badge_bg:"#EEEDFE",badge_color:"#534AB7"},
+  management:   {label:"Wound management",    dot:"#1D9E75",bg:"#E1F5EE",border:"#5DCAA5",text:"#085041",badge_bg:"#E1F5EE",badge_color:"#0F6E56"},
+  burns:        {label:"Burns",               dot:"#D85A30",bg:"#FAECE7",border:"#F0997B",text:"#712B13",badge_bg:"#FAECE7",badge_color:"#993C1D"},
+  lymphedema:   {label:"Lymphedema / edema",  dot:"#378ADD",bg:"#E6F1FB",border:"#85B7EB",text:"#0C447C",badge_bg:"#E6F1FB",badge_color:"#185FA5"},
+};
+
+const CARDS=[
+  // ── WOUND CLASSIFICATION ──
+  {cat:"classification",front:"Pressure injury staging (NPIAP)",back:"<b>Stage 1:</b> intact skin, non-blanchable erythema.<br><b>Stage 2:</b> partial thickness — open blister or shallow crater, dermis exposed.<br><b>Stage 3:</b> full thickness — subcutaneous tissue visible, no bone/tendon/muscle.<br><b>Stage 4:</b> full thickness — bone, tendon, or muscle exposed.<br><b>Unstageable:</b> base obscured by slough/eschar.<br><b>DTI:</b> intact skin, purple/maroon discoloration or blood-filled blister — deep damage."},
+  {cat:"classification",front:"Pressure injury — risk and locations",back:"<b>High-risk sites:</b> sacrum (most common), ischial tuberosities, greater trochanters, heels, malleoli, occiput.<br><b>Braden Scale</b> (6 domains: sensory perception, moisture, activity, mobility, nutrition, friction/shear):<br>≤18 = at risk &nbsp; ≤12 = high risk. Lower score = higher risk."},
+  {cat:"classification",front:"Wagner wound classification (diabetic foot)",back:"<b>0:</b> intact skin. <b>1:</b> superficial ulcer (dermis). <b>2:</b> deep — tendon/capsule/bone.<br><b>3:</b> deep + osteomyelitis or abscess. <b>4:</b> forefoot gangrene. <b>5:</b> whole foot gangrene.<br>Grade 3+ = urgent surgical referral."},
+  {cat:"classification",front:"Wound depth classification",back:"<b>Superficial:</b> epidermis only — heals by regeneration, no scar.<br><b>Partial thickness:</b> epidermis + part of dermis — heals by epithelialization, minimal scar.<br><b>Full thickness:</b> through entire dermis — heals by granulation, contraction, epithelialization — significant scar.<br><b>Subdermal:</b> into muscle/bone — surgical intervention required."},
+  {cat:"classification",front:"Wound etiology — major types",back:"<b>Pressure:</b> bony prominence + external force.<br><b>Arterial:</b> ischemic, distal, painful, punched-out.<br><b>Venous:</b> medial lower leg, irregular, wet, minimal pain.<br><b>Neuropathic/diabetic:</b> plantar, painless, callus rim.<br>Etiology determines treatment approach."},
+  {cat:"classification",front:"Arterial vs venous ulcers",back:"<b>Arterial:</b> distal (toes/dorsal foot), punched-out, pale/necrotic base, painful (worse with elevation), minimal exudate, ABI &lt;0.7. Tx: revascularization + offloading.<br><b>Venous:</b> medial gaiter area, irregular edges, heavy exudate, edema, hemosiderin staining, relatively painless, normal ABI. Tx: compression (primary)."},
+  {cat:"classification",front:"Neuropathic / diabetic foot ulcer",back:"<b>Location:</b> plantar — metatarsal heads, heel, toes.<br><b>Features:</b> painless, callus rim, punched-out, moderate exudate.<br><b>Gold standard offloading:</b> total contact cast.<br><b>Screen with:</b> monofilament testing (loss of protective sensation = LOPS).<br>Also: glucose control, debridement, infection management."},
+  {cat:"classification",front:"Wound edges and periwound",back:"<b>Undermining/tunneling:</b> document with clock notation (12 o'clock = toward head).<br><b>Rolled edges (epibole):</b> epithelium rolled under — needs debridement.<br><b>Maceration:</b> white, soft periwound — dressing too moist.<br><b>Erythema &gt;2 cm from edge:</b> cellulitis — refer."},
+
+  // ── WOUND HEALING ──
+  {cat:"healing",front:"Wound healing phases",back:"<b>Hemostasis</b> (0–min): vasoconstriction, platelet aggregation, clot.<br><b>Inflammatory</b> (0–4 days): vasodilation, neutrophils (d1–2), macrophages (d2–4), phagocytosis.<br><b>Proliferative</b> (4d–3wk): fibroblasts, Type III collagen, angiogenesis, granulation, epithelialization.<br><b>Remodeling</b> (3wk–2yr): Type III → Type I collagen, tensile strength → ~80%."},
+  {cat:"healing",front:"Primary vs secondary vs tertiary intention",back:"<b>Primary:</b> edges approximated surgically — fastest, minimal scar.<br><b>Secondary:</b> left open, heals by granulation and contraction — larger scar, longer timeline.<br><b>Tertiary (delayed primary):</b> left open then closed later — used for contaminated wounds to reduce infection risk.<br>Most chronic wounds heal by secondary intention."},
+  {cat:"healing",front:"Tissue types in wound bed",back:"<b>Granulation:</b> beefy red, cobblestone, moist — healthy, proliferative phase.<br><b>Epithelium:</b> pink/light, migrates from edges.<br><b>Slough:</b> yellow/white, stringy — devitalized, must debride.<br><b>Eschar:</b> black/brown, necrotic — debride (exception: stable dry heel eschar in ischemic limb — leave unless vascular clearance obtained).<br><b>Hypergranulation:</b> raised above edges — impedes epithelialization."},
+  {cat:"healing",front:"Factors impairing wound healing",back:"<b>Local:</b> infection, desiccation, necrotic tissue, poor perfusion, repeated trauma.<br><b>Systemic:</b> diabetes (↓ leukocyte function, ↓ perfusion), malnutrition (protein/zinc/vit C), corticosteroids, smoking (vasoconstriction), age, immunosuppression, radiation.<br>Moist environment optimizes all phases."},
+  {cat:"healing",front:"Wound infection — signs and criteria",back:"<b>Local signs:</b> ↑ exudate, purulence, friable granulation, malodor, periwound erythema &gt;2 cm, new/increased pain, delayed healing.<br><b>Systemic:</b> fever, leukocytosis, sepsis.<br><b>Infection threshold:</b> &gt;10⁵ organisms/gram tissue OR clinical signs.<br><b>Biofilm:</b> highly antibiotic-resistant — requires debridement."},
+  {cat:"healing",front:"Wound measurement and documentation",back:"<b>Size:</b> longest length × widest width (perpendicular).<br><b>Depth:</b> cotton-tipped applicator at deepest point.<br><b>Tunneling:</b> clock notation (12 = toward head).<br><b>Document:</b> location, size, wound bed tissue %, edges, periwound, exudate (amount/type/color), odor, pain."},
+
+  // ── WOUND MANAGEMENT ──
+  {cat:"management",front:"Debridement methods",back:"<b>Sharp/surgical:</b> fastest, selective — indicated for urgent debridement.<br><b>Mechanical:</b> pulsed lavage, whirlpool. Wet-to-dry largely abandoned (non-selective, disrupts granulation).<br><b>Autolytic:</b> moisture-retentive dressings — slowest, painless, selective. Contraindicated in infected wounds.<br><b>Enzymatic:</b> collagenase (Santyl) — selective, good for necrotic tissue.<br><b>Biological (maggots):</b> highly effective for chronic wounds."},
+  {cat:"management",front:"Wound dressing selection principles",back:"Match dressing to wound moisture needs:<br><b>Dry wound:</b> add moisture (hydrogel, hydrocolloid).<br><b>Heavy exudate:</b> absorb (foam, alginate).<br><b>Infected:</b> antimicrobial (silver, iodine, PHMB).<br><b>Tunneling:</b> fill (alginate rope, packing gauze).<br><b>Fragile periwound:</b> protect (silicone borders).<br>Moist healing is 30–50% faster than dry."},
+  {cat:"management",front:"Dressing types — key categories",back:"<b>Hydrogel:</b> adds moisture — dry/necrotic wounds, autolytic debridement.<br><b>Hydrocolloid:</b> moisture-retentive, occlusive — partial thickness, low exudate.<br><b>Foam:</b> absorptive — moderate-heavy exudate.<br><b>Alginate:</b> highly absorptive, gels on contact — heavy exudate, bleeding wounds.<br><b>Silver:</b> antimicrobial — infected/high-risk.<br><b>NPWT (VAC):</b> promotes granulation, ↓ edema, draws edges together."},
+  {cat:"management",front:"Negative pressure wound therapy (NPWT)",back:"Mechanism: sub-atmospheric pressure (−75 to −125 mmHg) → removes exudate, promotes granulation, ↓ edema, draws wound edges together.<br><b>Indications:</b> chronic wounds, surgical dehiscence, skin grafts, diabetic foot ulcers.<br><b>Contraindications:</b> untreated osteomyelitis, undebrided necrosis, malignancy in wound, exposed vessels/nerves/organs."},
+  {cat:"management",front:"Offloading — pressure redistribution",back:"<b>Total contact cast (TCC):</b> gold standard for diabetic plantar ulcers — distributes pressure evenly, enforces compliance.<br><b>Removable cast walker (RCW):</b> effective but compliance-dependent.<br><b>Mattress:</b> reactive (air/foam) vs active (alternating pressure — high-risk patients).<br>30° tilt &gt; 90° side-lying for trochanteric pressure reduction."},
+  {cat:"management",front:"Electrical stimulation for wound healing",back:"<b>HVPC</b> (high-voltage pulsed current): most evidence — promotes fibroblasts, angiogenesis, antibacterial.<br><b>Positive polarity:</b> attracts neutrophils/macrophages (inflammatory phase).<br><b>Negative polarity:</b> attracts fibroblasts/epithelial cells (proliferative phase).<br><b>Protocol:</b> 100 Hz, 75–200V, 45–60 min, 5×/week.<br><b>Contraindicated:</b> osteomyelitis, malignancy, over pacemaker."},
+  {cat:"management",front:"Pulsed lavage with suction (PLWS)",back:"Pressurized irrigation + simultaneous suction — removes bacteria, devitalized tissue, exudate.<br><b>Effective pressure:</b> 4–15 psi. Standard: 8 psi.<br><b>Precautions:</b> aerosolization risk — PPE required (mask, goggles, gown).<br><b>Contraindicated:</b> tunnels communicating with body cavities, exposed vessels, clean granulating wounds."},
+  {cat:"management",front:"Whirlpool — indications and precautions",back:"<b>Indication:</b> adherent exudate/slough — debridement only, not routine care.<br><b>Temperature:</b> 92–96°F — avoid hot in insensate or ischemic limbs.<br><b>Avoid in:</b> venous insufficiency (dependency ↑ edema), clean granulating wounds, infection (cross-contamination risk).<br><b>Duration:</b> 20 min. Largely replaced by pulsed lavage."},
+
+  // ── BURNS ──
+  {cat:"burns",front:"Burn depth classification",back:"<b>Superficial (1°):</b> epidermis — red, dry, painful, no blisters. Heals 3–5 days, no scar.<br><b>Partial thickness superficial (2°):</b> blistered, moist, very painful. Heals 7–21 days, minimal scar.<br><b>Partial thickness deep (2°):</b> mottled, less painful, may need grafting.<br><b>Full thickness (3°):</b> white/brown/black, dry, leathery, painless — requires grafting.<br><b>Subdermal (4°):</b> muscle/bone — may need amputation."},
+  {cat:"burns",front:"Rule of nines — burn surface area",back:"<b>Adult:</b> head 9%, each arm 9%, anterior trunk 18%, posterior trunk 18%, each leg 18%, perineum 1%.<br><b>Child:</b> head 18%, each leg 13.5%.<br><b>Palm method:</b> patient's palm ≈ 1% BSA.<br><b>Major burn:</b> &gt;25% BSA partial thickness (adult), &gt;20% child, &gt;10% full thickness, face/hands/feet/genitalia/joints, inhalation injury."},
+  {cat:"burns",front:"Burn zones (Jackson's model)",back:"<b>Coagulation:</b> center — maximum damage, necrotic, cannot be salvaged.<br><b>Stasis:</b> surrounds coagulation — viable but at risk. Goal of resuscitation = prevent progression to coagulation.<br><b>Hyperemia:</b> outermost — increased perfusion, spontaneously recovers.<br>Aggressive fluid resuscitation and positioning maintain stasis zone perfusion."},
+  {cat:"burns",front:"Burn rehab — PT priorities",back:"<b>Acute:</b> positioning (anti-contracture), splinting, AROM/PROM, edema management, early ambulation.<br><b>Scar management:</b> compression garments (20–25 mmHg, 23 hrs/day, 12–18 months), silicone gel sheets, massage (after graft adherence), stretching.<br><b>Resistance training:</b> begins ~5–7 days post-graft adherence."},
+  {cat:"burns",front:"Burn contracture — anti-contracture positioning",back:"<b>Neck:</b> extension + lateral rotation (not flexion).<br><b>Shoulder:</b> 90° abduction + ER (not adduction).<br><b>Elbow:</b> extension + supination (not flexion).<br><b>Hand:</b> intrinsic plus — MCP flexion 70–90°, IP extension, thumb abduction.<br><b>Hip:</b> extension + abduction. <b>Knee:</b> extension. <b>Ankle:</b> neutral/DF."},
+  {cat:"burns",front:"Skin grafting — types and PT implications",back:"<b>STSG</b> (split-thickness): epidermis + partial dermis — meshed or sheet. Large areas. Donor site heals spontaneously.<br><b>FTSG</b> (full-thickness): better cosmesis — face/hands.<br><b>PT:</b> immobilize graft 3–5 days → gentle AROM. Avoid shear over new graft.<br><b>Graft failure causes:</b> infection, shear, hematoma."},
+  {cat:"burns",front:"Inhalation injury",back:"<b>Above glottis:</b> heat — edema, airway obstruction. Early intubation before airway swells shut.<br><b>Below glottis:</b> chemical — delayed pulmonary edema, ARDS, bronchospasm.<br><b>CO poisoning:</b> CO binds Hgb 240× — hypoxia despite normal SpO2. Treat: 100% O2 non-rebreather.<br><b>PT:</b> airway clearance, positioning, early mobilization."},
+  {cat:"burns",front:"Hypertrophic scar vs keloid",back:"<b>Hypertrophic:</b> raised, red, within wound boundaries — develops 4–8 wk, may regress 1–2 years.<br><b>Keloid:</b> extends beyond boundaries — does not regress, recurs after excision, more common in darker skin.<br><b>PT primary intervention:</b> compression garments (23 hrs/day) for full scar maturation (12–18 months). Also: silicone, steroid injection."},
+
+  // ── LYMPHEDEMA / EDEMA ──
+  {cat:"lymphedema",front:"Lymphedema — primary vs secondary",back:"<b>Primary:</b> congenital lymphatic malformation — presents at birth (congenita), puberty (praecox), or &gt;35 yrs (tarda).<br><b>Secondary (most common):</b> post-mastectomy (most common in US), radiation, filariasis (most common worldwide), trauma, malignancy.<br><b>Gold standard Tx:</b> complete decongestive therapy (CDT)."},
+  {cat:"lymphedema",front:"Lymphedema staging (ISL)",back:"<b>Stage 0:</b> subclinical — no visible edema, lymphatic transport impaired.<br><b>Stage 1:</b> pitting edema, reduces with elevation (spontaneously reversible).<br><b>Stage 2:</b> pitting → non-pitting, fibrosis, does not reduce with elevation.<br><b>Stage 3:</b> severe, skin changes (papillomas, hyperkeratosis), recurrent infections.<br>PT most effective Stage 1–2."},
+  {cat:"lymphedema",front:"Complete decongestive therapy (CDT)",back:"<b>Phase 1</b> (intensive, 2–4 wk daily): MLD + multilayer compression bandaging + exercise + skin care.<br><b>Phase 2</b> (maintenance, lifelong): compression garments + self-MLD + exercise + skin care.<br><b>Garment pressures:</b> mild 20–30 mmHg | moderate 30–40 | severe 40–50."},
+  {cat:"lymphedema",front:"Manual lymphatic drainage (MLD)",back:"Gentle rhythmic massage following lymphatic pathways — proximal clearing first, then distal drainage.<br><b>Pressure:</b> very light (30–40 mmHg) — lymphatics are superficial and collapse under excess pressure.<br><b>Contraindications:</b> active cellulitis, active malignancy in region, acute DVT, cardiac edema (relative).<br>Not standard massage — requires specialized training."},
+  {cat:"lymphedema",front:"Compression bandaging vs garments",back:"<b>Short-stretch bandaging</b> (Phase 1): inelastic — high working pressure, low resting pressure. Worn 23 hrs/day.<br><b>Long-stretch (elastic):</b> not recommended — high resting pressure impairs lymphatic flow.<br><b>Garments</b> (Phase 2): custom-fitted, replace every 3–6 months, measure in morning.<br>Never compress if ABI &lt;0.5 without vascular clearance."},
+  {cat:"lymphedema",front:"Pitting vs non-pitting edema",back:"<b>Pitting</b> (protein-poor): venous insufficiency, cardiac failure, hypoalbuminemia, DVT.<br>Grading: 1+ (2mm) | 2+ (4mm) | 3+ (6mm) | 4+ (8mm).<br><b>Non-pitting</b> (protein-rich): lymphedema (late stages), myxedema, lipedema.<br><b>Stemmer's sign:</b> can't pinch skin at base of 2nd toe = lymphedema."},
+  {cat:"lymphedema",front:"Lipedema vs lymphedema",back:"<b>Lipedema:</b> bilateral, symmetric fat deposition — LE but spares feet ('cuffing' at ankle). Predominantly female. Painful, bruises easily. NOT reducible with elevation or compression. Stemmer's sign negative.<br><b>Lymphedema:</b> asymmetric, involves foot, Stemmer's positive, pitting (early), reducible.<br>Lipedema can progress to lipo-lymphedema — treat lymphedema component with CDT."},
+  {cat:"lymphedema",front:"Cellulitis in lymphedema",back:"High risk for recurrent cellulitis — impaired immune surveillance.<br><b>Signs:</b> acute erythema, warmth, tenderness, fever, flu-like symptoms.<br><b>Tx:</b> antibiotics (penicillin-based), rest, elevation. Pause MLD and compression until resolved.<br><b>Prevention:</b> meticulous skin care, moisturization, treat fungal infections (portal of entry)."},
+  {cat:"lymphedema",front:"Exercise and lymphedema",back:"Exercise is safe and beneficial — does not worsen lymphedema when compression garment is worn.<br><b>Resistance training:</b> progressive UE resistance post-mastectomy is evidence-based — reduces lymphedema risk (previously contraindicated, now supported by RCTs).<br><b>Aquatic exercise:</b> hydrostatic pressure = natural compression.<br><b>Deep breathing:</b> promotes lymphatic flow via pressure gradient."},
+  {cat:"lymphedema",front:"Venous insufficiency — PT management",back:"<b>Cause:</b> incompetent venous valves → venous hypertension → edema, skin changes, ulceration.<br><b>Skin changes:</b> hemosiderin staining, lipodermatosclerosis, varicose veins.<br><b>Tx:</b> compression (30–40 mmHg) primary. Calf pump activation (ankle pumps, walking). Elevation above heart. Moisture-retentive dressings for ulcers.<br>Avoid prolonged standing/sitting."},
+];
+
+const CONF_COLORS={gotit:{bg:'#E1F5EE',color:'#0F6E56'},almost:{bg:'#FAEEDA',color:'#854F0B'},nope:{bg:'#FCEBEB',color:'#A32D2D'}};
+const CONF_LABELS={gotit:'Got it',almost:'Almost',nope:'Nope'};
+const CONF_FILTER_OPTIONS={
+  nope:   {label:'Nope',   bg:'#FCEBEB',color:'#A32D2D',border:'#F09595'},
+  almost: {label:'Almost', bg:'#FAEEDA',color:'#854F0B',border:'#EF9F27'},
+  gotit:  {label:'Got it', bg:'#E1F5EE',color:'#0F6E56',border:'#5DCAA5'},
+  unrated:{label:'Unrated',bg:'#f5f4f0',color:'#6b6966',border:'#c8c6c3'},
+};
+
+
+
+CARDS.forEach((c,i)=>c._id='card_'+i);
+function cid(c){return c._id;}
+
+const FIREBASE_CONFIG={apiKey:"AIzaSyA6EjnhyYUOt0iRYUaywCoqZ5POaVQmcsk",authDomain:"npte-flaschcards.firebaseapp.com",databaseURL:"https://npte-flaschcards-default-rtdb.firebaseio.com",projectId:"npte-flaschcards",storageBucket:"npte-flaschcards.firebasestorage.app",messagingSenderId:"429875976159",appId:"1:429875976159:web:04fc0eda2e758c606e966a"};
+const USER_ID='thisisElyk';
+
+// Firebase loaded via CDN
+let _db=null;
+let _fbRef=null;
+let _pendingSave=null;
+let _saveTimer=null;
+
+function initFirebase(storageKey){
+  if(typeof firebase==='undefined'){setSyncStatus('err','Firebase failed to load');return;}
+  firebase.initializeApp(FIREBASE_CONFIG);
+  _db=firebase.database();
+  _fbRef=_db.ref('users/'+USER_ID+'/'+storageKey);
+  setSyncStatus('pending','Connecting...');
+}
+
+function setSyncStatus(state,msg){
+  const dot=document.getElementById('syncDot');
+  const txt=document.getElementById('syncTxt');
+  if(!dot||!txt)return;
+  dot.className='sync-dot'+(state?' '+state:'');
+  txt.textContent=msg;
+}
+
+function saveState(stateObj){
+  // Always save to localStorage as offline fallback
+  try{localStorage.setItem('integumentary_cards_v1',JSON.stringify(stateObj));}catch(e){}
+  // Debounce Firebase writes (300ms)
+  if(_saveTimer)clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(()=>{
+    if(!_fbRef){return;}
+    setSyncStatus('pending','Saving...');
+    _fbRef.set(stateObj)
+      .then(()=>setSyncStatus('ok','Synced'))
+      .catch(e=>{setSyncStatus('err','Sync failed');console.warn('Firebase save error:',e);});
+  },300);
+}
+
+function loadState(storageKey,callback){
+  // Try localStorage immediately for fast start
+  let localState=null;
+  try{const r=localStorage.getItem(storageKey);if(r)localState=JSON.parse(r);}catch(e){}
+
+  if(localState)callback(localState);
+
+  // Then fetch from Firebase and update if newer/different
+  initFirebase(storageKey);
+  if(!_fbRef){callback(localState);return;}
+  _fbRef.once('value')
+    .then(snap=>{
+      const fbState=snap.val();
+      if(fbState){
+        // Update localStorage with Firebase state
+        try{localStorage.setItem(storageKey,JSON.stringify(fbState));}catch(e){}
+        setSyncStatus('ok','Synced');
+        callback(fbState);
+      } else {
+        setSyncStatus('ok','Synced');
+        if(!localState)callback(null);
+      }
+    })
+    .catch(e=>{
+      setSyncStatus('err','Offline — using local data');
+      console.warn('Firebase load error:',e);
+      if(!localState)callback(null);
+    });
+}
+
+let _initDone=false;
+let activeCats,activeRegions,activeSystems,activeSubs,activeConf,deck=[],removedIds=new Set(),confidence={},idx=0,revealed=false;
+
+let _firstLoad=true;
+
+function initDeck(saved){
+activeCats=new Set(saved?saved.activeCats:Object.keys(CATS));
+activeConf=new Set(saved?saved.activeConf:Object.keys(CONF_FILTER_OPTIONS));
+  removedIds=new Set(saved&&saved.removedIds?saved.removedIds:[]);
+  confidence=saved&&saved.confidence?saved.confidence:{};
+  idx=saved&&saved.idx?saved.idx:0;
+  if(!_initDone){_initDone=true;buildFilters();rebuildDeck();}
+  else{buildFilters();rebuildDeck();}
+}
+
+loadState('integumentary_cards_v1',initDeck);
+
+function confKey(c){return confidence[cid(c)]||'unrated';}
+function filteredCards(){
+  return CARDS.filter(c=>!removedIds.has(cid(c))&&activeCats.has(c.cat)&&activeConf.has(confKey(c)));
+}
+
+function rebuildDeck(){
+  deck=filteredCards();
+  if(_firstLoad){_firstLoad=false;if(idx>=deck.length)idx=Math.max(0,deck.length-1);}
+  else{idx=0;}
+  revealed=false;render();
+}
+
+
+function getState(){
+  return {
+    confidence,
+    removedIds:[...removedIds],
+    activeCats:typeof activeCats!=='undefined'?[...activeCats]:[],
+    activeRegions:typeof activeRegions!=='undefined'?[...activeRegions]:[],
+    activeSystems:typeof activeSystems!=='undefined'?[...activeSystems]:[],
+    activeSubs:typeof activeSubs!=='undefined'?[...activeSubs]:[],
+    activeConf:typeof activeConf!=='undefined'?[...activeConf]:[],
+    idx
+  };
+}
+
+function buildFilters(){
+  const el=document.getElementById('catFilters');
+  el.innerHTML='';
+  Object.entries(CATS).forEach(([k,v])=>{
+    const b=document.createElement('button');
+    b.className='fbtn'+(activeCats.has(k)?' active':'');
+    if(activeCats.has(k))b.style.background=v.dot;
+    b.textContent=v.label;
+    b.onclick=()=>{activeCats.has(k)?activeCats.delete(k):activeCats.add(k);buildFilters();rebuildDeck();saveState(getState());};
+    el.appendChild(b);
+  });
+  const confEl=document.getElementById('confFilters');
+  confEl.innerHTML='';
+  Object.entries(CONF_FILTER_OPTIONS).forEach(([k,v])=>{
+    const count=CARDS.filter(c=>!removedIds.has(cid(c))&&activeCats.has(c.cat)&&confKey(c)===k).length;
+    const b=document.createElement('button');
+    const isActive=activeConf.has(k);
+    b.className='fbtn'+(isActive?' active':'');
+    if(isActive)b.style.cssText='background:'+v.bg+';color:'+v.color+';border-color:'+v.border+';';
+    b.textContent=v.label+' ('+count+')';
+    b.onclick=()=>{activeConf.has(k)?activeConf.delete(k):activeConf.add(k);buildFilters();rebuildDeck();saveState(getState());};
+    confEl.appendChild(b);
+  });
+}
+
+function selectAll(){
+  activeCats=new Set(Object.keys(CATS));
+  activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
+  buildFilters();rebuildDeck();saveState(getState());
+}
+function clearAll(){
+  activeCats.clear();activeConf.clear();
+  buildFilters();rebuildDeck();saveState(getState());
+}
+
+function render(){
+  updateStats();
+  const area=document.getElementById('cardArea');
+  const navRow=document.getElementById('navRow');
+  if(deck.length===0){
+    let msg;
+    if(activeCats.size===0||activeConf.size===0){
+      msg='No filters selected — select at least one option in each row above.';
+    } else {
+      const allRemoved=CARDS.filter(c=>activeCats.has(c.cat)).every(c=>removedIds.has(cid(c)));
+      msg=allRemoved
+        ?'All cards mastered! Hit "Reset deck" to bring them back.'
+        :'No cards match the current confidence filter. Adjust the Confidence filter above or hit "Reset deck".';
+    }
+    area.innerHTML='<div class="empty-state"><strong>'+msg+'</strong></div>';
+    navRow.style.display='none';
+    document.getElementById('progFill').style.width='0%';
+    document.getElementById('progTxt').textContent='0 cards';
+    return;
+  }
+  navRow.style.display='flex';
+  if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+  const c=deck[idx];
+  const id=cid(c);
+  const conf=confidence[id]||null;
+  const pct=Math.round(((idx+1)/deck.length)*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=(idx+1)+' / '+deck.length;
+  const cat=CATS[c.cat];
+  const canRemove=conf==='gotit';
+
+  if(!revealed){
+    const confBadge=conf?'<span class="conf-badge" style="background:'+CONF_COLORS[conf].bg+';color:'+CONF_COLORS[conf].color+';">'+CONF_LABELS[conf]+'</span>':'';
+    area.innerHTML=`<div class="card card-front" onclick="toggle()">
+      <div class="front-cat" style="color:${cat.dot};">${cat.label}</div>
+      <div class="front-title">${c.front}</div>
+      ${confBadge}
+      <div class="hint">Tap to reveal</div>
+    </div>`;
+  } else {
+    const removeBtn=canRemove?'<button class="remove-btn" onclick="removeCard()">Remove</button>':'';
+    area.innerHTML=`<div class="card card-back" style="background:${cat.bg};border:0.5px solid ${cat.border};" onclick="handleBackClick(event)">
+      <div class="back-title" style="color:${cat.text};">${c.front}</div>
+      <div class="badge-row">
+        <span class="type-badge" style="background:${cat.badge_bg};color:${cat.badge_color};">${cat.label}</span>
+      </div>
+      <div class="divider" style="background:${cat.border};"></div>
+      <div class="blbl" style="color:${cat.dot};">Key facts</div>
+      <div class="bval" style="color:${cat.text};">${c.back}</div>
+      <div class="spacer"></div>
+      <div class="confidence-row" style="border-top:0.5px solid ${cat.border};" onclick="event.stopPropagation()">
+        <span class="conf-lbl" style="color:${cat.dot};">Confidence:</span>
+        <button class="cbtn cbtn-nope${conf==='nope'?' selected':''}" onclick="rate('nope')">Nope</button>
+        <button class="cbtn cbtn-almost${conf==='almost'?' selected':''}" onclick="rate('almost')">Almost</button>
+        <button class="cbtn cbtn-gotit${conf==='gotit'?' selected':''}" onclick="rate('gotit')">Got it</button>
+        ${removeBtn}
+      </div>
+      <div class="flip-hint" style="color:${cat.dot};">Tap card to flip back</div>
+    </div>`;
+  }
+}
+
+function handleBackClick(e){if(!e.target.closest('.confidence-row'))toggle();}
+function toggle(){revealed=!revealed;render();}
+function rate(val){
+  confidence[cid(deck[idx])]=val;
+  if(!activeConf.has(val)){
+    deck=filteredCards();
+    if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+    revealed=false;
+  }
+  saveState(getState());buildFilters();render();
+}
+function removeCard(){
+  const id=cid(deck[idx]);
+  removedIds.add(id);
+  deck=filteredCards();
+  if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+  revealed=false;saveState(getState());buildFilters();render();
+}
+function resetDeck(){
+  removedIds.clear();confidence={};
+  activeCats=new Set(Object.keys(CATS));
+  activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
+  idx=0;revealed=false;saveState(getState());buildFilters();rebuildDeck();
+}
+function updateStats(){
+  const removed=CARDS.filter(c=>removedIds.has(cid(c))).length;
+  const gotit=deck.filter(c=>confidence[cid(c)]==='gotit').length;
+  const almost=deck.filter(c=>confidence[cid(c)]==='almost').length;
+  const nope=deck.filter(c=>confidence[cid(c)]==='nope').length;
+  document.getElementById('statsRow').innerHTML=
+    '<div class="stat">Active <span>'+deck.length+'</span></div>'+
+    '<div class="stat">Mastered <span>'+removed+'</span></div>'+
+    '<div class="stat">Got it <span style="color:#0F6E56;">'+gotit+'</span></div>'+
+    '<div class="stat">Almost <span style="color:#854F0B;">'+almost+'</span></div>'+
+    '<div class="stat">Nope <span style="color:#A32D2D;">'+nope+'</span></div>';
+}
+function go(dir){const next=idx+dir;if(next<0||next>=deck.length)return;idx=next;revealed=false;saveState(getState());render();}
+function shuffle(){
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+  idx=0;revealed=false;saveState(getState());render();
+}
+</script>
+</body>
+</html>

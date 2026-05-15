@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Systems Interactions Flashcards — NPTE</title>
+<style>
+  :root{--bg-primary:#ffffff;--bg-secondary:#f5f4f0;--bg-tertiary:#edecea;--text-primary:#1a1a1a;--text-secondary:#6b6966;--text-tertiary:#a09d9a;--border:rgba(0,0,0,0.12);--border-md:rgba(0,0,0,0.22);--radius-md:8px;--radius-lg:12px;--purple:#7F77DD;}
+  @media(prefers-color-scheme:dark){:root{--bg-primary:#1c1c1e;--bg-secondary:#2c2c2e;--bg-tertiary:#3a3a3c;--text-primary:#f2f2f7;--text-secondary:#aeaeb2;--text-tertiary:#6e6e73;--border:rgba(255,255,255,0.1);--border-md:rgba(255,255,255,0.2);}}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg-tertiary);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem 3rem;color:var(--text-primary);}
+  .wrap{width:100%;max-width:680px;}
+  .page-title{font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:1.25rem;}
+  .filter-section{margin-bottom:1rem;}
+  .filter-group-label{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary);font-weight:500;margin-bottom:6px;}
+  .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+  .fbtn{font-size:12px;padding:4px 12px;border-radius:999px;border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-secondary);cursor:pointer;transition:all 0.15s;font-family:inherit;}
+  .fbtn.active{color:#fff;border-color:transparent;}
+  .filter-actions{display:flex;gap:10px;margin-top:4px;}
+  .faction{font-size:12px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
+  .stats-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+  .stat{background:var(--bg-secondary);border-radius:var(--radius-md);padding:5px 10px;font-size:12px;color:var(--text-secondary);}
+  .stat span{font-weight:500;color:var(--text-primary);}
+  .prog-wrap{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
+  .prog-bg{flex:1;height:4px;background:var(--bg-secondary);border-radius:2px;}
+  .prog-fill{height:4px;background:var(--purple);border-radius:2px;transition:width 0.3s;}
+  .prog-txt{font-size:13px;color:var(--text-secondary);white-space:nowrap;}
+  .card{border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1rem;cursor:pointer;min-height:280px;display:flex;flex-direction:column;}
+  .card-front{background:var(--bg-primary);border:0.5px solid var(--border);align-items:center;justify-content:center;}
+  .card-back{justify-content:flex-start;}
+  .front-cat{font-size:11px;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:6px;font-weight:500;}
+  .front-sub{font-size:11px;letter-spacing:0.04em;margin-bottom:10px;opacity:0.7;}
+  .front-title{font-size:23px;font-weight:500;color:var(--text-primary);line-height:1.2;text-align:center;}
+  .hint{font-size:13px;color:var(--text-tertiary);margin-top:1.25rem;}
+  .back-title{font-size:19px;font-weight:500;margin-bottom:6px;}
+  .badge-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .type-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:500;}
+  .sub-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;background:var(--bg-secondary);color:var(--text-secondary);}
+  .divider{height:0.5px;margin-bottom:14px;}
+  .blbl{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;font-weight:500;margin-bottom:6px;}
+  .bval{font-size:14px;line-height:1.7;} .bval b{font-weight:600;}
+  .spacer{flex:1;}
+  .confidence-row{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:12px;flex-wrap:wrap;}
+  .conf-lbl{font-size:12px;font-weight:500;margin-right:2px;}
+  .cbtn{font-size:12px;padding:5px 14px;border-radius:999px;border:0.5px solid;cursor:pointer;font-weight:500;font-family:inherit;}
+  .cbtn-nope{background:#FCEBEB;color:#A32D2D;border-color:#F09595;}
+  .cbtn-almost{background:#FAEEDA;color:#854F0B;border-color:#EF9F27;}
+  .cbtn-gotit{background:#E1F5EE;color:#0F6E56;border-color:#5DCAA5;}
+  .cbtn.selected{outline:2px solid currentColor;outline-offset:1px;}
+  .remove-btn{margin-left:auto;font-size:12px;padding:5px 12px;border-radius:999px;border:0.5px solid #5DCAA5;background:#E1F5EE;color:#0F6E56;cursor:pointer;font-weight:500;font-family:inherit;}
+  .flip-hint{text-align:center;margin-top:12px;font-size:12px;}
+  .conf-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:500;margin-top:10px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-bottom:8px;}
+  .nbtn{padding:8px 22px;font-size:14px;border-radius:var(--radius-md);border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-primary);cursor:pointer;font-family:inherit;}
+  .nbtn:hover{background:var(--bg-secondary);}
+  .nbtn.primary{background:#7F77DD;color:#fff;border-color:#7F77DD;}
+  .nbtn.primary:hover{background:#534AB7;}
+  .bottom-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:6px;}
+  .shuf-btn{font-size:13px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
+  .reset-btn{font-size:13px;color:#7F77DD;background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
+  .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-secondary);font-size:14px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1rem;background:var(--bg-primary);}
+  .empty-state strong{display:block;font-size:16px;color:var(--text-primary);margin-bottom:8px;font-weight:500;}
+  .sync-bar{display:flex;align-items:center;gap:6px;margin-bottom:0.75rem;font-size:12px;color:var(--text-tertiary);}
+  .sync-dot{width:7px;height:7px;border-radius:50%;background:#c8c6c3;flex-shrink:0;transition:background 0.3s;}
+  .sync-dot.ok{background:#5DCAA5;}
+  .sync-dot.err{background:#F09595;}
+  .sync-dot.pending{background:#EF9F27;}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="page-title">Systems interactions flashcards — NPTE</div>
+  <div class="sync-bar"><div class="sync-dot" id="syncDot"></div><span id="syncTxt">Connecting...</span></div>
+
+  <div class="filter-section">
+    <div class="filter-group-label">Category</div>
+    <div class="filter-row" id="catFilters"></div>
+    <div class="filter-group-label">Subcategory</div>
+    <div class="filter-row" id="subFilters"></div>
+    <div class="filter-group-label">Confidence</div>
+    <div class="filter-row" id="confFilters"></div>
+    <div class="filter-actions">
+      <button class="faction" onclick="selectAll()">Select all</button>
+      <button class="faction" onclick="clearAll()">Clear all</button>
+    </div>
+  </div>
+  <div class="stats-row" id="statsRow"></div>
+  <div class="prog-wrap">
+    <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-txt" id="progTxt"></div>
+  </div>
+  <div id="cardArea"></div>
+  <div class="btn-row" id="navRow">
+    <button class="nbtn" onclick="go(-1)">← Prev</button>
+    <button class="nbtn primary" onclick="go(1)">Next →</button>
+  </div>
+  <div class="bottom-row">
+    <button class="shuf-btn" onclick="shuffle()">Shuffle deck</button>
+    <button class="reset-btn" onclick="resetDeck()">Reset deck</button>
+  </div>
+</div>
+<script>
+const CATS={
+  screening:  {label:"Screening & referral",   dot:"#E24B4A",bg:"#FCEBEB",border:"#F09595",text:"#791F1F",badge_bg:"#FCEBEB",badge_color:"#A32D2D"},
+  medications:{label:"Medications & PT",        dot:"#BA7517",bg:"#FAEEDA",border:"#EF9F27",text:"#633806",badge_bg:"#FAEEDA",badge_color:"#854F0B"},
+  systemic:   {label:"Systemic disease effects",dot:"#7F77DD",bg:"#EEEDFE",border:"#AFA9EC",text:"#3C3489",badge_bg:"#EEEDFE",badge_color:"#534AB7"},
+  oncology:   {label:"Oncology",                dot:"#D4537E",bg:"#FBEAF0",border:"#ED93B1",text:"#72243E",badge_bg:"#FBEAF0",badge_color:"#993556"},
+  endocrine:  {label:"Endocrine",               dot:"#1D9E75",bg:"#E1F5EE",border:"#5DCAA5",text:"#085041",badge_bg:"#E1F5EE",badge_color:"#0F6E56"},
+  immune:     {label:"Immunological / rheum",   dot:"#378ADD",bg:"#E6F1FB",border:"#85B7EB",text:"#0C447C",badge_bg:"#E6F1FB",badge_color:"#185FA5"},
+};
+const SUBS={
+  cardiac:"Cardiac",pulmonary:"Pulmonary",neuro:"Neurological",msk:"MSK",
+  gi:"GI / hepatic",renal:"Renal",cancer:"Cancer rehab",chemo:"Chemo / radiation",
+  diabetes:"Diabetes",thyroid:"Thyroid",bone:"Bone / osteoporosis",
+  rheum:"Rheumatological",autoimmune:"Autoimmune",general:"General",
+};
+const SUB_COLORS={
+  cardiac:"#E24B4A",pulmonary:"#378ADD",neuro:"#7F77DD",msk:"#D85A30",
+  gi:"#BA7517",renal:"#639922",cancer:"#D4537E",chemo:"#993556",
+  diabetes:"#1D9E75",thyroid:"#0F6E56",bone:"#888780",
+  rheum:"#185FA5",autoimmune:"#534AB7",general:"#6b6966",
+};
+
+const CARDS=[
+  // ── SCREENING & REFERRAL ──
+  {cat:"screening",sub:"general",front:"Red flags — immediate referral",back:"<b>Cauda equina:</b> saddle anesthesia + bladder retention = emergency.<br><b>Cardiac:</b> chest pain not reproduced by palpation + diaphoresis + dyspnea = call EMS.<br><b>Stroke:</b> FAST (Face, Arm, Speech, Time to call 911).<br><b>Fracture:</b> trauma + inability to WB + point tenderness.<br><b>Infection:</b> fever + night pain + unexplained weight loss + immunocompromised = urgent referral."},
+  {cat:"screening",sub:"general",front:"Cyriax's systemic disease pattern",back:"Constant pain unrelated to movement or position.<br>Pain at rest and at night.<br>Bilateral or alternating symptoms.<br>Multi-joint involvement without trauma.<br>Systemically unwell: fever, weight loss (&gt;10 lbs/6 months), fatigue, night sweats.<br>Progressive worsening despite appropriate PT.<br>Any of these = screen for systemic cause before treating as mechanical."},
+  {cat:"screening",sub:"general",front:"SINSS — symptom behavior screening",back:"<b>S</b>everity: pain out of proportion to mechanism?<br><b>I</b>rritability: how easily provoked, how long to settle?<br><b>N</b>ature: mechanical (position-dependent) vs chemical (constant, non-mechanical)?<br><b>S</b>tage: acute, subacute, chronic?<br><b>S</b>pecial questions: weight loss, night pain, bilateral symptoms, bowel/bladder.<br>High irritability + non-mechanical behavior = treat cautiously, consider referral."},
+  {cat:"screening",sub:"cardiac",front:"Cardiac red flags in PT",back:"<b>Stop immediately + call EMS:</b> chest pain/pressure during exercise, jaw/left arm pain + diaphoresis, new arrhythmia, SBP drop &gt;10 mmHg with ↑ workload, syncope.<br>Give NTG if prescribed — EMS if no relief in 5 min.<br>Do not leave patient alone."},
+  {cat:"screening",sub:"cardiac",front:"Ankle swelling — differential screening",back:"<b>Bilateral pitting:</b> cardiac failure (JVD, orthopnea, S3), hypoalbuminemia, venous insufficiency, medications (CCBs, steroids).<br><b>Unilateral pitting:</b> DVT, Baker's cyst rupture, cellulitis.<br><b>Non-pitting bilateral:</b> lymphedema, lipedema, myxedema (hypothyroid).<br>Bilateral + JVD + dyspnea = cardiac referral."},
+  {cat:"screening",sub:"pulmonary",front:"Pulmonary red flags in PT",back:"<b>SpO2 &lt;88%</b> at rest or exercise: withhold, O2, notify MD.<br><b>Hemoptysis:</b> refer — lung cancer, PE, severe infection until ruled out.<br><b>Stridor</b> (high-pitched inspiratory): upper airway obstruction — emergency.<br><b>Sudden dyspnea + pleuritic pain + tachycardia:</b> PE until proven otherwise.<br><b>Asymmetric breath sounds + tracheal deviation:</b> tension pneumothorax — call EMS."},
+  {cat:"screening",sub:"neuro",front:"Neurological red flags in PT",back:"<b>Bowel/bladder + saddle anesthesia:</b> cauda equina — emergency.<br><b>Bilateral neuro symptoms from single spinal level:</b> cord compression or systemic cause — urgent referral.<br><b>Progressive neuro deficit:</b> urgent referral.<br><b>Worst headache of life:</b> subarachnoid hemorrhage — call EMS.<br><b>Hoffman's + hyperreflexia + gait disturbance:</b> myelopathy — imaging before mobilization."},
+  {cat:"screening",sub:"msk",front:"MSK red flags — fracture and infection",back:"<b>Fracture:</b> mechanism + point tenderness + inability to WB (Ottawa rules).<br><b>Stress fracture:</b> insidious onset, focal bone tenderness, activity-related.<br><b>Osteomyelitis:</b> bone pain + fever + ↑ ESR/CRP — refer.<br><b>Septic arthritis:</b> acute joint swelling + fever + restricted ROM — emergency aspiration needed.<br><b>Tumor:</b> constant bone pain, night pain, unexplained swelling. Age &lt;20 or &gt;50 with new back pain + no trauma = red flag."},
+  {cat:"screening",sub:"gi",front:"GI / hepatic referral signs",back:"<b>Referred pain patterns:</b> liver/gallbladder → right shoulder tip (phrenic C3–C5). Spleen → left shoulder (Kehr's sign). Pancreas → mid-back/epigastric. Appendix → RLQ (McBurney's).<br><b>GI red flags:</b> blood in stool, unexplained weight loss, progressive dysphagia, jaundice, abdominal mass.<br>Any abdominal symptom not reproduced by palpation or movement = refer."},
+  {cat:"screening",sub:"renal",front:"Renal referral signs",back:"<b>CVA tenderness:</b> kidney infection (pyelonephritis) — posterior flank pain + punch tenderness. Differentiates from lumbar muscle pain (not tender to percussion).<br><b>Hematuria:</b> calculi, infection, malignancy.<br><b>Bilateral edema + HTN + proteinuria:</b> nephrotic syndrome.<br><b>Renal colic:</b> severe flank pain radiating to groin."},
+
+  // ── MEDICATIONS & PT ──
+  {cat:"medications",sub:"cardiac",front:"Medications that blunt HR response",back:"<b>Beta-blockers</b> (metoprolol, atenolol, carvedilol): most significant — blunt HR and BP response.<br><b>CCBs</b> (verapamil, diltiazem): reduce HR and BP.<br><b>Digoxin:</b> reduces ventricular rate in AF.<br>Never use 220 − age formula for beta-blocker patients. Use RPE or HR from GXT on medication."},
+  {cat:"medications",sub:"cardiac",front:"Medications causing orthostatic hypotension",back:"<b>High-risk drugs:</b> antihypertensives, diuretics, alpha-blockers, TCAs, antipsychotics, nitrates, opioids, Parkinson's meds (levodopa).<br><b>Definition:</b> SBP drop ≥20 mmHg or DBP drop ≥10 mmHg within 3 min of standing.<br><b>PT protocol:</b> measure lying → sitting → standing, wait 1–2 min each. Slow position changes, compression stockings, adequate hydration."},
+  {cat:"medications",sub:"msk",front:"Medications affecting bone and tendon",back:"<b>Corticosteroids</b> (long-term): osteoporosis, AVN (femoral head), proximal myopathy, impaired wound healing.<br><b>Fluoroquinolones</b> (ciprofloxacin): tendon rupture risk — Achilles most common. Avoid aggressive eccentric loading during course and 4 weeks after.<br><b>Bisphosphonates:</b> ↓ fracture risk but associated with atypical femoral fractures (long-term) and jaw osteonecrosis."},
+  {cat:"medications",sub:"neuro",front:"Medications affecting balance and falls",back:"<b>Highest fall risk:</b> benzodiazepines (most evidence), opioids, TCAs, antipsychotics, anticonvulsants, sedating antihistamines.<br><b>Moderate risk:</b> antihypertensives (orthostatic), diuretics, SSRIs, alpha-blockers.<br><b>Polypharmacy (≥4 meds):</b> independent fall risk factor.<br>PT: identify high-risk meds, screen orthostatic BP, implement fall prevention, communicate with prescriber."},
+  {cat:"medications",sub:"general",front:"NSAIDs — PT implications",back:"COX inhibition → ↓ prostaglandins → analgesia, anti-inflammatory, antipyretic.<br><b>PT:</b> may mask pain — do not progress load based on NSAID-reduced pain alone.<br>Impair tendon and bone healing long-term (prostaglandins required for healing cascade).<br><b>Risks:</b> GI (take with food), renal (elderly/dehydrated), fluid retention (avoid in HF).<br>Topical NSAIDs: fewer systemic effects for superficial MSK pain."},
+  {cat:"medications",sub:"general",front:"Opioids — PT implications",back:"<b>Effects:</b> analgesia, sedation, constipation, respiratory depression, dependence.<br><b>PT:</b> sedation impairs motor learning — schedule when at therapeutic peak if possible.<br>Constipation may mimic lumbar pain (abdominal guarding).<br>Monitor RR during exercise.<br><b>Opioid-induced hyperalgesia:</b> paradoxical ↑ pain with long-term use — suspect when pain worsens despite dose escalation."},
+  {cat:"medications",sub:"general",front:"Anticoagulants — exercise safety",back:"DVT on anticoagulation: ambulation safe and encouraged — do not rest.<br><b>Increased bleeding risk:</b> fall prevention critical. Avoid contact sports.<br><b>Monitor for internal bleeding:</b> abdominal pain, severe headache, visual changes, significant bruising.<br><b>Warfarin:</b> INR &gt;3.5 = exercise with caution, notify MD."},
+  {cat:"medications",sub:"diabetes",front:"Diabetes medications — PT implications",back:"<b>Insulin + sulfonylureas:</b> hypoglycemia risk during exercise.<br><b>Hold exercise if glucose:</b> &lt;100 mg/dL (give snack first) or &gt;300 mg/dL.<br><b>Hypo signs:</b> diaphoresis, tremor, confusion, tachycardia, weakness.<br><b>Metformin:</b> low hypoglycemia risk, safe for exercise.<br><b>SGLT-2 inhibitors:</b> dehydration risk — ensure adequate hydration."},
+  {cat:"medications",sub:"bone",front:"Osteoporosis medications — PT implications",back:"<b>Bisphosphonates</b> (alendronate): ↓ vertebral and hip fracture risk. Lateral thigh pain with long-term use = atypical femoral fracture red flag.<br><b>Denosumab:</b> similar fracture protection (RANK-L inhibitor).<br><b>Teriparatide</b> (PTH): anabolic, limited to 2 years.<br><b>PT:</b> weight-bearing + resistance training additive to medications. Ca 1200 mg/day + Vit D 800–1000 IU/day required."},
+
+  // ── SYSTEMIC DISEASE EFFECTS ──
+  {cat:"systemic",sub:"cardiac",front:"Heart failure effects on PT",back:"↓ CO → exercise intolerance, early fatigue. Pulmonary congestion → dyspnea on exertion, orthopnea, crackles.<br><b>Hold exercise if:</b> weight gain &gt;2 lbs/24 hrs or &gt;5 lbs/week, dyspnea at rest, new S3, ↑ edema.<br><b>PT:</b> monitor daily weight, SpO2, HR, BP, RPE. Moderate aerobic exercise (40–60% HRR) is evidence-based for stable HF."},
+  {cat:"systemic",sub:"cardiac",front:"Peripheral artery disease effects on function",back:"<b>Presentation:</b> intermittent claudication → rest pain → tissue loss (critical limb ischemia).<br>ABI &lt;0.4 = severe — exercise may be limited by ischemic rest pain.<br><b>Best PT Rx:</b> supervised walking to claudication onset, rest, repeat — better than stenting for functional outcomes.<br>Wound healing severely impaired with ABI &lt;0.5. Inspect feet each session."},
+  {cat:"systemic",sub:"pulmonary",front:"COPD systemic effects",back:"Beyond lungs: skeletal muscle atrophy (primary exercise limiter — not dyspnea), cachexia, osteoporosis (steroids + inactivity), cardiovascular comorbidity, depression/anxiety.<br><b>PT:</b> resistance training addresses peripheral muscle dysfunction directly. Nutrition assessment: low BMI = poor prognosis.<br>Exercise is safe — does not cause exacerbations."},
+  {cat:"systemic",sub:"neuro",front:"Parkinson's disease — systemic effects on PT",back:"<b>Autonomic:</b> orthostatic hypotension (assess before each session), constipation, bladder urgency.<br><b>Dysphagia:</b> aspiration risk — refer to SLP.<br><b>Mood:</b> depression/anxiety very common — affects motivation.<br><b>PT:</b> implicit learning, external cues, avoid dual-task early in gait training."},
+  {cat:"systemic",sub:"msk",front:"Rheumatoid arthritis — systemic effects on PT",back:"<b>Extra-articular:</b> atlantoaxial instability (C1–C2), pulmonary fibrosis, pericarditis, vasculitis, peripheral neuropathy, anemia.<br><b>Medications:</b> methotrexate (hepatotoxic), biologics (↑ infection risk).<br><b>PT:</b> resistance + aerobic during remission. Reduce load during flare (AROM, aquatic).<br>Never manipulate cervically — atlantoaxial instability risk."},
+  {cat:"systemic",sub:"msk",front:"Osteoporosis — functional effects and PT",back:"<b>Vertebral compression fractures:</b> kyphosis, height loss, chronic pain, restrictive pulmonary pattern.<br><b>Hip fractures:</b> major morbidity/mortality — 20–30% die within 1 year.<br><b>PT:</b> weight-bearing + resistance exercise (Wolff's law). Avoid spinal flexion loading, high-impact.<br><b>DEXA:</b> T-score ≤-2.5 = osteoporosis | -1.0 to -2.5 = osteopenia."},
+  {cat:"systemic",sub:"gi",front:"Hepatic disease — PT implications",back:"<b>Cirrhosis:</b> coagulopathy (avoid contact), portal HTN → esophageal varices (avoid Valsalva), ascites (limits diaphragm), hepatic encephalopathy (impairs motor learning).<br><b>Exercise:</b> low-moderate intensity safe in compensated cirrhosis.<br><b>Avoid:</b> heavy resistance (Valsalva + varices), contact sports.<br><b>Refer:</b> new jaundice, significant ascites, encephalopathy."},
+  {cat:"systemic",sub:"renal",front:"Chronic kidney disease — PT implications",back:"<b>Anemia</b> (↓ EPO): early fatigue, dyspnea — check Hgb before exercise.<br><b>Peripheral neuropathy:</b> sensory loss, balance impairment.<br><b>Renal osteodystrophy:</b> fracture risk.<br><b>Dialysis patients:</b> exercise on non-dialysis days preferred (fatigue + hemodynamic instability post-dialysis).<br>Exercise safe and beneficial — improves function, QOL, may slow progression."},
+
+  // ── ONCOLOGY ──
+  {cat:"oncology",sub:"cancer",front:"Cancer rehab — PT framework",back:"<b>Preventive:</b> pre-treatment — optimize baseline.<br><b>Restorative:</b> post-treatment — return to prior function.<br><b>Supportive:</b> during treatment — manage side effects.<br><b>Palliative:</b> advanced disease — comfort, function, QOL.<br><b>Cancer-related fatigue (CRF):</b> most common and disabling symptom — exercise is the best evidence-based intervention."},
+  {cat:"oncology",sub:"cancer",front:"Cancer-related fatigue (CRF)",back:"Affects 80–100% during treatment, persists in 30% of survivors.<br>Not relieved by rest, disproportionate to activity.<br><b>Best evidence:</b> aerobic + resistance training during and after treatment.<br><b>PT:</b> graded exercise prescription, energy conservation, pacing, sleep hygiene.<br>Absolute rest is harmful — perpetuates deconditioning and worsens fatigue."},
+  {cat:"oncology",sub:"cancer",front:"Bone metastasis — PT precautions",back:"<b>Common sites:</b> vertebral column (most common), pelvis, proximal femur, proximal humerus.<br><b>Mirels score ≥9:</b> prophylactic fixation before WB — no WB until surgical stabilization.<br><b>Vertebral mets:</b> no spinal loading/twisting, log roll, brace if prescribed.<br><b>Pathological fracture signs:</b> acute severe pain with minimal mechanism — stop, immobilize, refer urgently."},
+  {cat:"oncology",sub:"cancer",front:"Post-mastectomy PT",back:"<b>Axillary web syndrome (cording):</b> tight fibrous cords axilla → medial arm — limits shoulder ER/abduction. Tx: progressive mobilization, nerve gliding, manual therapy.<br><b>Lymphedema risk:</b> 20–30% post-ALND, lower with SLNB.<br><b>PT:</b> early ROM (within 48 hrs of drain removal), progressive strengthening.<br>Resistance training does NOT ↑ lymphedema risk — strongly supported."},
+  {cat:"oncology",sub:"cancer",front:"Prostate cancer — PT implications",back:"<b>ADT (androgen deprivation therapy):</b> ↓ muscle, ↑ fat, osteoporosis, fatigue, cardiovascular risk, cognitive changes.<br><b>PT:</b> resistance + aerobic training counteract ADT effects — critical for this population.<br><b>Post-prostatectomy:</b> pelvic floor PT for urinary incontinence — first-line treatment (Kegels with correct technique).<br>Bone mets common — screen for precautions."},
+  {cat:"oncology",sub:"chemo",front:"Chemotherapy side effects — PT implications",back:"<b>CIPN</b> (paclitaxel, platinum): sensory loss, balance impairment, fall risk.<br><b>Cardiotoxicity</b> (doxorubicin): cardiomyopathy → HF — monitor HR, BP, exercise tolerance.<br><b>Pulmonary toxicity</b> (bleomycin): fibrosis → restrictive — SpO2 monitoring.<br><b>Myelosuppression:</b> neutropenia (↑ infection), thrombocytopenia (↑ bleeding), anemia (↓ exercise tolerance).<br>Adjust intensity to current labs."},
+  {cat:"oncology",sub:"chemo",front:"Radiation therapy effects — PT implications",back:"<b>Acute:</b> skin reaction (avoid friction/heat over field), fatigue, local inflammation.<br><b>Late:</b> fibrosis (mobilize early to prevent — most effective strategy), lymphedema, radiation neuropathy, cognitive effects ('chemo brain').<br><b>Chest radiation:</b> pulmonary fibrosis, cardiac toxicity.<br><b>Pelvic radiation:</b> bowel/bladder dysfunction, pelvic floor effects."},
+  {cat:"oncology",sub:"chemo",front:"Exercise during chemotherapy — safety thresholds",back:"<b>Hold exercise:</b> fever &gt;38°C, symptomatic anemia (Hgb &lt;8 g/dL), platelets &lt;50K (contact/impact).<br><b>Caution:</b> ANC &lt;1.0 K/µL (avoid public pools/gyms).<br>Moderate aerobic + resistance generally safe during treatment — ↓ CRF, maintains function, ↑ QOL.<br>Verify current labs before each session — adjust to current status, not pre-treatment baseline."},
+
+  // ── ENDOCRINE ──
+  {cat:"endocrine",sub:"diabetes",front:"Diabetes — systemic complications relevant to PT",back:"<b>Peripheral neuropathy:</b> LOPS → undetected wounds → ulceration → amputation.<br><b>PVD:</b> impaired wound healing, claudication.<br><b>Retinopathy:</b> fall risk, avoid Valsalva/contact/high-impact (proliferative).<br><b>Autonomic neuropathy:</b> orthostatic hypotension, blunted HR response (use RPE).<br><b>MSK:</b> adhesive capsulitis, Dupuytren's, limited joint mobility (collagen glycosylation)."},
+  {cat:"endocrine",sub:"diabetes",front:"Diabetes — exercise guidelines",back:"<b>Target glucose before exercise:</b> 100–250 mg/dL.<br><b>Hold:</b> &lt;100 mg/dL (snack first) or &gt;300 mg/dL.<br><b>Check glucose:</b> before, during (&gt;45 min), and after.<br><b>Hypo treatment:</b> 15-15 rule — 15g fast-acting carb, recheck in 15 min.<br><b>FITT:</b> 150 min/week moderate aerobic, resistance 2–3×/week, no more than 2 consecutive rest days."},
+  {cat:"endocrine",sub:"diabetes",front:"Diabetic foot — assessment and management",back:"<b>Monofilament test</b> (10g): inability to feel = LOPS.<br><b>Inspect every session:</b> blisters, callus, wounds, nail changes, maceration.<br><b>Footwear:</b> therapeutic shoes — no bare feet.<br><b>Offloading gold standard:</b> total contact cast.<br><b>Charcot arthropathy:</b> acute warm swollen foot + neuropathy + no fever = NWB until acute phase resolved. Often misdiagnosed as infection."},
+  {cat:"endocrine",sub:"thyroid",front:"Hypothyroidism — PT implications",back:"<b>Signs:</b> fatigue, cold intolerance, weight gain, bradycardia, constipation, depression, delayed reflexes (hung-up).<br><b>MSK:</b> proximal myopathy, carpal tunnel syndrome, myalgia.<br><b>PT:</b> fatigue management, progressive exercise as tolerated, screen for carpal tunnel.<br><b>Myxedema</b> (severe): non-pitting edema — urgent referral."},
+  {cat:"endocrine",sub:"thyroid",front:"Hyperthyroidism — PT implications",back:"<b>Signs:</b> heat intolerance, weight loss, tachycardia, palpitations, tremor, anxiety, exophthalmos (Graves').<br><b>MSK:</b> proximal myopathy, osteoporosis.<br><b>Exercise:</b> cardiovascular response exaggerated — use RPE, not target HR. Check rhythm before exercise (↑ AF risk).<br><b>Thyroid storm:</b> high fever + tachycardia + altered mental status = emergency."},
+  {cat:"endocrine",sub:"bone",front:"Osteoporosis — screening, diagnosis, PT",back:"<b>DEXA T-score:</b> ≥-1.0 = normal | -1.0 to -2.5 = osteopenia | ≤-2.5 = osteoporosis.<br><b>FRAX:</b> 10-year fracture probability.<br><b>PT exercise:</b> weight-bearing aerobic + progressive resistance — most effective combination.<br>Avoid spinal flexion loading in severe osteoporosis. Fall prevention program critical."},
+  {cat:"endocrine",sub:"bone",front:"Charcot arthropathy",back:"Neuropathic arthropathy — progressive bone/joint destruction from undetected trauma in insensate foot.<br><b>Acute phase:</b> warm, erythematous, swollen foot — often confused with cellulitis or gout.<br><b>Key distinction:</b> no fever/leukocytosis in Charcot (vs infection).<br><b>Management:</b> NWB (TCC) until acute phase resolves (skin temp normalizes).<br>Any acute warm foot in neuropathic patient = refer before WB."},
+
+  // ── IMMUNOLOGICAL / RHEUMATOLOGICAL ──
+  {cat:"immune",sub:"rheum",front:"Rheumatoid arthritis — PT management",back:"Symmetrical small joint involvement (MCPs, PIPs, wrists) — spares DIPs. Morning stiffness &gt;1 hour.<br><b>PT:</b> resistance + aerobic during remission. Reduce load during flare (AROM, aquatic). Splinting, energy conservation.<br><b>Precautions:</b> atlantoaxial instability — never manipulate cervically. Swan neck/boutonniere — avoid provocative positions."},
+  {cat:"immune",sub:"rheum",front:"Seronegative spondyloarthropathies",back:"Includes: ankylosing spondylitis, psoriatic arthritis, reactive arthritis, IBD-associated arthritis.<br><b>Shared features:</b> HLA-B27, asymmetric large joint + SI involvement, enthesitis, uveitis.<br><b>Ankylosing spondylitis:</b> progressive spinal fusion ('bamboo spine').<br><b>PT:</b> extension exercises (counters kyphotic tendency), deep breathing, swimming. Schober test measures lumbar mobility."},
+  {cat:"immune",sub:"rheum",front:"Gout and pseudogout",back:"<b>Gout:</b> uric acid crystals — 1st MTP most common (podagra). Acute: hot, swollen joint.<br><b>Pseudogout:</b> calcium pyrophosphate crystals — knee most common.<br><b>Acute flare:</b> rest, ice, NSAIDs/colchicine. PT: avoid loading affected joint.<br>Between attacks: normal exercise. Tophaceous gout: skin breakdown risk at tophi sites."},
+  {cat:"immune",sub:"rheum",front:"Systemic lupus erythematosus (SLE)",back:"Multi-system autoimmune — predominantly young women.<br><b>Features:</b> malar rash, photosensitivity, serositis, nephritis, non-erosive arthritis, cytopenias.<br><b>PT:</b> fatigue (energy conservation), photosensitivity (indoor exercise or sun protection), AVN (corticosteroids → femoral head), osteoporosis, cardiovascular risk.<br>Moderate exercise safe — ↓ fatigue and CV risk."},
+  {cat:"immune",sub:"autoimmune",front:"Myositis — polymyositis and dermatomyositis",back:"<b>Polymyositis:</b> proximal bilateral muscle weakness, no rash, ↑ CK.<br><b>Dermatomyositis:</b> same + heliotrope rash (periorbital), Gottron's papules (MCP/PIP).<br><b>Malignancy association:</b> dermatomyositis — screen for occult cancer.<br><b>PT:</b> ROM only during flare. Progressive resistance training during stable disease — does not worsen inflammation.<br>Distinguish from steroid myopathy (normal CK)."},
+  {cat:"immune",sub:"autoimmune",front:"Scleroderma (systemic sclerosis)",back:"<b>Limited (CREST):</b> Calcinosis, Raynaud's, Esophageal dysmotility, Sclerodactyly, Telangiectasia.<br><b>Diffuse:</b> widespread skin + organ fibrosis (lungs, kidneys, heart, GI).<br><b>Raynaud's:</b> vasospasm with cold — no cold modalities, protect from cold.<br><b>PT:</b> hand/facial ROM exercises, breathing exercises (pulmonary fibrosis). Avoid aggressive joint mobilization (fragile skin)."},
+  {cat:"immune",sub:"autoimmune",front:"Fibromyalgia",back:"Chronic widespread pain + fatigue + sleep disturbance + cognitive dysfunction ('fibro fog').<br>No inflammatory markers, no structural pathology.<br><b>Mechanism:</b> central sensitization — amplified pain processing.<br><b>Best evidence:</b> graded aerobic exercise (↓ pain, fatigue, sleep issues). Start very low, progress slowly.<br>CBT + exercise most effective. Educate on pain neuroscience. Avoid passive treatment-dependent approaches."},
+  {cat:"immune",sub:"autoimmune",front:"Sjögren's syndrome",back:"Autoimmune exocrinopathy — dry eyes + dry mouth (primary).<br>Secondary: associated with RA, SLE, scleroderma.<br><b>PT implications:</b> dry eyes (avoid fans/drafts during exercise), dry mouth (frequent water breaks essential), peripheral neuropathy (balance), fatigue (energy conservation), arthralgia.<br>Systemic: pulmonary, renal, CNS involvement possible."},
+  {cat:"immune",sub:"general",front:"Immunosuppressed patients — PT precautions",back:"<b>Causes:</b> chemotherapy (neutropenia), HIV/AIDS, transplant (anti-rejection meds), high-dose steroids, biologic DMARDs.<br><b>PT precautions:</b> avoid public settings if ANC &lt;500/µL, no pools if severely neutropenic, hand hygiene critical, screen for fever before each session (&gt;38°C = hold).<br>Wound healing impaired. Opportunistic infections may present atypically — unexplained functional decline = refer."},
+];
+
+const CONF_COLORS={gotit:{bg:'#E1F5EE',color:'#0F6E56'},almost:{bg:'#FAEEDA',color:'#854F0B'},nope:{bg:'#FCEBEB',color:'#A32D2D'}};
+const CONF_LABELS={gotit:'Got it',almost:'Almost',nope:'Nope'};
+const CONF_FILTER_OPTIONS={
+  nope:   {label:'Nope',   bg:'#FCEBEB',color:'#A32D2D',border:'#F09595'},
+  almost: {label:'Almost', bg:'#FAEEDA',color:'#854F0B',border:'#EF9F27'},
+  gotit:  {label:'Got it', bg:'#E1F5EE',color:'#0F6E56',border:'#5DCAA5'},
+  unrated:{label:'Unrated',bg:'#f5f4f0',color:'#6b6966',border:'#c8c6c3'},
+};
+
+
+
+CARDS.forEach((c,i)=>c._id='card_'+i);
+function cid(c){return c._id;}
+
+const FIREBASE_CONFIG={apiKey:"AIzaSyA6EjnhyYUOt0iRYUaywCoqZ5POaVQmcsk",authDomain:"npte-flaschcards.firebaseapp.com",databaseURL:"https://npte-flaschcards-default-rtdb.firebaseio.com",projectId:"npte-flaschcards",storageBucket:"npte-flaschcards.firebasestorage.app",messagingSenderId:"429875976159",appId:"1:429875976159:web:04fc0eda2e758c606e966a"};
+const USER_ID='thisisElyk';
+
+// Firebase loaded via CDN
+let _db=null;
+let _fbRef=null;
+let _pendingSave=null;
+let _saveTimer=null;
+
+function initFirebase(storageKey){
+  if(typeof firebase==='undefined'){setSyncStatus('err','Firebase failed to load');return;}
+  firebase.initializeApp(FIREBASE_CONFIG);
+  _db=firebase.database();
+  _fbRef=_db.ref('users/'+USER_ID+'/'+storageKey);
+  setSyncStatus('pending','Connecting...');
+}
+
+function setSyncStatus(state,msg){
+  const dot=document.getElementById('syncDot');
+  const txt=document.getElementById('syncTxt');
+  if(!dot||!txt)return;
+  dot.className='sync-dot'+(state?' '+state:'');
+  txt.textContent=msg;
+}
+
+function saveState(stateObj){
+  // Always save to localStorage as offline fallback
+  try{localStorage.setItem('sysinteractions_cards_v1',JSON.stringify(stateObj));}catch(e){}
+  // Debounce Firebase writes (300ms)
+  if(_saveTimer)clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(()=>{
+    if(!_fbRef){return;}
+    setSyncStatus('pending','Saving...');
+    _fbRef.set(stateObj)
+      .then(()=>setSyncStatus('ok','Synced'))
+      .catch(e=>{setSyncStatus('err','Sync failed');console.warn('Firebase save error:',e);});
+  },300);
+}
+
+function loadState(storageKey,callback){
+  // Try localStorage immediately for fast start
+  let localState=null;
+  try{const r=localStorage.getItem(storageKey);if(r)localState=JSON.parse(r);}catch(e){}
+
+  if(localState)callback(localState);
+
+  // Then fetch from Firebase and update if newer/different
+  initFirebase(storageKey);
+  if(!_fbRef){callback(localState);return;}
+  _fbRef.once('value')
+    .then(snap=>{
+      const fbState=snap.val();
+      if(fbState){
+        // Update localStorage with Firebase state
+        try{localStorage.setItem(storageKey,JSON.stringify(fbState));}catch(e){}
+        setSyncStatus('ok','Synced');
+        callback(fbState);
+      } else {
+        setSyncStatus('ok','Synced');
+        if(!localState)callback(null);
+      }
+    })
+    .catch(e=>{
+      setSyncStatus('err','Offline — using local data');
+      console.warn('Firebase load error:',e);
+      if(!localState)callback(null);
+    });
+}
+
+let _initDone=false;
+let activeCats,activeRegions,activeSystems,activeSubs,activeConf,deck=[],removedIds=new Set(),confidence={},idx=0,revealed=false;
+
+let _firstLoad=true;
+
+function initDeck(saved){
+activeCats=new Set(saved?saved.activeCats:Object.keys(CATS));
+activeSubs=new Set(saved?saved.activeSubs:Object.keys(SUBS));
+activeConf=new Set(saved?saved.activeConf:Object.keys(CONF_FILTER_OPTIONS));
+  removedIds=new Set(saved&&saved.removedIds?saved.removedIds:[]);
+  confidence=saved&&saved.confidence?saved.confidence:{};
+  idx=saved&&saved.idx?saved.idx:0;
+  if(!_initDone){_initDone=true;buildFilters();rebuildDeck();}
+  else{buildFilters();rebuildDeck();}
+}
+
+loadState('sysinteractions_cards_v1',initDeck);
+
+function confKey(c){return confidence[cid(c)]||'unrated';}
+function filteredCards(){
+  return CARDS.filter(c=>!removedIds.has(cid(c))&&activeCats.has(c.cat)&&activeSubs.has(c.sub)&&activeConf.has(confKey(c)));
+}
+
+function rebuildDeck(){
+  deck=filteredCards();
+  if(_firstLoad){_firstLoad=false;if(idx>=deck.length)idx=Math.max(0,deck.length-1);}
+  else{idx=0;}
+  revealed=false;render();
+}
+
+
+function getState(){
+  return {
+    confidence,
+    removedIds:[...removedIds],
+    activeCats:typeof activeCats!=='undefined'?[...activeCats]:[],
+    activeRegions:typeof activeRegions!=='undefined'?[...activeRegions]:[],
+    activeSystems:typeof activeSystems!=='undefined'?[...activeSystems]:[],
+    activeSubs:typeof activeSubs!=='undefined'?[...activeSubs]:[],
+    activeConf:typeof activeConf!=='undefined'?[...activeConf]:[],
+    idx
+  };
+}
+
+function buildFilters(){
+  const catEl=document.getElementById('catFilters');
+  catEl.innerHTML='';
+  Object.entries(CATS).forEach(([k,v])=>{
+    const b=document.createElement('button');
+    b.className='fbtn'+(activeCats.has(k)?' active':'');
+    if(activeCats.has(k))b.style.background=v.dot;
+    b.textContent=v.label;
+    b.onclick=()=>{activeCats.has(k)?activeCats.delete(k):activeCats.add(k);buildFilters();rebuildDeck();saveState(getState());};
+    catEl.appendChild(b);
+  });
+  const subEl=document.getElementById('subFilters');
+  subEl.innerHTML='';
+  Object.entries(SUBS).forEach(([k,v])=>{
+    const b=document.createElement('button');
+    b.className='fbtn'+(activeSubs.has(k)?' active':'');
+    if(activeSubs.has(k))b.style.background=SUB_COLORS[k];
+    b.textContent=v;
+    b.onclick=()=>{activeSubs.has(k)?activeSubs.delete(k):activeSubs.add(k);buildFilters();rebuildDeck();saveState(getState());};
+    subEl.appendChild(b);
+  });
+  const confEl=document.getElementById('confFilters');
+  confEl.innerHTML='';
+  Object.entries(CONF_FILTER_OPTIONS).forEach(([k,v])=>{
+    const count=CARDS.filter(c=>!removedIds.has(cid(c))&&activeCats.has(c.cat)&&activeSubs.has(c.sub)&&confKey(c)===k).length;
+    const b=document.createElement('button');
+    const isActive=activeConf.has(k);
+    b.className='fbtn'+(isActive?' active':'');
+    if(isActive)b.style.cssText='background:'+v.bg+';color:'+v.color+';border-color:'+v.border+';';
+    b.textContent=v.label+' ('+count+')';
+    b.onclick=()=>{activeConf.has(k)?activeConf.delete(k):activeConf.add(k);buildFilters();rebuildDeck();saveState(getState());};
+    confEl.appendChild(b);
+  });
+}
+
+function selectAll(){
+  activeCats=new Set(Object.keys(CATS));
+  activeSubs=new Set(Object.keys(SUBS));
+  activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
+  buildFilters();rebuildDeck();saveState(getState());
+}
+function clearAll(){
+  activeCats.clear();activeSubs.clear();activeConf.clear();
+  buildFilters();rebuildDeck();saveState(getState());
+}
+
+function render(){
+  updateStats();
+  const area=document.getElementById('cardArea');
+  const navRow=document.getElementById('navRow');
+  if(deck.length===0){
+    let msg;
+    if(activeCats.size===0||activeSubs.size===0||activeConf.size===0){
+      msg='No filters selected — select at least one option in each row above.';
+    } else {
+      const allRemoved=CARDS.filter(c=>activeCats.has(c.cat)&&activeSubs.has(c.sub)).every(c=>removedIds.has(cid(c)));
+      msg=allRemoved
+        ?'All cards mastered! Hit "Reset deck" to bring them back.'
+        :'No cards match the current confidence filter. Adjust the Confidence filter above or hit "Reset deck".';
+    }
+    area.innerHTML='<div class="empty-state"><strong>'+msg+'</strong></div>';
+    navRow.style.display='none';
+    document.getElementById('progFill').style.width='0%';
+    document.getElementById('progTxt').textContent='0 cards';
+    return;
+  }
+  navRow.style.display='flex';
+  if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+  const c=deck[idx];
+  const id=cid(c);
+  const conf=confidence[id]||null;
+  const pct=Math.round(((idx+1)/deck.length)*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=(idx+1)+' / '+deck.length;
+  const cat=CATS[c.cat];
+  const subLabel=SUBS[c.sub];
+  const subColor=SUB_COLORS[c.sub];
+  const canRemove=conf==='gotit';
+
+  if(!revealed){
+    const confBadge=conf?'<span class="conf-badge" style="background:'+CONF_COLORS[conf].bg+';color:'+CONF_COLORS[conf].color+';">'+CONF_LABELS[conf]+'</span>':'';
+    area.innerHTML=`<div class="card card-front" onclick="toggle()">
+      <div class="front-cat" style="color:${cat.dot};">${cat.label}</div>
+      <div class="front-sub" style="color:${subColor};">${subLabel}</div>
+      <div class="front-title">${c.front}</div>
+      ${confBadge}
+      <div class="hint">Tap to reveal</div>
+    </div>`;
+  } else {
+    const removeBtn=canRemove?'<button class="remove-btn" onclick="removeCard()">Remove</button>':'';
+    area.innerHTML=`<div class="card card-back" style="background:${cat.bg};border:0.5px solid ${cat.border};" onclick="handleBackClick(event)">
+      <div class="back-title" style="color:${cat.text};">${c.front}</div>
+      <div class="badge-row">
+        <span class="type-badge" style="background:${cat.badge_bg};color:${cat.badge_color};">${cat.label}</span>
+        <span class="sub-badge">${subLabel}</span>
+      </div>
+      <div class="divider" style="background:${cat.border};"></div>
+      <div class="blbl" style="color:${cat.dot};">Key facts</div>
+      <div class="bval" style="color:${cat.text};">${c.back}</div>
+      <div class="spacer"></div>
+      <div class="confidence-row" style="border-top:0.5px solid ${cat.border};" onclick="event.stopPropagation()">
+        <span class="conf-lbl" style="color:${cat.dot};">Confidence:</span>
+        <button class="cbtn cbtn-nope${conf==='nope'?' selected':''}" onclick="rate('nope')">Nope</button>
+        <button class="cbtn cbtn-almost${conf==='almost'?' selected':''}" onclick="rate('almost')">Almost</button>
+        <button class="cbtn cbtn-gotit${conf==='gotit'?' selected':''}" onclick="rate('gotit')">Got it</button>
+        ${removeBtn}
+      </div>
+      <div class="flip-hint" style="color:${cat.dot};">Tap card to flip back</div>
+    </div>`;
+  }
+}
+
+function handleBackClick(e){if(!e.target.closest('.confidence-row'))toggle();}
+function toggle(){revealed=!revealed;render();}
+function rate(val){
+  confidence[cid(deck[idx])]=val;
+  if(!activeConf.has(val)){
+    deck=filteredCards();
+    if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+    revealed=false;
+  }
+  saveState(getState());buildFilters();render();
+}
+function removeCard(){
+  const id=cid(deck[idx]);removedIds.add(id);
+  deck=filteredCards();
+  if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+  revealed=false;saveState(getState());buildFilters();render();
+}
+function resetDeck(){
+  removedIds.clear();confidence={};
+  activeCats=new Set(Object.keys(CATS));
+  activeSubs=new Set(Object.keys(SUBS));
+  activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
+  idx=0;revealed=false;saveState(getState());buildFilters();rebuildDeck();
+}
+function updateStats(){
+  const removed=CARDS.filter(c=>removedIds.has(cid(c))).length;
+  const gotit=deck.filter(c=>confidence[cid(c)]==='gotit').length;
+  const almost=deck.filter(c=>confidence[cid(c)]==='almost').length;
+  const nope=deck.filter(c=>confidence[cid(c)]==='nope').length;
+  document.getElementById('statsRow').innerHTML=
+    '<div class="stat">Active <span>'+deck.length+'</span></div>'+
+    '<div class="stat">Mastered <span>'+removed+'</span></div>'+
+    '<div class="stat">Got it <span style="color:#0F6E56;">'+gotit+'</span></div>'+
+    '<div class="stat">Almost <span style="color:#854F0B;">'+almost+'</span></div>'+
+    '<div class="stat">Nope <span style="color:#A32D2D;">'+nope+'</span></div>';
+}
+function go(dir){const next=idx+dir;if(next<0||next>=deck.length)return;idx=next;revealed=false;saveState(getState());render();}
+function shuffle(){
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+  idx=0;revealed=false;saveState(getState());render();
+}
+</script>
+</body>
+</html>

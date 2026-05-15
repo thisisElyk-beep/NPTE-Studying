@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cranial Nerve Flashcards — NPTE</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f4f0;
+    --bg-tertiary: #edecea;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6966;
+    --text-tertiary: #a09d9a;
+    --border: rgba(0,0,0,0.12);
+    --border-md: rgba(0,0,0,0.22);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --purple: #7F77DD;
+    --purple-light: #EEEDFE;
+    --purple-mid: #AFA9EC;
+    --purple-dark: #3C3489;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1c1c1e;
+      --bg-secondary: #2c2c2e;
+      --bg-tertiary: #3a3a3c;
+      --text-primary: #f2f2f7;
+      --text-secondary: #aeaeb2;
+      --text-tertiary: #6e6e73;
+      --border: rgba(255,255,255,0.1);
+      --border-md: rgba(255,255,255,0.2);
+      --purple-light: #26215C;
+      --purple-mid: #534AB7;
+      --purple-dark: #CECBF6;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg-tertiary);
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:2rem 1rem 3rem;
+    color:var(--text-primary);
+  }
+  .wrap{width:100%;max-width:680px;}
+  .page-title{font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:1.5rem;}
+  .stats-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+  .stat{background:var(--bg-secondary);border-radius:var(--radius-md);padding:5px 10px;font-size:12px;color:var(--text-secondary);}
+  .stat span{font-weight:500;color:var(--text-primary);}
+  .prog-wrap{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
+  .prog-bg{flex:1;height:4px;background:var(--bg-secondary);border-radius:2px;}
+  .prog-fill{height:4px;background:var(--purple);border-radius:2px;transition:width 0.3s;}
+  .prog-txt{font-size:13px;color:var(--text-secondary);white-space:nowrap;}
+  .card{border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1rem;cursor:pointer;min-height:280px;display:flex;flex-direction:column;}
+  .card-front{background:var(--bg-primary);border:0.5px solid var(--border);align-items:center;justify-content:center;}
+  .card-back{background:var(--purple-light);border:0.5px solid var(--purple-mid);justify-content:flex-start;}
+  .cn-label{font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:var(--text-tertiary);margin-bottom:8px;}
+  .cn-num{font-size:52px;font-weight:500;color:var(--text-primary);line-height:1;}
+  .hint{font-size:13px;color:var(--text-tertiary);margin-top:1.25rem;}
+  .back-name{font-size:20px;font-weight:500;color:var(--purple-dark);margin-bottom:8px;}
+  .type-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:500;margin-bottom:16px;}
+  .divider{height:0.5px;background:var(--purple-mid);margin-bottom:14px;}
+  .section-divider{height:0.5px;background:var(--purple-mid);margin:14px 0;}
+  .blbl{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--purple);font-weight:500;margin-bottom:6px;}
+  .bval{font-size:15px;color:var(--purple-dark);line-height:1.7;}
+  .spacer{flex:1;}
+  .confidence-row{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:12px;border-top:0.5px solid var(--purple-mid);flex-wrap:wrap;}
+  .conf-lbl{font-size:12px;color:var(--purple);font-weight:500;margin-right:2px;}
+  .cbtn{font-size:12px;padding:5px 14px;border-radius:999px;border:0.5px solid;cursor:pointer;font-weight:500;}
+  .cbtn-nope{background:#FCEBEB;color:#A32D2D;border-color:#F09595;}
+  .cbtn-almost{background:#FAEEDA;color:#854F0B;border-color:#EF9F27;}
+  .cbtn-gotit{background:#E1F5EE;color:#0F6E56;border-color:#5DCAA5;}
+  .cbtn.selected{outline:2px solid currentColor;outline-offset:1px;}
+  .remove-btn{margin-left:auto;font-size:12px;padding:5px 12px;border-radius:999px;border:0.5px solid #5DCAA5;background:#E1F5EE;color:#0F6E56;cursor:pointer;font-weight:500;}
+  .flip-hint{text-align:center;margin-top:12px;font-size:12px;color:var(--purple);}
+  .conf-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:500;margin-top:12px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-bottom:8px;}
+  .nbtn{padding:8px 22px;font-size:14px;border-radius:var(--radius-md);border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-primary);cursor:pointer;}
+  .nbtn:hover{background:var(--bg-secondary);}
+  .nbtn.primary{background:var(--purple);color:#fff;border-color:var(--purple);}
+  .nbtn.primary:hover{background:#534AB7;}
+  .bottom-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:6px;}
+  .shuf-btn{font-size:13px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;}
+  .reset-btn{font-size:13px;color:var(--purple);background:none;border:none;cursor:pointer;text-decoration:underline;}
+  .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-secondary);font-size:14px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1rem;background:var(--bg-primary);}
+  .empty-state strong{display:block;font-size:16px;color:var(--text-primary);margin-bottom:8px;font-weight:500;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="page-title">Cranial nerve flashcards — NPTE</div>
+  <div class="stats-row" id="statsRow"></div>
+  <div class="prog-wrap">
+    <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-txt" id="progTxt"></div>
+  </div>
+  <div id="cardArea"></div>
+  <div class="btn-row" id="navRow">
+    <button class="nbtn" onclick="go(-1)">← Prev</button>
+    <button class="nbtn primary" onclick="go(1)">Next →</button>
+  </div>
+  <div class="bottom-row">
+    <button class="shuf-btn" onclick="shuffle()">Shuffle deck</button>
+    <button class="reset-btn" onclick="resetDeck()">Reset deck</button>
+  </div>
+</div>
+
+<script>
+const CNS=[
+  {num:"I", name:"Olfactory", type:"sensory",
+   functions:"Smell.",
+   finding:"Damage = loss of smell (anosmia). Often caused by head trauma. Patient may say food has lost its taste."},
+  {num:"II", name:"Optic", type:"sensory",
+   functions:"Vision.",
+   finding:"Damage = vision loss. Which eye or field is affected tells you where the lesion is along the visual pathway."},
+  {num:"III", name:"Oculomotor", type:"motor",
+   functions:"Moves the eyeball (most directions). Lifts the eyelid. Constricts the pupil.",
+   finding:"Damage = drooping eyelid (ptosis), eye points down and out, pupil fixed and dilated."},
+  {num:"IV", name:"Trochlear", type:"motor",
+   functions:"Moves the eye downward and inward (looking down and in).",
+   finding:"Damage = double vision on stairs or looking down. Patient tilts head to compensate."},
+  {num:"V", name:"Trigeminal", type:"both",
+   functions:"Sensation to the face (forehead, cheeks, jaw). Moves the jaw muscles for chewing.",
+   finding:"Damage = facial numbness. Jaw deviates toward the damaged side when opened."},
+  {num:"VI", name:"Abducens", type:"motor",
+   functions:"Moves the eye outward (away from the nose).",
+   finding:"Damage = eye stuck looking inward, can't look to that side. Double vision when looking toward the affected side."},
+  {num:"VII", name:"Facial", type:"both",
+   functions:"Moves the muscles of facial expression. Taste on the front 2/3 of the tongue.",
+   finding:"Lower motor neuron (Bell's palsy): whole side of face droops including forehead. Upper motor neuron (stroke): only lower face affected, forehead OK."},
+  {num:"VIII", name:"Vestibulocochlear", type:"sensory",
+   functions:"Hearing (cochlear branch). Balance and head position sense (vestibular branch).",
+   finding:"Cochlear damage = hearing loss, ringing (tinnitus). Vestibular damage = dizziness, vertigo, balance problems."},
+  {num:"IX", name:"Glossopharyngeal", type:"both",
+   functions:"Taste and sensation on the back 1/3 of the tongue and throat. Triggers the gag reflex (sensory side).",
+   finding:"Damage = weak or absent gag reflex (sensory limb), trouble swallowing, loss of taste at the back of the tongue."},
+  {num:"X", name:"Vagus", type:"both",
+   functions:"Controls the voice, swallowing, and most of the body's internal organs (heart, lungs, gut).",
+   finding:"Damage = hoarse voice, trouble swallowing, uvula swings away from the damaged side."},
+  {num:"XI", name:"Accessory", type:"motor",
+   functions:"Turns the head (via SCM). Shrugs the shoulder (via trapezius).",
+   finding:"Damage = weak head turn away from the lesion side, dropped shoulder, weak shrug."},
+  {num:"XII", name:"Hypoglossal", type:"motor",
+   functions:"Moves the tongue.",
+   finding:"Damage = tongue deviates toward the damaged side (lower motor neuron) or away from it (upper motor neuron)."}
+];
+
+const TYPE_COLORS={sensory:{bg:'#E1F5EE',color:'#0F6E56'},motor:{bg:'#FAECE7',color:'#993C1D'},both:{bg:'#EEEDFE',color:'#3C3489'}};
+const CONF_COLORS={gotit:{bg:'#E1F5EE',color:'#0F6E56'},almost:{bg:'#FAEEDA',color:'#854F0B'},nope:{bg:'#FCEBEB',color:'#A32D2D'}};
+const CONF_LABELS={gotit:'Got it',almost:'Almost',nope:'Nope'};
+
+let deck=[...CNS],removedIds=new Set(),confidence={},idx=0,revealed=false;
+
+function cardId(c){return 'CN'+c.num;}
+function activeDeck(){return CNS.filter(c=>!removedIds.has(cardId(c)));}
+
+function render(){
+  updateStats();
+  const area=document.getElementById('cardArea');
+  const navRow=document.getElementById('navRow');
+  const active=activeDeck();
+  if(active.length===0){
+    area.innerHTML='<div class="empty-state"><strong>All cards mastered!</strong>Hit "Reset deck" to bring them all back.</div>';
+    navRow.style.display='none';
+    document.getElementById('progFill').style.width='100%';
+    document.getElementById('progTxt').textContent='0 remaining';
+    return;
+  }
+  navRow.style.display='flex';
+  if(idx>=deck.length) idx=Math.max(0,deck.length-1);
+  const c=deck[idx];
+  const id=cardId(c);
+  const conf=confidence[id]||null;
+  const pct=Math.round(((idx+1)/deck.length)*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=(idx+1)+' / '+deck.length;
+  const tc=TYPE_COLORS[c.type];
+  const canRemove=conf==='gotit';
+
+  if(!revealed){
+    const confBadge=conf?'<span class="conf-badge" style="background:'+CONF_COLORS[conf].bg+';color:'+CONF_COLORS[conf].color+';">'+CONF_LABELS[conf]+'</span>':'';
+    area.innerHTML='<div class="card card-front" onclick="toggle()"><div class="cn-label">Cranial nerve</div><div class="cn-num">'+c.num+'</div>'+confBadge+'<div class="hint">Tap to reveal</div></div>';
+  } else {
+    const removeBtn=canRemove?'<button class="remove-btn" onclick="removeCard()">Remove</button>':'';
+    area.innerHTML=
+      '<div class="card card-back" onclick="handleBackClick(event)">'+
+        '<div class="back-name">CN '+c.num+' \u2014 '+c.name+'</div>'+
+        '<span class="type-badge" style="background:'+tc.bg+';color:'+tc.color+';">'+c.type+'</span>'+
+        '<div class="divider"></div>'+
+        '<div class="blbl">Main functions</div>'+
+        '<div class="bval">'+c.functions+'</div>'+
+        '<div class="section-divider"></div>'+
+        '<div class="blbl">If damaged</div>'+
+        '<div class="bval">'+c.finding+'</div>'+
+        '<div class="spacer"></div>'+
+        '<div class="confidence-row" onclick="event.stopPropagation()">'+
+          '<span class="conf-lbl">Confidence:</span>'+
+          '<button class="cbtn cbtn-nope'+(conf==='nope'?' selected':'')+'" onclick="rate(\'nope\')">Nope</button>'+
+          '<button class="cbtn cbtn-almost'+(conf==='almost'?' selected':'')+'" onclick="rate(\'almost\')">Almost</button>'+
+          '<button class="cbtn cbtn-gotit'+(conf==='gotit'?' selected':'')+'" onclick="rate(\'gotit\')">Got it</button>'+
+          removeBtn+
+        '</div>'+
+        '<div class="flip-hint">Tap card to flip back</div>'+
+      '</div>';
+  }
+}
+
+function handleBackClick(e){if(!e.target.closest('.confidence-row'))toggle();}
+function toggle(){revealed=!revealed;render();}
+function rate(val){confidence[cardId(deck[idx])]=val;render();}
+
+function removeCard(){
+  const id=cardId(deck[idx]);
+  removedIds.add(id);
+  deck=deck.filter(c=>cardId(c)!==id);
+  if(idx>=deck.length) idx=Math.max(0,deck.length-1);
+  revealed=false;render();
+}
+
+function resetDeck(){
+  removedIds.clear();
+  deck=[...CNS];
+  idx=0;revealed=false;render();
+}
+
+function updateStats(){
+  const removed=CNS.length-activeDeck().length;
+  const gotit=deck.filter(c=>confidence[cardId(c)]==='gotit').length;
+  const almost=deck.filter(c=>confidence[cardId(c)]==='almost').length;
+  const nope=deck.filter(c=>confidence[cardId(c)]==='nope').length;
+  document.getElementById('statsRow').innerHTML=
+    '<div class="stat">Active <span>'+deck.length+'</span></div>'+
+    '<div class="stat">Mastered <span>'+removed+'</span></div>'+
+    '<div class="stat">Got it <span style="color:#0F6E56;">'+gotit+'</span></div>'+
+    '<div class="stat">Almost <span style="color:#854F0B;">'+almost+'</span></div>'+
+    '<div class="stat">Nope <span style="color:#A32D2D;">'+nope+'</span></div>';
+}
+
+function go(dir){
+  const next=idx+dir;
+  if(next<0||next>=deck.length)return;
+  idx=next;revealed=false;render();
+}
+
+function shuffle(){
+  for(let i=deck.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [deck[i],deck[j]]=[deck[j],deck[i]];
+  }
+  idx=0;revealed=false;render();
+}
+
+render();
+</script>
+</body>
+</html>
