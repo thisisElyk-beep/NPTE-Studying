@@ -25,6 +25,10 @@
   .filter-section{margin-bottom:1rem;}
   .filter-group-label{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary);font-weight:500;margin-bottom:6px;}
   .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+  .mode-row{display:flex;gap:6px;margin-bottom:8px;}
+  .mbtn{font-size:12px;padding:5px 14px;border-radius:999px;border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-secondary);cursor:pointer;font-family:inherit;transition:all 0.15s;}
+  .mbtn.active{background:var(--purple);color:#fff;border-color:var(--purple);}
+  .sr-badge{font-size:10px;background:var(--purple-light);color:var(--purple);padding:2px 8px;border-radius:999px;margin-left:6px;font-weight:500;}
   .fbtn{font-size:12px;padding:4px 12px;border-radius:999px;border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-secondary);cursor:pointer;transition:all 0.15s;font-family:inherit;}
   .fbtn.active{color:#fff;border-color:transparent;}
   .filter-actions{display:flex;gap:10px;margin-top:4px;}
@@ -32,9 +36,9 @@
   .stats-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
   .stat{background:var(--bg-secondary);border-radius:var(--radius-md);padding:5px 10px;font-size:12px;color:var(--text-secondary);}
   .stat span{font-weight:500;color:var(--text-primary);}
-  .prog-wrap{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
-  .prog-bg{flex:1;height:4px;background:var(--bg-secondary);border-radius:2px;}
-  .prog-fill{height:4px;background:var(--purple);border-radius:2px;transition:width 0.3s;}
+    .prog-wrap{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
+  .prog-bg{flex:1;height:6px;background:var(--bg-secondary);border-radius:3px;overflow:hidden;display:flex;gap:1px;}
+  .prog-seg{height:100%;border-radius:2px;transition:width 0.3s;}
   .prog-txt{font-size:13px;color:var(--text-secondary);white-space:nowrap;}
   .card{border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1rem;cursor:pointer;min-height:280px;display:flex;flex-direction:column;}
   .card-front{background:var(--bg-primary);border:0.5px solid var(--border);align-items:center;justify-content:center;}
@@ -66,9 +70,11 @@
   .nbtn:hover{background:var(--bg-secondary);}
   .nbtn.primary{background:#7F77DD;color:#fff;border-color:#7F77DD;}
   .nbtn.primary:hover{background:#534AB7;}
-  .bottom-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:6px;}
-  .shuf-btn{font-size:13px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
-  .reset-btn{font-size:13px;color:#7F77DD;background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}
+    .bottom-row{display:flex;gap:8px;justify-content:center;margin-top:6px;flex-wrap:wrap;}
+  .nbtn.secondary{background:var(--bg-primary);color:var(--text-secondary);border-color:var(--border-md);}
+  .nbtn.secondary:hover{background:var(--bg-secondary);color:var(--text-primary);}
+  .nbtn.finish{background:#FCEBEB;color:#A32D2D;border-color:#F09595;}
+  .nbtn.finish:hover{background:#f9d9d9;}
   .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-secondary);font-size:14px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1rem;background:var(--bg-primary);}
   .empty-state strong{display:block;font-size:16px;color:var(--text-primary);margin-bottom:8px;font-weight:500;}
   .sync-bar{display:flex;align-items:center;gap:6px;margin-bottom:0.75rem;font-size:12px;color:var(--text-tertiary);}
@@ -85,6 +91,11 @@
   <div class="page-title">Cardiopulmonary flashcards — NPTE</div>
   <div class="sync-bar"><div class="sync-dot" id="syncDot"></div><span id="syncTxt">Connecting...</span></div>
 
+    <div class="mode-row" id="modeRow">
+    <button class="mbtn active" id="mode-all" onclick="setMode('all')">All</button>
+    <button class="mbtn" id="mode-weak" onclick="setMode('weak')">Weak spots</button>
+    <button class="mbtn" id="mode-unseen" onclick="setMode('unseen')">Unseen</button>
+  </div>
   <div class="filter-section">
     <div class="filter-group-label">Category</div>
     <div class="filter-row" id="catFilters"></div>
@@ -99,7 +110,7 @@
   </div>
   <div class="stats-row" id="statsRow"></div>
   <div class="prog-wrap">
-    <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-bg" id="progBar"></div>
     <div class="prog-txt" id="progTxt"></div>
   </div>
   <div id="cardArea"></div>
@@ -108,8 +119,9 @@
     <button class="nbtn primary" onclick="go(1)">Next →</button>
   </div>
   <div class="bottom-row">
-    <button class="shuf-btn" onclick="shuffle()">Shuffle deck</button>
-    <button class="reset-btn" onclick="resetDeck()">Reset deck</button>
+    <button class="nbtn secondary" onclick="shuffle()">Shuffle</button>
+    <button class="nbtn secondary" onclick="resetDeck()">Reset deck</button>
+    <a class="nbtn finish" href="#" onclick="finishStudying(event)" style="text-decoration:none;display:inline-flex;align-items:center;">Finish studying</a>
   </div>
 </div>
 <script>
@@ -291,7 +303,113 @@ activeConf=new Set(saved?saved.activeConf:Object.keys(CONF_FILTER_OPTIONS));
   removedIds=new Set(saved&&saved.removedIds?saved.removedIds:[]);
   confidence=saved&&saved.confidence?saved.confidence:{};
   idx=saved&&saved.idx?saved.idx:0;
-  if(!_initDone){_initDone=true;buildFilters();rebuildDeck();}
+  if(!_initDone){_initDone=true;const WEIGHTS={gotit:1,almost:2,nope:4,unrated:3};
+const autoAdvance=true;
+let autoTimer=null;
+let _history=[];
+let sessionStart={};
+let sessionReviewed=new Set();
+
+function allRated(){return deck.length>0&&deck.every(c=>confKey(c)!=='unrated');}
+
+function weightedNext(){
+  const pool=[];
+  deck.forEach((c,i)=>{
+    if(i===idx)return;
+    const w=WEIGHTS[confKey(c)]||1;
+    for(let j=0;j<w;j++)pool.push(i);
+  });
+  if(!pool.length)return(idx+1)%deck.length;
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+function setMode(mode){
+  document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('active'));
+  const mb=document.getElementById('mode-'+mode);if(mb)mb.classList.add('active');
+  if(mode==='all'){activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));}
+  else if(mode==='weak'){activeConf=new Set(['nope','almost']);}
+  else if(mode==='unseen'){activeConf=new Set(['unrated']);}
+  _history=[];revealed=false;
+  buildFilters();rebuildDeck();saveState(getState());
+}
+
+function cancelAuto(){if(autoTimer){clearTimeout(autoTimer);autoTimer=null;}}
+function scheduleAutoAdvance(){
+  if(autoTimer)clearTimeout(autoTimer);
+  autoTimer=setTimeout(()=>{advanceCard();},0);
+}
+
+function advanceCard(){
+  cancelAuto();
+  if(deck.length===0)return;
+  _history.push(idx);
+  if(_history.length>50)_history.shift();
+  if(allRated()){idx=weightedNext();}
+  else{idx=(idx+1)%deck.length;}
+  revealed=false;saveState(getState());render();
+}
+
+function showToast(msg,duration=2500){
+  const t=document.getElementById('toast');
+  if(!t)return;
+  t.textContent=msg;t.style.display='block';t.style.opacity='1';
+  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>{t.style.display='none';},300);},duration);
+}
+
+function finishStudying(e){
+  e.preventDefault();
+  const reviewed=sessionReviewed.size;
+  if(reviewed===0){window.location.href='index.html';return;}
+  let moved=[];
+  sessionReviewed.forEach(id=>{
+    const before=sessionStart[id]||'unrated';
+    const after=confidence[id]||'unrated';
+    if(before!==after)moved.push({before,after});
+  });
+  const upgrades=moved.filter(m=>
+    (m.before==='unrated'&&m.after!=='unrated')||
+    (m.before==='nope'&&(m.after==='almost'||m.after==='gotit'))||
+    (m.before==='almost'&&m.after==='gotit')
+  ).length;
+  const downgrades=moved.filter(m=>
+    (m.before==='gotit'&&(m.after==='almost'||m.after==='nope'))||
+    (m.before==='almost'&&m.after==='nope')
+  ).length;
+  const gotit=deck.filter(c=>confidence[cid(c)]==='gotit').length;
+  const almost=deck.filter(c=>confidence[cid(c)]==='almost').length;
+  const nope=deck.filter(c=>confidence[cid(c)]==='nope').length;
+  const unrated=deck.filter(c=>confKey(c)==='unrated').length;
+  const srActive=allRated();
+  let html=`<div style="margin-bottom:10px;"><strong style="color:var(--text-primary);">Cards reviewed:</strong> ${reviewed}</div>`;
+  if(upgrades>0)html+=`<div style="color:#0F6E56;">↑ ${upgrades} card${upgrades>1?'s':''} improved</div>`;
+  if(downgrades>0)html+=`<div style="color:#A32D2D;">↓ ${downgrades} card${downgrades>1?'s':''} moved down</div>`;
+  html+=`<div style="margin-top:12px;padding-top:12px;border-top:0.5px solid var(--border);display:flex;gap:12px;flex-wrap:wrap;">`;
+  if(gotit>0)html+=`<span style="color:#0F6E56;">Got it: ${gotit}</span>`;
+  if(almost>0)html+=`<span style="color:#854F0B;">Almost: ${almost}</span>`;
+  if(nope>0)html+=`<span style="color:#A32D2D;">Nope: ${nope}</span>`;
+  if(unrated>0)html+=`<span style="color:#6b6966;">Unrated: ${unrated}</span>`;
+  html+=`</div>`;
+  if(srActive)html+=`<div style="margin-top:10px;font-size:12px;color:var(--purple);">Spaced repetition active — all cards rated.</div>`;
+  document.getElementById('summaryBody').innerHTML=html;
+  document.getElementById('summaryModal').style.display='flex';
+}
+
+function closeSummary(){document.getElementById('summaryModal').style.display='none';}
+
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(document.getElementById('summaryModal').style.display==='flex')return;
+  switch(e.key){
+    case ' ':case 'Spacebar':e.preventDefault();if(deck.length>0)toggle();break;
+    case 'ArrowRight':e.preventDefault();go(1);break;
+    case 'ArrowLeft':e.preventDefault();go(-1);break;
+    case '1':if(revealed)rate('nope');break;
+    case '2':if(revealed)rate('almost');break;
+    case '3':if(revealed)rate('gotit');break;
+  }
+});
+
+buildFilters();rebuildDeck();}
   else{buildFilters();rebuildDeck();}
 }
 
@@ -378,8 +496,28 @@ function clearAll(){
   buildFilters();rebuildDeck();saveState(getState());
 }
 
+function updateProgressBar(){
+  const ALL=CARDS;
+  const total=ALL.length;
+  const gotit=ALL.filter(c=>confidence[cid(c)]==='gotit'||removedIds.has(cid(c))).length;
+  const almost=ALL.filter(c=>!removedIds.has(cid(c))&&confidence[cid(c)]==='almost').length;
+  const nope=ALL.filter(c=>!removedIds.has(cid(c))&&confidence[cid(c)]==='nope').length;
+  const gp=Math.round(gotit/total*100);
+  const ap=Math.round(almost/total*100);
+  const np=Math.round(nope/total*100);
+  const up=Math.max(0,100-gp-ap-np);
+  const bar=document.getElementById('progBar');
+  if(bar)bar.innerHTML=
+    (gp>0?`<div class="prog-seg" style="background:#5DCAA5;width:${gp}%;"></div>`:'')+
+    (ap>0?`<div class="prog-seg" style="background:#EF9F27;width:${ap}%;"></div>`:'')+
+    (np>0?`<div class="prog-seg" style="background:#F09595;width:${np}%;"></div>`:'')+
+    (up>0?`<div class="prog-seg" style="background:var(--bg-tertiary);width:${up}%;"></div>`:'');
+  const txt=document.getElementById('progTxt');
+  if(txt)txt.textContent=(idx+1)+' / '+deck.length;
+}
 function render(){
   updateStats();
+  updateProgressBar();
   const area=document.getElementById('cardArea');
   const navRow=document.getElementById('navRow');
   if(deck.length===0){
@@ -394,18 +532,20 @@ function render(){
     }
     area.innerHTML='<div class="empty-state"><strong>'+msg+'</strong></div>';
     navRow.style.display='none';
-    document.getElementById('progFill').style.width='0%';
-    document.getElementById('progTxt').textContent='0 cards';
+    
+    
     return;
   }
   navRow.style.display='flex';
   if(idx>=deck.length)idx=Math.max(0,deck.length-1);
   const c=deck[idx];
   const id=cid(c);
+  sessionReviewed.add(id);
+  if(!(id in sessionStart))sessionStart[id]=confidence[id]||\'unrated\';
   const conf=confidence[id]||null;
   const pct=Math.round(((idx+1)/deck.length)*100);
-  document.getElementById('progFill').style.width=pct+'%';
-  document.getElementById('progTxt').textContent=(idx+1)+' / '+deck.length;
+  
+  
   const cat=CATS[c.cat];
   const sysLabel=SYSTEMS[c.sys];
   const sysColor=SYS_COLORS[c.sys];
@@ -462,7 +602,7 @@ function removeCard(){
   if(idx>=deck.length)idx=Math.max(0,deck.length-1);
   revealed=false;saveState(getState());buildFilters();render();
 }
-function resetDeck(){
+function resetDeck(){cancelAuto();_history=[];sessionStart={};sessionReviewed=new Set();document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('active'));const _ma=document.getElementById('mode-all');if(_ma)_ma.classList.add('active');
   removedIds.clear();confidence={};
   activeCats=new Set(Object.keys(CATS));
   activeSystems=new Set(Object.keys(SYSTEMS));
@@ -481,11 +621,25 @@ function updateStats(){
     '<div class="stat">Almost <span style="color:#854F0B;">'+almost+'</span></div>'+
     '<div class="stat">Nope <span style="color:#A32D2D;">'+nope+'</span></div>';
 }
-function go(dir){const next=idx+dir;if(next<0||next>=deck.length)return;idx=next;revealed=false;saveState(getState());render();}
-function shuffle(){
+function go(dir){cancelAuto();if(dir===-1&&_history.length>0){idx=_history.pop();revealed=false;saveState(getState());render();return;}if(dir===1){advanceCard();return;}const next=idx+dir;if(next<0||next>=deck.length)return;idx=next;revealed=false;saveState(getState());render();}
+function shuffle(){cancelAuto();_history=[];
   for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
   idx=0;revealed=false;saveState(getState());render();
 }
 </script>
+
+<!-- Toast -->
+<div id="toast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.2);transition:opacity 0.3s;"></div>
+<!-- Session summary modal -->
+<div id="summaryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:var(--bg-primary);border:0.5px solid var(--border);border-radius:16px;padding:2rem;max-width:400px;width:90%;margin:auto;">
+    <div style="font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:1.25rem;">Session complete</div>
+    <div id="summaryBody" style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:1.5rem;"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="nbtn secondary" onclick="closeSummary()">Keep studying</button>
+      <a class="nbtn finish" href="index.html" style="text-decoration:none;display:inline-flex;align-items:center;">Go to index</a>
+    </div>
+  </div>
+</div>
 </body>
 </html>
