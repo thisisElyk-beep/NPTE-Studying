@@ -436,7 +436,7 @@ function showToast(msg,duration=2500){
 function finishStudying(e){
   e.preventDefault();
   const reviewed=sessionReviewed.size;
-  if(reviewed===0){window.location.href='./index.html';return;}
+  if(reviewed===0){window.location.href='index.html';return;}
   let moved=[];
   sessionReviewed.forEach(id=>{
     const before=sessionStart[id]||'unrated';
@@ -495,8 +495,8 @@ function initDeck(saved){
   confidence=saved&&saved.confidence?saved.confidence:{};
   idx=saved&&saved.idx?saved.idx:0;
   if(!_initDone){_initDone=true;
-buildFilters();rebuildDeck();}
-  else{buildFilters();rebuildDeck();}
+buildFilters();rebuildDeck(true);}
+  else{buildFilters();rebuildDeck(true);}
 }
 
 loadState('msk_cards_v2',initDeck);
@@ -515,14 +515,10 @@ function filteredCards(){
   );
 }
 
-function rebuildDeck(){
+function rebuildDeck(preserveIdx){
   deck=filteredCards();
-  if(_firstLoad){
-    _firstLoad=false;
-    if(idx>=deck.length) idx=Math.max(0,deck.length-1);
-  } else {
-    idx=0;
-  }
+  if(preserveIdx){if(idx>=deck.length)idx=Math.max(0,deck.length-1);}
+  else{idx=0;}
   revealed=false;render();
 }
 
@@ -754,7 +750,7 @@ rebuildDeck();
     <div id="summaryBody" style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:1.5rem;"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
       <button class="nbtn secondary" onclick="closeSummary()">Keep studying</button>
-      <a class="nbtn finish" href="./index.html" style="text-decoration:none;display:inline-flex;align-items:center;">Go to index</a>
+      <a class="nbtn finish" href="index.html" style="text-decoration:none;display:inline-flex;align-items:center;">Go to index</a>
     </div>
   </div>
 </div>
