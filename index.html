@@ -3,468 +3,410 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NPTE Forge — Study Tracker</title>
+<title>NPTE Flashcards</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --gold:#D4A843;--gold-light:#F0C060;--gold-dim:#8A6A20;
-  --bg:#0D0F14;--bg2:#141720;--bg3:#1A1E28;--bg4:#222736;
-  --border:rgba(212,168,67,0.2);--border-bright:rgba(212,168,67,0.5);
-  --text:#E8E0CC;--text-dim:#7A7260;--text-mid:#B0A888;
-  --mskel:#E8593C;--neuro:#7C6EE8;--cardio:#3A9BD4;
-  --integ:#4CAF7A;--sysint:#E8A830;--safety:#B06AC8;
-  --goal:#30D4A0;--cohort:#7A7260;
-}
-body{font-family:'Inter',sans-serif;background:#0D0F14;color:#E8E0CC;min-height:100vh;overflow-x:hidden}
-.app{max-width:900px;margin:0 auto;padding:16px}
-.header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;margin-bottom:12px;background:linear-gradient(135deg,#141720,#1A1E28);border:1px solid rgba(212,168,67,0.2);border-radius:12px;gap:12px}
-.header-left{display:flex;flex-direction:column;gap:2px}
-.logo{font-family:'Cinzel',serif;font-size:19px;color:#D4A843;letter-spacing:2px}
-.logo-sub{color:#7A7260;font-size:10px;letter-spacing:1px}
-.countdown-header{font-family:'Cinzel';font-size:11px;color:#E8593C;letter-spacing:1px;margin-top:4px}
-.header-stats{display:flex;gap:16px;flex-shrink:0}
-.hstat{text-align:center}
-.hstat-val{font-size:18px;font-weight:600;color:#D4A843;font-family:'Cinzel'}
-.hstat-lbl{font-size:9px;color:#7A7260;letter-spacing:1px;text-transform:uppercase}
-.daily-goal-bar{background:#141720;border:1px solid rgba(212,168,67,0.2);border-radius:12px;padding:14px 18px;margin-bottom:12px;display:flex;align-items:center;gap:18px}
-.goal-ring-wrap{position:relative;width:60px;height:60px;flex-shrink:0}
-.goal-ring-wrap svg{transform:rotate(-90deg)}
-.goal-ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
-.goal-pct{font-family:'Cinzel';font-size:12px;color:#30D4A0;line-height:1}
-.goal-min-lbl{font-size:9px;color:#7A7260;margin-top:1px}
-.goal-info{flex:1}
-.goal-title{font-size:13px;font-weight:600;color:#E8E0CC;margin-bottom:4px}
-.goal-sub{font-size:11px;color:#7A7260}
-.goal-met-text{color:#30D4A0;font-weight:600}
-.goal-streak-row{display:flex;gap:10px;margin-top:6px}
-.goal-chip{font-size:10px;background:#1A1E28;border:1px solid rgba(212,168,67,0.2);border-radius:6px;padding:3px 8px;color:#7A7260}
-.goal-chip span{color:#30D4A0;font-weight:600}
-.celebrate{display:none;background:rgba(48,212,160,0.08);border:1px solid rgba(48,212,160,0.3);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;text-align:center;color:#30D4A0}
-.celebrate.show{display:block}
-.tabs{display:flex;gap:3px;margin-bottom:14px;background:#141720;border:1px solid rgba(212,168,67,0.2);border-radius:10px;padding:4px}
-.tab{flex:1;padding:7px 4px;text-align:center;font-size:11px;cursor:pointer;border-radius:7px;color:#7A7260;transition:all 0.2s;font-weight:500}
-.tab.active{background:#222736;color:#D4A843;border:1px solid rgba(212,168,67,0.5)}
-.tab:hover:not(.active){color:#E8E0CC;background:#1A1E28}
-.panel{display:none}.panel.active{display:block}
-.card{background:#141720;border:1px solid rgba(212,168,67,0.2);border-radius:12px;padding:18px;margin-bottom:12px}
-.card-title{font-family:'Cinzel';font-size:13px;color:#D4A843;margin-bottom:14px;letter-spacing:1px}
-.weekly-summary{background:#141720;border:1px solid rgba(212,168,67,0.2);border-radius:12px;padding:14px 18px;margin-bottom:12px}
-.ws-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.ws-title{font-family:'Cinzel';font-size:12px;color:#D4A843;letter-spacing:1px}
-.ws-period{font-size:10px;color:#7A7260}
-.ws-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.ws-stat{background:#1A1E28;border-radius:8px;padding:10px;text-align:center}
-.ws-stat-val{font-family:'Cinzel';font-size:16px;color:#D4A843}
-.ws-stat-lbl{font-size:9px;color:#7A7260;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
-.ws-domains{display:flex;flex-direction:column;gap:5px}
-.ws-domain-row{display:flex;align-items:center;gap:8px;font-size:11px}
-.ws-domain-name{min-width:60px;color:#7A7260}
-.ws-domain-bar-wrap{flex:1;height:5px;background:#222736;border-radius:3px;overflow:hidden}
-.ws-domain-bar{height:100%;border-radius:3px}
-.ws-domain-val{min-width:36px;text-align:right;color:#B0A888}
-.readiness-bar{background:#141720;border:1px solid rgba(212,168,67,0.2);border-radius:10px;padding:14px;margin-bottom:12px}
-.readiness-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.readiness-label{font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#7A7260}
-.readiness-val{font-family:'Cinzel';font-size:17px;color:#D4A843}
-.readiness-track{height:5px;background:#222736;border-radius:3px;overflow:hidden}
-.readiness-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#7C6EE8,#D4A843);transition:width 0.5s}
-.tree-container{background:#141720;border:1px solid rgba(212,168,67,0.2);border-radius:12px;overflow:hidden;margin-bottom:12px}
-.domain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.domain-card{background:#141720;border:1px solid rgba(212,168,67,0.2);border-radius:10px;padding:12px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
-.domain-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--dc)}
-.domain-card:hover{border-color:var(--dc);transform:translateY(-1px)}
-.dc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
-.dc-name{font-size:12px;font-weight:600;color:var(--dc)}
-.dc-level{font-size:10px;background:var(--dc-dim);color:var(--dc);padding:2px 6px;border-radius:4px}
-.dc-xp-bar{height:4px;background:#222736;border-radius:2px;margin-bottom:6px}
-.dc-xp-fill{height:100%;border-radius:2px;background:var(--dc);transition:width 0.4s}
-.dc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
-.dc-stat{font-size:10px;color:#7A7260}
-.dc-stat span{color:#B0A888;font-weight:500}
-.dc-meta{font-size:9px;color:#7A7260;margin-bottom:5px}
-.conf-row{display:flex;justify-content:space-between;align-items:center}
-.conf-dots{display:flex;gap:3px}
-.conf-dot{width:7px;height:7px;border-radius:50%;background:#222736;transition:background 0.2s;cursor:pointer}
-.conf-dot.filled{background:var(--dc)}
-.conf-trend{font-size:11px;font-weight:600}
-.levelup-overlay{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:200;display:flex;align-items:center;justify-content:center}
-.levelup-burst{display:none;flex-direction:column;align-items:center;gap:8px}
-.levelup-burst.show{display:flex;animation:burstIn 0.4s ease forwards}
-.levelup-text{font-family:'Cinzel';font-size:32px;color:#D4A843;text-shadow:0 0 30px rgba(212,168,67,0.8)}
-.levelup-sub{font-family:'Cinzel';font-size:16px;color:#F0C060;opacity:0.9}
-.particle{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:199;animation:particleFly 0.8s ease forwards}
-@keyframes burstIn{0%{transform:scale(0.5);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
-@keyframes burstOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.3)}}
-@keyframes particleFly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-.form-group{display:flex;flex-direction:column;gap:6px}
-.form-label{font-size:11px;color:#7A7260;letter-spacing:0.5px;text-transform:uppercase}
-.form-input{background:#1A1E28;border:1px solid rgba(212,168,67,0.2);border-radius:8px;color:#E8E0CC;padding:9px 12px;font-size:13px;font-family:'Inter';outline:none;transition:border-color 0.2s;width:100%}
-.form-input:focus{border-color:rgba(212,168,67,0.5)}
-.domain-time-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
-.domain-time-row{display:flex;align-items:center;gap:10px;background:#1A1E28;border:1px solid rgba(212,168,67,0.2);border-radius:8px;padding:10px 12px}
-.dtr-label{font-size:12px;font-weight:600;flex:1}
-.dtr-input{background:#222736;border:1px solid rgba(212,168,67,0.2);border-radius:6px;color:#E8E0CC;padding:6px 10px;font-size:13px;width:80px;font-family:'Inter';outline:none;text-align:center}
-.dtr-unit{font-size:11px;color:#7A7260;min-width:24px}
-.xp-preview{background:#1A1E28;border:1px solid rgba(212,168,67,0.2);border-radius:8px;padding:12px;margin-bottom:12px}
-.xp-preview-title{font-size:11px;color:#7A7260;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
-.xp-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:2px 0}
-.xp-domain{display:flex;align-items:center;gap:6px}
-.xp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.xp-amount{color:#D4A843;font-weight:600}
-.btn-sm{padding:5px 10px;background:#222736;border:1px solid rgba(212,168,67,0.2);border-radius:6px;color:#7A7260;font-size:11px;cursor:pointer;transition:all 0.2s;font-family:'Inter'}
-.btn-sm:hover{color:#E8593C;border-color:#E8593C}
-.btn-boss{padding:6px 14px;background-color:#E8593C;border:none;border-radius:7px;color:#ffffff;font-family:'Cinzel';font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s}
-.btn-boss:hover{background-color:#FF6B4A;transform:translateY(-1px)}
-.session-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-.session-item{background:#1A1E28;border:1px solid rgba(212,168,67,0.2);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
-.si-left{display:flex;flex-direction:column;gap:3px}
-.si-date{font-size:11px;color:#7A7260}
-.si-info{font-size:13px}
-.si-right{display:flex;align-items:center;gap:10px}
-.si-xp{font-size:14px;font-weight:600;color:#D4A843;font-family:'Cinzel'}
-.si-goal{font-size:10px;color:#30D4A0;margin-top:2px}
-.si-domains{font-size:10px;color:#7A7260;margin-top:2px}
-.toc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.toc-stat{background:#1A1E28;border-radius:8px;padding:12px;text-align:center}
-.toc-stat-val{font-family:'Cinzel';font-size:20px;color:#D4A843;margin-bottom:2px}
-.toc-stat-lbl{font-size:10px;color:#7A7260;text-transform:uppercase;letter-spacing:0.5px}
-.toc-stat-sub{font-size:10px;margin-top:2px}
-.toc-benchmarks{margin-bottom:16px}
-.toc-bar-labels{display:flex;justify-content:space-between;font-size:10px;color:#7A7260;margin-bottom:4px}
-.toc-bar-track{height:12px;background:#222736;border-radius:6px;position:relative;overflow:visible;margin-bottom:6px}
-.toc-bar-cohort{position:absolute;top:0;height:100%;border-radius:6px;background:#7A7260;opacity:0.45}
-.toc-bar-you{position:absolute;top:0;height:100%;border-radius:6px;background:#3A9BD4;transition:width 0.4s}
-.toc-bar-goal-line{position:absolute;top:-4px;bottom:-4px;width:2px;background:#30D4A0;border-radius:1px}
-.toc-bar-you-marker{position:absolute;top:-5px;width:3px;height:22px;background:#D4A843;border-radius:2px;transition:left 0.4s}
-.toc-legend{display:flex;gap:14px;flex-wrap:wrap}
-.toc-legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:#7A7260}
-.toc-legend-dot{width:8px;height:8px;border-radius:2px}
-.toc-history{display:flex;flex-direction:column;gap:6px;margin-top:12px}
-.toc-session{background:#1A1E28;border:1px solid rgba(212,168,67,0.2);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
-.toc-score-badge{font-family:'Cinzel';font-size:16px;font-weight:600}
-.badges-section-title{font-family:'Cinzel';font-size:11px;color:#7A7260;letter-spacing:1px;margin:14px 0 8px;text-transform:uppercase}
-.badges-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.badge-card{background:#1A1E28;border:1px solid rgba(212,168,67,0.2);border-radius:10px;padding:12px 8px;text-align:center;transition:all 0.2s}
-.badge-card.earned{border-color:#8A6A20}
-.badge-card.earned:hover{border-color:#D4A843;transform:translateY(-1px)}
-.badge-icon{font-size:22px;margin-bottom:6px;filter:grayscale(1) opacity(0.25)}
-.badge-card.earned .badge-icon{filter:none}
-.badge-name{font-size:10px;font-weight:600;color:#7A7260}
-.badge-card.earned .badge-name{color:#D4A843}
-.badge-desc{font-size:9px;color:#7A7260;margin-top:2px;line-height:1.4}
-.boss-unlock-item{display:flex;justify-content:space-between;align-items:center;background:#1A1E28;border:1px solid rgba(212,168,67,0.2);border-radius:8px;padding:10px 14px;margin-bottom:8px}
-.bui-left{display:flex;flex-direction:column;gap:2px}
-.bui-name{font-size:13px;font-weight:600}
-.bui-tier-desc{font-size:10px;color:#7A7260}
-.bui-status{display:flex;align-items:center;gap:8px;font-size:11px}
-.bui-unlocked{color:#4CAF7A}
-.bui-locked{color:#7A7260}
-.boss-tier-badge{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600;margin-left:4px}
-.tier-1{background:rgba(76,175,122,0.2);color:#4CAF7A}
-.tier-2{background:rgba(232,168,48,0.2);color:#E8A830}
-.tier-3{background:rgba(232,89,60,0.2);color:#E8593C}
-.boss-q{background:#1A1E28;border:1px solid rgba(212,168,67,0.2);border-radius:10px;padding:16px;margin-bottom:12px;font-size:13px;line-height:1.6}
-.boss-options{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
-.boss-opt{background:#1A1E28;border:1px solid rgba(212,168,67,0.2);border-radius:8px;padding:10px 14px;text-align:left;cursor:pointer;font-size:13px;color:#E8E0CC;font-family:'Inter';transition:all 0.2s}
-.boss-opt:hover{border-color:#8A6A20;background:#222736}
-.boss-opt.correct{border-color:#4CAF7A !important;background:rgba(76,175,122,0.1) !important;color:#4CAF7A !important}
-.boss-opt.wrong{border-color:#E8593C !important;background:rgba(232,89,60,0.1) !important;color:#E8593C !important}
-.boss-explanation{background:#222736;border-left:3px solid #D4A843;border-radius:0 6px 6px 0;padding:10px 12px;font-size:12px;color:#B0A888;line-height:1.5;margin-bottom:12px;display:none}
-.boss-explanation.show{display:block}
-.boss-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.boss-timer-sm{font-family:'Cinzel';font-size:20px;color:#D4A843}
-.notif{position:fixed;top:20px;right:20px;z-index:300;background:#1A1E28;border:1px solid #8A6A20;border-radius:10px;padding:12px 16px;font-size:13px;max-width:260px;transform:translateX(300px);transition:transform 0.3s ease}
-.notif.show{transform:translateX(0)}
-.notif-title{font-family:'Cinzel';color:#D4A843;font-size:12px;margin-bottom:4px}
-.notif.goal-notif{border-color:rgba(48,212,160,0.5)}
-.notif.goal-notif .notif-title{color:#30D4A0}
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500&display=swap');
+
+  :root {
+    --bg: #F2F0EB;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.1);
+    --text: #1a1a1a;
+    --text-secondary: #6b6966;
+    --text-tertiary: #a09d9a;
+    --green: #0F6E56;
+    --green-bg: #E1F5EE;
+    --amber: #854F0B;
+    --amber-bg: #FAEEDA;
+    --red: #A32D2D;
+    --red-bg: #FCEBEB;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a1c;
+      --surface: #242426;
+      --border: rgba(255,255,255,0.08);
+      --text: #f2f2f7;
+      --text-secondary: #aeaeb2;
+      --text-tertiary: #6e6e73;
+      --green-bg: #0a2e24;
+      --amber-bg: #2a1f0a;
+      --red-bg: #2e0f0f;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text);
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  .wrap { max-width: 640px; margin: 0 auto; }
+
+  header { margin-bottom: 2.5rem; }
+
+  .eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 38px;
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .summary-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .summary-chip {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+
+  .section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .deck-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 2.5rem;
+  }
+
+  .deck-card {
+    display: block;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .deck-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .deck-card:active { transform: translateY(0); }
+
+  .deck-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .deck-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .deck-name {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .arrow { color: var(--text-tertiary); font-size: 14px; }
+
+  /* progress bar */
+  .prog-track {
+    height: 5px;
+    background: var(--bg);
+    border-radius: 3px;
+    overflow: hidden;
+    display: flex;
+    gap: 1px;
+    margin-bottom: 7px;
+  }
+
+  .prog-seg { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+
+  .stat-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .stat-chip {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .chip-loading {
+    background: var(--bg);
+    color: var(--text-tertiary);
+  }
+
+  .forge-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    background: linear-gradient(135deg, #141720, #1A1E28);
+    border: 0.5px solid rgba(212,168,67,0.35);
+    border-radius: 10px;
+    text-decoration: none;
+    margin-bottom: 6px;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .forge-banner:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(212,168,67,0.12); }
+  .forge-banner:active { transform: translateY(0); }
+  .forge-title {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 18px;
+    color: #D4A843;
+    margin-bottom: 3px;
+  }
+  .forge-sub { font-size: 12px; color: #7A7260; }
+  .forge-banner .arrow { color: #D4A843; font-size: 16px; flex-shrink: 0; }
+
+    font-size: 12px;
+    color: var(--text-tertiary);
+    text-align: center;
+    line-height: 1.7;
+  }
+
+  .sync-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 1.5rem;
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+
+  .sync-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #c8c6c3;
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+
+  .sync-dot.ok { background: #5DCAA5; }
+  .sync-dot.err { background: #F09595; }
+  .sync-dot.pending { background: #EF9F27; }
+  .pos-chip{font-size:11px;color:var(--text-tertiary);white-space:nowrap;flex-shrink:0;}
 </style>
 </head>
 <body>
-<div class="app">
-<div class="header">
-  <div class="header-left">
+<div class="wrap">
+  <header>
+    <div class="eyebrow">NPTE Prep</div>
+    <h1>Flashcard<br>Decks</h1>
+  </header>
 
-    <div class="logo">NPTE FORGE</div>
-    <div class="logo-sub">Study Tracker</div>
-    <div class="countdown-header" id="countdown-header">— DAYS TO THE FINAL BATTLE — JUL 28</div>
+  <div class="sync-bar">
+    <div class="sync-dot pending" id="syncDot"></div>
+    <span id="syncTxt">Loading progress...</span>
   </div>
-  <div class="header-stats">
-    <div class="hstat"><div class="hstat-val" id="h-goalstreak" style="color:#30D4A0">0</div><div class="hstat-lbl">Goal Streak</div></div>
-    <div class="hstat"><div class="hstat-val" id="h-anystreak" style="color:#E8593C">0</div><div class="hstat-lbl">Session Streak</div></div>
-    <div class="hstat"><div class="hstat-val" id="h-freezes" style="color:#3AB4D4">0</div><div class="hstat-lbl">Freezes</div></div>
-    <div class="hstat"><div class="hstat-val" id="h-totalxp">0</div><div class="hstat-lbl">Total XP</div></div>
-    <div class="hstat"><div class="hstat-val" id="h-sessions">0</div><div class="hstat-lbl">Sessions</div></div>
-    <a href="index.html" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1px solid rgba(212,168,67,0.3);color:#D4A843;text-decoration:none;font-size:22px;flex-shrink:0;margin-left:4px;font-weight:700;" title="Back to index">⌂</a>
-  </div>
-</div>
-<div class="daily-goal-bar">
-  <div class="goal-ring-wrap">
-    <svg width="60" height="60" viewBox="0 0 60 60">
-      <circle cx="30" cy="30" r="24" fill="none" stroke="rgba(48,212,160,0.1)" stroke-width="5"/>
-      <circle id="goal-ring-fill" cx="30" cy="30" r="24" fill="none" stroke="#30D4A0" stroke-width="5" stroke-linecap="round" stroke-dasharray="0 150.8" stroke-dashoffset="0"/>
-    </svg>
-    <div class="goal-ring-center"><div class="goal-pct" id="goal-pct">0%</div><div class="goal-min-lbl">180m</div></div>
-  </div>
-  <div class="goal-info">
-    <div class="goal-title" id="goal-title-text">Today's forge goal: 3 hours</div>
-    <div class="goal-sub" id="goal-sub-text">Log sessions to fill your daily goal</div>
-    <div class="goal-streak-row">
-      <div class="goal-chip">Goal streak <span id="gs-chip">0</span> days</div>
-      <div class="goal-chip">Today <span id="today-min-chip">0</span> min logged</div>
-      <div class="goal-chip"><span id="freeze-chip">0</span>/3 freezes · <span id="half-freeze-chip">0</span>/2 days</div>
+
+  <div class="summary-row" id="summaryRow"></div>
+
+  <div class="section-label">Forge</div>
+
+  <a class="forge-banner" href="npte_forge.html">
+    <div class="forge-left">
+      <div class="forge-title">Forge</div>
+      <div class="forge-sub">XP · Streaks · Boss Battles · Trial of Combat</div>
     </div>
+    <span class="arrow">→</span>
+  </a>
+
+  <div class="section-label" style="margin-top:1.5rem;">Flashcard decks</div>
+
+  <div class="deck-list" id="deckList"></div>
+
+  <div class="footer">
+    Bookmark this page for quick access from any device.
   </div>
 </div>
-<div class="celebrate" id="celebrate-banner">Daily Forge Goal complete! Halfway to your next streak freeze</div>
-<div class="tabs">
-  <div class="tab active" onclick="switchTab('tree')">Skill Tree</div>
-  <div class="tab" onclick="switchTab('log')">Log Session</div>
-  <div class="tab" onclick="switchTab('toc')">Trial of Combat</div>
-  <div class="tab" onclick="switchTab('badges')">Badges</div>
-  <div class="tab" onclick="switchTab('boss')">Boss Battles</div>
-</div>
-<div class="panel active" id="panel-tree">
-  <div class="weekly-summary" id="weekly-summary"></div>
-  <div class="readiness-bar">
-    <div class="readiness-header"><span class="readiness-label">Forge Readiness</span><span class="readiness-val" id="readiness-val">0%</span></div>
-    <div class="readiness-track"><div class="readiness-fill" id="readiness-fill" style="width:0%"></div></div>
-  </div>
-  <div class="tree-container">
-    <svg width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
-      <defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(212,168,67,0.04)" stroke-width="0.5"/></pattern></defs>
-      <rect width="680" height="420" fill="url(#grid)"/>
-      <line x1="220" y1="128" x2="311" y2="90" stroke="rgba(212,168,67,0.12)" stroke-width="1.5" stroke-dasharray="4 4"/>
-      <line x1="175" y1="190" x2="170" y2="219" stroke="rgba(212,168,67,0.12)" stroke-width="1.5" stroke-dasharray="4 4"/>
-      <line x1="390" y1="115" x2="480" y2="200" stroke="rgba(212,168,67,0.12)" stroke-width="1.5" stroke-dasharray="4 4"/>
-      <line x1="185" y1="275" x2="310" y2="330" stroke="rgba(212,168,67,0.12)" stroke-width="1.5" stroke-dasharray="4 4"/>
-      <line x1="495" y1="245" x2="505" y2="320" stroke="rgba(212,168,67,0.12)" stroke-width="1.5" stroke-dasharray="4 4"/>
-      <line x1="360" y1="355" x2="465" y2="350" stroke="rgba(212,168,67,0.12)" stroke-width="1.5" stroke-dasharray="4 4"/>
-      <g style="cursor:pointer" onclick="selectDomain('mskel')"><circle cx="170" cy="140" r="62" fill="rgba(232,89,60,0.05)" stroke="rgba(232,89,60,0.2)" stroke-width="1"/><circle cx="170" cy="140" r="50" fill="rgba(232,89,60,0.1)" stroke="#E8593C" stroke-width="1.5" id="nc-mskel"/><text x="170" y="133" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#E8593C" font-weight="600">MSK</text><text x="170" y="148" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="rgba(232,89,60,0.55)">SYSTEM</text><text x="170" y="162" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#D4A843" id="lvl-mskel">Novice</text></g>
-      <g style="cursor:pointer" onclick="selectDomain('neuro')"><circle cx="355" cy="85" r="56" fill="rgba(124,110,232,0.05)" stroke="rgba(124,110,232,0.2)" stroke-width="1"/><circle cx="355" cy="85" r="44" fill="rgba(124,110,232,0.1)" stroke="#7C6EE8" stroke-width="1.5" id="nc-neuro"/><text x="355" y="79" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#7C6EE8" font-weight="600">NEURO</text><text x="355" y="94" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#D4A843" id="lvl-neuro">Novice</text></g>
-      <g style="cursor:pointer" onclick="selectDomain('cardio')"><circle cx="170" cy="255" r="46" fill="rgba(58,155,212,0.05)" stroke="rgba(58,155,212,0.2)" stroke-width="1"/><circle cx="170" cy="255" r="36" fill="rgba(58,155,212,0.1)" stroke="#3A9BD4" stroke-width="1.5" id="nc-cardio"/><text x="170" y="249" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#3A9BD4" font-weight="600">CARDIO</text><text x="170" y="263" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#D4A843" id="lvl-cardio">Novice</text></g>
-      <g style="cursor:pointer" onclick="selectDomain('sysint')"><circle cx="500" cy="215" r="42" fill="rgba(232,168,48,0.05)" stroke="rgba(232,168,48,0.2)" stroke-width="1"/><circle cx="500" cy="215" r="32" fill="rgba(232,168,48,0.1)" stroke="#E8A830" stroke-width="1.5" id="nc-sysint"/><text x="500" y="209" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#E8A830" font-weight="600">SYS INT</text><text x="500" y="223" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#D4A843" id="lvl-sysint">Novice</text></g>
-      <g style="cursor:pointer" onclick="selectDomain('integ')"><circle cx="330" cy="345" r="38" fill="rgba(76,175,122,0.05)" stroke="rgba(76,175,122,0.2)" stroke-width="1"/><circle cx="330" cy="345" r="28" fill="rgba(76,175,122,0.1)" stroke="#4CAF7A" stroke-width="1.5" id="nc-integ"/><text x="330" y="339" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#4CAF7A" font-weight="600">INTEG</text><text x="330" y="353" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#D4A843" id="lvl-integ">Novice</text></g>
-      <g style="cursor:pointer" onclick="selectDomain('safety')"><circle cx="495" cy="345" r="38" fill="rgba(176,106,200,0.05)" stroke="rgba(176,106,200,0.2)" stroke-width="1"/><circle cx="495" cy="345" r="28" fill="rgba(176,106,200,0.1)" stroke="#B06AC8" stroke-width="1.5" id="nc-safety"/><text x="495" y="339" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#B06AC8" font-weight="600">SAFETY</text><text x="495" y="353" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#D4A843" id="lvl-safety">Novice</text></g>
-      <g id="xp-rings"></g>
-      <circle id="sel-ring" cx="170" cy="140" r="65" fill="none" stroke="rgba(212,168,67,0)" stroke-width="2" stroke-dasharray="8 4"/>
-    </svg>
-  </div>
-  <div class="domain-grid" id="domain-grid"></div>
-</div>
-<div class="panel" id="panel-log">
-  <div class="card">
-    <div class="card-title">DOMAIN STUDY SESSION</div>
-    <div class="form-row">
-      <div class="form-group"><div class="form-label">Date</div><input type="date" class="form-input" id="log-date"></div>
-      <div class="form-group"><div class="form-label">XP Rate</div><div style="font-size:11px;color:#7A7260;padding:9px 0">80 XP per 30 min per domain</div></div>
-    </div>
-    <div class="form-label" style="margin-bottom:10px">Minutes studied per domain</div>
-    <div class="domain-time-grid" id="domain-time-grid"></div>
-    <div class="form-group" style="margin-bottom:12px">
-      <div class="form-label">Update confidence (optional)</div>
-      <div id="conf-update-area" style="display:flex;flex-direction:column;gap:8px;margin-top:6px"></div>
-    </div>
-    <div class="xp-preview"><div class="xp-preview-title">XP Preview</div><div id="log-xp-breakdown"><div style="font-size:12px;color:#7A7260">Enter minutes per domain to preview XP</div></div></div>
-    <button onclick="logDomainSession()" style="width:100%;padding:12px;background-color:#D4A843;border:none;border-radius:8px;color:#0D0F14;font-family:'Cinzel',serif;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;margin-top:0" onmouseover="this.style.backgroundColor='#F0C060'" onmouseout="this.style.backgroundColor='#D4A843'">FORGE SESSION</button>
-  </div>
-  <div class="card">
-    <div class="card-title">SESSION HISTORY</div>
-    <div class="session-list" id="session-list"><div style="font-size:12px;color:#7A7260;text-align:center;padding:16px">No sessions logged yet</div></div>
-  </div>
-</div>
-<div class="panel" id="panel-toc">
-  <div class="card">
-    <div class="card-title">TRIAL OF COMBAT</div>
-    <div class="toc-stats">
-      <div class="toc-stat"><div class="toc-stat-val" id="toc-current">—</div><div class="toc-stat-lbl">Your Average</div><div class="toc-stat-sub" id="toc-vs-cohort" style="color:#7A7260"></div></div>
-      <div class="toc-stat"><div class="toc-stat-val" style="color:#7A7260">65</div><div class="toc-stat-lbl">Cohort Avg</div><div class="toc-stat-sub" style="color:#7A7260">Benchmark</div></div>
-      <div class="toc-stat"><div class="toc-stat-val" style="color:#30D4A0">80</div><div class="toc-stat-lbl">Your Goal</div><div class="toc-stat-sub" id="toc-gap" style="color:#7A7260"></div></div>
-    </div>
-    <div class="toc-benchmarks">
-      <div class="toc-bar-labels"><span>0</span><span>Cohort: 65</span><span>Goal: 80</span><span>100</span></div>
-      <div class="toc-bar-track">
-        <div class="toc-bar-cohort" style="width:65%"></div>
-        <div class="toc-bar-you" id="toc-bar-you" style="width:0%"></div>
-        <div class="toc-bar-goal-line" style="left:80%"></div>
-        <div class="toc-bar-you-marker" id="toc-you-marker" style="left:0%;display:none"></div>
-      </div>
-      <div class="toc-legend">
-        <div class="toc-legend-item"><div class="toc-legend-dot" style="background:#3A9BD4"></div>Your average</div>
-        <div class="toc-legend-item"><div class="toc-legend-dot" style="background:#7A7260;opacity:0.6"></div>Cohort (65)</div>
-        <div class="toc-legend-item"><div class="toc-legend-dot" style="background:#30D4A0"></div>Goal (80)</div>
-        <div class="toc-legend-item"><div class="toc-legend-dot" style="background:#D4A843"></div>You (marker)</div>
-      </div>
-    </div>
-    <canvas id="toc-graph" height="110" style="width:100%;margin:14px 0;display:block"></canvas>
-    <div style="border-top:1px solid rgba(212,168,67,0.2);padding-top:14px">
-      <div class="card-title" style="margin-bottom:12px">LOG TRIAL</div>
-      <div class="form-row">
-        <div class="form-group"><div class="form-label">Date</div><input type="date" class="form-input" id="toc-date"></div>
-        <div class="form-group"><div class="form-label">Score (0–100)</div><input type="number" class="form-input" id="toc-score" placeholder="75" min="0" max="100" oninput="updateTocPreview()"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><div class="form-label">Duration (minutes)</div><input type="number" class="form-input" id="toc-mins" placeholder="60" min="1" max="300"></div>
-        <div class="form-group"><div class="form-label">Notes (optional)</div><input type="text" class="form-input" id="toc-notes" placeholder="e.g. struggled with neuro"></div>
-      </div>
-      <div id="toc-preview" style="margin-bottom:12px"></div>
-      <button onclick="logTrial()" style="width:100%;padding:12px;background-color:#D4A843;border:none;border-radius:8px;color:#0D0F14;font-family:'Cinzel',serif;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer" onmouseover="this.style.backgroundColor='#F0C060'" onmouseout="this.style.backgroundColor='#D4A843'">RECORD TRIAL</button>
-    </div>
-  </div>
-  <div class="card"><div class="card-title">COMBAT RECORD</div><div class="toc-history" id="toc-history"><div style="font-size:12px;color:#7A7260;text-align:center;padding:16px">No trials recorded yet</div></div></div>
-</div>
-<div class="panel" id="panel-badges">
-  <div class="card"><div class="card-title">ACHIEVEMENTS</div><div id="badges-container"></div></div>
-</div>
-<div class="panel" id="panel-boss">
-  <div class="card">
-    <div class="card-title">BOSS BATTLES</div>
-    <div id="boss-unlock-list"></div>
-    <div id="boss-battle-area" style="display:none;margin-top:14px">
-      <div style="font-family:Cinzel;font-size:17px;margin-bottom:3px" id="boss-title"></div>
-      <div style="font-size:11px;color:#7A7260;margin-bottom:12px" id="boss-tier-desc"></div>
-      <div class="boss-meta">
-        <div style="font-size:12px;color:#7A7260">Q <span id="boss-q-num">1</span>/5</div>
-        <div class="boss-timer-sm" id="boss-timer">2:00</div>
-        <div style="font-size:12px;color:#7A7260">HP <span id="boss-hp" style="color:#E8593C">3</span></div>
-      </div>
-      <div class="boss-q" id="boss-q-text"></div>
-      <div class="boss-options" id="boss-options"></div>
-      <div class="boss-explanation" id="boss-explanation"></div>
-      <div id="boss-result-box" style="display:none;text-align:center;padding:20px">
-        <div style="font-family:Cinzel;font-size:20px;margin-bottom:8px" id="boss-result-title"></div>
-        <div style="font-size:13px;color:#7A7260;margin-bottom:12px" id="boss-result-sub"></div>
-        <button class="btn-boss" onclick="closeBoss()">Return</button>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-<div class="levelup-overlay" id="levelup-overlay">
-  <div class="levelup-burst" id="levelup-burst">
-    <div class="levelup-text" id="levelup-text">LEVEL UP!</div>
-    <div class="levelup-sub" id="levelup-sub"></div>
-  </div>
-</div>
-<div class="notif" id="notif"><div class="notif-title" id="notif-title"></div><div id="notif-body"></div></div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-const DOMAINS={mskel:{name:'Musculoskeletal',short:'MSK',color:'#E8593C',dim:'rgba(232,89,60,0.15)',weight:0.32,cx:170,cy:140},neuro:{name:'Neuromuscular',short:'Neuro',color:'#7C6EE8',dim:'rgba(124,110,232,0.15)',weight:0.28,cx:355,cy:85},cardio:{name:'Cardiopulmonary',short:'Cardio',color:'#3A9BD4',dim:'rgba(58,155,212,0.15)',weight:0.17,cx:170,cy:255},integ:{name:'Integumentary',short:'Integ',color:'#4CAF7A',dim:'rgba(76,175,122,0.15)',weight:0.06,cx:330,cy:345},sysint:{name:'System Interactions',short:'Sys Int',color:'#E8A830',dim:'rgba(232,168,48,0.15)',weight:0.06,cx:500,cy:215},safety:{name:'Safety & Research',short:'Safety',color:'#B06AC8',dim:'rgba(176,106,200,0.15)',weight:0.11,cx:495,cy:345}};
-const LEVEL_NAMES=['Novice','Apprentice','Proficient','Advanced','Master'];
-const LEVEL_THRESH=[0,2000,5000,10000,18000];
-const NODE_RADII={mskel:50,neuro:44,cardio:36,integ:28,sysint:32,safety:28};
-const GOAL_MINS=180;const GOAL_BONUS=500;const XP_PER_30=80;
-const TIER_LABELS=['','Apprentice','Advanced','Master'];
-const TIER_REQ=[0,1,3,4];
-const TIER_DESC=['','Unlock at Proficient','Unlock at Advanced','Unlock at Master'];
-const COUNTDOWN_START=85;
-const BOSS_Q={mskel:{1:[{q:"A patient with lateral epicondylalgia has pain with resisted wrist extension. Which tendon is primarily involved?",opts:["FCU","ECRB","FCR","ECU"],ans:1,exp:"ECRB (extensor carpi radialis brevis) is the primary tendon in lateral epicondylalgia — it inserts at the lateral epicondyle and is heavily loaded with wrist extension and gripping."},{q:"Which special test assesses ACL integrity with the knee near full extension?",opts:["McMurray's","Lachman's","Valgus stress","Apley's"],ans:1,exp:"Lachman's test at 20–30° flexion is the most sensitive clinical test for ACL rupture, superior to the anterior drawer at 90°."},{q:"The empty can test assesses which rotator cuff muscle?",opts:["Infraspinatus","Subscapularis","Supraspinatus","Teres minor"],ans:2,exp:"Empty can (Jobe's) isolates the supraspinatus at 90° abduction in the scapular plane with internal rotation and downward pressure."},{q:"Which Maitland grade is used for pain relief at end range?",opts:["Grade I","Grade II","Grade III","Grade IV"],ans:3,exp:"Grade IV: small amplitude oscillations at end range. Grade III: large amplitude into resistance. Both target stiffness but at different points."},{q:"Ober's test assesses tightness of which structure?",opts:["Rectus femoris","IT band","Piriformis","Hamstrings"],ans:1,exp:"Ober's assesses IT band/TFL tightness. Positive = hip remains abducted when released, indicating restricted iliotibial band."}],2:[{q:"A patient has painful arc with shoulder abduction 60–120° only. Which structure is most likely involved?",opts:["Supraspinatus","Subacromial bursa","AC joint","Long head biceps"],ans:1,exp:"Painful arc 60–120° with relief at end range suggests subacromial bursa impingement. AC joint pain typically peaks above 160°."},{q:"Which technique directly addresses anterior glide restriction at the glenohumeral joint?",opts:["Inferior glide","Posterior glide","Anterior glide","Distraction"],ans:2,exp:"Convex-concave rule: restricted anterior glide limits external rotation. Anterior glide mobilization of the humerus restores this motion."},{q:"Spondylolisthesis most commonly occurs at which level?",opts:["L2-L3","L3-L4","L4-L5","L5-S1"],ans:3,exp:"L5-S1 is most common due to high shear forces at the lumbosacral junction and the orientation of facet joints at this level."},{q:"A positive Thomas test indicates tightness of which muscle?",opts:["Iliopsoas","Rectus femoris","TFL","Sartorius"],ans:0,exp:"If the lowered leg rises without knee bending, iliopsoas tightness is indicated. Knee extension during the test indicates rectus femoris."},{q:"McKenzie repeated extension is contraindicated in which condition?",opts:["Disc herniation","Lumbar stenosis","Spondylolisthesis","Facet syndrome"],ans:2,exp:"Spondylolisthesis: extension increases anterior shear at the affected segment, worsening instability and symptoms."}],3:[{q:"A 45-year-old has insidious onset lateral heel pain worse with first steps in the morning. What structure?",opts:["Achilles tendon","Plantar fascia","Peroneal tendons","Retrocalcaneal bursa"],ans:1,exp:"Classic plantar fasciitis: post-static dyskinesia (worst with first steps after rest), lateral heel pain at calcaneal insertion."},{q:"Which mechanism best describes a lateral ankle sprain?",opts:["Dorsiflexion and eversion","Plantarflexion and inversion","Plantarflexion and eversion","Dorsiflexion and inversion"],ans:1,exp:"ATFL is under greatest tension in plantarflexion, making it vulnerable to inversion stress in that position — the classic sprain mechanism."},{q:"The scapular plane is approximately how many degrees anterior to the frontal plane?",opts:["15","30","45","60"],ans:1,exp:"The scapula rests ~30–35° anterior to the frontal plane. Elevation in the scapular plane (scaption) is biomechanically optimal."},{q:"Which nerve is at risk during a proximal fibular fracture?",opts:["Saphenous","Tibial","Common peroneal","Sural"],ans:2,exp:"Common peroneal nerve wraps around the fibular head. Injury causes foot drop, loss of ankle dorsiflexion and eversion."},{q:"Which finding distinguishes CRPS I from CRPS II?",opts:["Allodynia present","No identifiable nerve lesion","Autonomic changes","Trophic changes"],ans:1,exp:"CRPS I has no identifiable nerve lesion (follows tissue injury). CRPS II requires confirmed peripheral nerve injury. Both share allodynia and autonomic changes."}]},neuro:{1:[{q:"Which Brunnstrom stage describes synergy patterns dominating movement?",opts:["Stage 1","Stage 2","Stage 3","Stage 4"],ans:2,exp:"Stage 3: spasticity peaks, limb synergies dominate. Stage 1 = flaccid; Stage 4 = voluntary isolated movement begins."},{q:"A patient with foot drop most likely has which nerve injury?",opts:["Femoral","Tibial","Common peroneal","Sural"],ans:2,exp:"Common peroneal nerve supplies the anterior compartment. Injury at the fibular head causes foot drop (loss of dorsiflexion)."},{q:"Which reflex level corresponds to the biceps tendon reflex?",opts:["C5-C6","C7-C8","L3-L4","S1-S2"],ans:0,exp:"Mnemonics: biceps C5-C6, brachioradialis C5-C6, triceps C7, patellar L3-L4, Achilles S1-S2."},{q:"Berg Balance Scale uses how many items?",opts:["10","12","14","16"],ans:2,exp:"BBS has 14 items scored 0–4, max 56 points. Scores below 45 indicate increased fall risk."},{q:"Pusher syndrome is most associated with which type of stroke?",opts:["Right hemisphere","Left hemisphere","Brainstem","Cerebellar"],ans:0,exp:"Pusher syndrome (contraversive pushing toward hemiplegic side) is most frequent after right hemisphere strokes."}],2:[{q:"Which outcome measure assesses functional mobility via timed sit-to-stand, gait, and stair tasks?",opts:["DGI","TUG","FIM","BBS"],ans:1,exp:"TUG: sit-to-stand, walk 3m, turn, return, sit. Assesses functional mobility and fall risk. MCID ~3.5 seconds."},{q:"A patient post-CVA has ipsilateral limb ataxia and ipsilateral facial droop. Which area?",opts:["Internal capsule","Cerebellum","Lateral medulla","Pons"],ans:2,exp:"Lateral medullary (Wallenberg) syndrome: ipsilateral facial sensory loss/Horner's, contralateral body pain/temp loss, dysphagia, ataxia."},{q:"In Parkinson's disease, which neurotransmitter is primarily deficient?",opts:["Serotonin","Acetylcholine","Dopamine","GABA"],ans:2,exp:"PD results from degeneration of dopaminergic neurons in the substantia nigra pars compacta, disrupting the nigrostriatal pathway."},{q:"A patient with MS has EDSS of 6.0. What does this indicate?",opts:["No disability","Mild disability","Requires walking aid","Wheelchair bound"],ans:2,exp:"EDSS 6.0 = requires constant or intermittent unilateral assistance (cane, crutch) to walk 100m. EDSS 7.0+ = wheelchair."},{q:"The H-reflex primarily tests the integrity of which pathway?",opts:["Corticospinal tract","Ia afferent and motor neuron","Spinocerebellar tract","Spinothalamic tract"],ans:1,exp:"H-reflex = electrophysiologic equivalent of Achilles reflex, testing the monosynaptic Ia afferent–alpha motor neuron arc (S1)."}],3:[{q:"Which gait finding is most consistent with cerebellar ataxia?",opts:["Trendelenburg","Wide-based irregular cadence","Steppage gait","Antalgic gait"],ans:1,exp:"Cerebellar ataxia: wide-based gait, irregular step length and cadence. Trendelenburg = hip abductor weakness; steppage = foot drop."},{q:"A patient with GBS has ascending weakness. Which reflex finding is most characteristic?",opts:["Hyperreflexia","Areflexia","Clonus","Babinski"],ans:1,exp:"GBS causes peripheral demyelination → areflexia. Absent reflexes distinguish it from central causes of ascending weakness."},{q:"Central pattern generators for locomotion are located primarily in which structure?",opts:["Cerebral cortex","Basal ganglia","Spinal cord","Cerebellum"],ans:2,exp:"CPGs are interneuronal networks in the spinal cord generating rhythmic stepping without supraspinal input — basis for treadmill training in SCI."},{q:"Which is the most sensitive measure for detecting change in mild TBI?",opts:["GCS","SCAT5","FIM","MMSE"],ans:1,exp:"SCAT5 includes symptom inventory, cognitive screening, balance testing, and neuro screen — far more sensitive than GCS for mild TBI."},{q:"Mirror neuron dysfunction has been most implicated in which condition?",opts:["Parkinson's","ALS","Autism spectrum disorder","MS"],ans:2,exp:"Mirror neurons fire during both action execution and observation. Dysfunction is most prominently implicated in ASD, affecting social cognition."}]},cardio:{1:[{q:"At what MET level is a patient considered to have adequate capacity for most daily activities?",opts:["2 METs","4 METs","7 METs","10 METs"],ans:1,exp:"4 METs = threshold for most daily activities and light work. ADLs range 2–4 METs. Stair climbing ~5–6 METs."},{q:"Which vital sign change during exercise is most concerning?",opts:["HR increase","SBP drop of 10+ mmHg","RR increase","Mild diaphoresis"],ans:1,exp:"SBP drop ≥10 mmHg during exercise (exercise-induced hypotension) indicates cardiovascular compromise — hard stop criterion in cardiac rehab."},{q:"What is the recommended RPE range for moderate intensity per Borg scale?",opts:["6-9","11-14","15-17","18-20"],ans:1,exp:"Borg RPE 11–14 (fairly light to somewhat hard) = moderate intensity. For cardiac patients, 11–13 is often the early target."},{q:"Which is the primary goal of Phase I cardiac rehab?",opts:["VO2 max improvement","Early mobilization and education","Return to sport","Resistance training"],ans:1,exp:"Phase I (inpatient): early mobilization to prevent deconditioning, patient education on risk factor modification, discharge planning."},{q:"A patient on beta blockers exercises. Which modification is appropriate?",opts:["No modification","Use RPE instead of HR","Double target HR","Stop if HR exceeds 100"],ans:1,exp:"Beta blockers blunt the chronotropic response, making HR unreliable for intensity prescription. RPE is the primary guide."}],2:[{q:"Which breath sound indicates pulmonary edema?",opts:["Stridor","Wheezing","Bibasilar crackles","Friction rub"],ans:2,exp:"Bibasilar crackles (rales) = fluid in alveoli from left heart failure. Stridor = upper airway obstruction; wheezing = bronchospasm."},{q:"PaO2 below what value indicates hypoxemia at sea level?",opts:["60 mmHg","80 mmHg","95 mmHg","100 mmHg"],ans:0,exp:"PaO2 <60 mmHg = hypoxemia, corresponding to SaO2 ~90% (steep portion of oxyhemoglobin dissociation curve). Threshold for O2 prescription."},{q:"A COPD patient using pursed-lip breathing primarily achieves which effect?",opts:["Increased tidal volume","Prevention of dynamic airway collapse","Improved diaphragm strength","Reduced RR"],ans:1,exp:"Pursed-lip breathing creates back-pressure stenting open collapsible airways during exhalation — preventing dynamic airway collapse in obstruction."},{q:"Which is most indicative of left heart failure?",opts:["Peripheral edema","JVD","Pulmonary edema","Hepatomegaly"],ans:2,exp:"Left heart failure → backup into pulmonary circuit → pulmonary edema, dyspnea, orthopnea. Right heart failure → systemic venous backup."},{q:"The 6MWT is most associated with which population?",opts:["Post-surgical ortho","CHF and COPD","Pediatric CP","Acute TBI"],ans:1,exp:"6MWT was developed for and validated in CHF and COPD. Distance predicts mortality in CHF. MCID ~54m in COPD."}],3:[{q:"A patient post-CABG reports sternal clicking with arm use. What is the priority action?",opts:["Continue exercise","Restrict arm use and notify physician","Apply sternal brace","Increase monitoring"],ans:1,exp:"Sternal clicking suggests sternal instability — a serious complication. Restrict arm use and notify physician. Risk: wire failure and dehiscence."},{q:"Which spirometry pattern indicates obstructive lung disease?",opts:["Reduced FVC normal FEV1/FVC","Normal FVC reduced FEV1/FVC","Reduced FVC and FEV1/FVC","Normal all values"],ans:1,exp:"Obstruction: FEV1/FVC <0.70, normal/near-normal FVC. Restriction: reduced FVC, normal/elevated FEV1/FVC. Mixed: both reduced."},{q:"Type II respiratory failure is characterized by?",opts:["Hypoxemia only","Hypercapnia with hypoxemia","Hypocapnia with hypoxemia","Normal gas exchange"],ans:1,exp:"Type I (hypoxemic) = low PaO2, normal/low PaCO2. Type II (hypercapnic) = low PaO2 + high PaCO2 — alveolar hypoventilation."},{q:"A patient with CHF has BNP of 800 pg/mL. What does this suggest?",opts:["Normal cardiac function","Significant ventricular wall stress","Dehydration","Pulmonary embolism"],ans:1,exp:"BNP released by ventricular myocytes in response to wall stress. Normal <100 pg/mL. >400 strongly indicates decompensated heart failure."},{q:"Which modification is most appropriate for pulmonary hypertension?",opts:["High intensity intervals","Avoid Valsalva and isometric exercise","Prioritize resistance over aerobic","No modifications"],ans:1,exp:"Valsalva and heavy isometrics increase intrathoracic pressure and right ventricular afterload — risk of syncope or right heart decompensation."}]},integ:{1:[{q:"A Stage II pressure injury involves which layer of tissue?",opts:["Epidermis only","Partial thickness dermis","Full thickness to fat","Full thickness to bone"],ans:1,exp:"Stage II = partial thickness loss (epidermis + dermis), shallow open ulcer or intact/ruptured blister. Stage I = intact skin, non-blanchable redness."},{q:"Which dressing is most appropriate for a heavily exudating wound?",opts:["Transparent film","Hydrocolloid","Alginate","Petrolatum gauze"],ans:2,exp:"Alginates are highly absorbent (derived from seaweed), form a gel on contact with wound fluid. Film = minimal exudate; hydrocolloid = moderate."},{q:"The rule of nines assigns what percentage to one entire lower extremity?",opts:["9%","18%","27%","36%"],ans:1,exp:"Rule of nines: head 9%, each arm 9%, anterior trunk 18%, posterior trunk 18%, each leg 18%, genitalia 1%."},{q:"Which factor most impairs wound healing?",opts:["Moist wound environment","Hyperglycemia","Adequate perfusion","Protein intake"],ans:1,exp:"Hyperglycemia impairs neutrophil function, reduces collagen synthesis, promotes AGEs, and impairs angiogenesis — all critical to healing."},{q:"The ABCDE rule is used to assess?",opts:["Burn severity","Melanoma screening","Wound infection","Pressure injury staging"],ans:1,exp:"ABCDE melanoma screening: Asymmetry, Border irregularity, Color variation, Diameter >6mm, Evolution. PTs screen and refer suspicious lesions."}],2:[{q:"A diabetic patient has a plantar ulcer with good granulation and no infection. Which offloading?",opts:["Standard footwear","Total contact cast","Posterior splint","Custom orthotic"],ans:1,exp:"TCC is the gold standard for diabetic plantar offloading — distributes pressure across entire plantar surface and cannot be removed by the patient."},{q:"Which wound characteristic most strongly suggests biofilm?",opts:["Purulent exudate","Failure to heal despite optimal care","Periwound erythema","Increased pain"],ans:1,exp:"Biofilm: polymicrobial community in extracellular matrix, resistant to antibiotics. Hallmark = failure to heal despite optimal care."},{q:"Ankle-brachial index below what value indicates significant PAD?",opts:["0.9","0.7","0.5","1.0"],ans:0,exp:"ABI <0.9 = PAD. 0.7–0.9 = mild-moderate; <0.5 = severe ischemia. >1.3 suggests calcified vessels (diabetic/renal disease)."},{q:"Which sign best differentiates a venous from arterial leg ulcer?",opts:["Wound location","Pain severity","Exudate amount","Wound depth"],ans:0,exp:"Location: venous = medially (gaiter region, medial malleolus); arterial = distally (toes, lateral malleolus, pressure points)."},{q:"Hyperbaric oxygen is most evidence-supported for which wound?",opts:["Stage III pressure injury","Diabetic foot ulcer with ischemia","Venous leg ulcer","Surgical wound dehiscence"],ans:1,exp:"HBO has strongest evidence for ischemic diabetic foot ulcers: increases tissue O2, promotes angiogenesis, enhances leukocyte function."}],3:[{q:"A full-thickness burn has waxy white appearance and no sensation. What burn depth?",opts:["Superficial partial","Deep partial","Full thickness","Subdermal"],ans:2,exp:"Full thickness (3rd degree): entire dermis destroyed, waxy white/leathery, insensate. Deep partial = painful with blisters."},{q:"The Parkland formula uses which fluid?",opts:["Normal saline","Lactated Ringer's","D5W","Albumin"],ans:1,exp:"Parkland: 4mL × kg × %TBSA of Lactated Ringer's in 24h (half in first 8h). LR chosen over NS to avoid hyperchloremic acidosis."},{q:"NPWT is contraindicated in which situation?",opts:["Chronic venous ulcers","Exposed vasculature","Diabetic foot ulcers","Post-surgical wounds"],ans:1,exp:"NPWT is contraindicated with exposed blood vessels (suction risks rupture/bleeding), untreated osteomyelitis, and malignancy in wound."},{q:"Which finding most strongly suggests osteomyelitis in a diabetic foot wound?",opts:["Periwound warmth","Positive probe-to-bone test","Wound size >2cm","Elevated WBC"],ans:1,exp:"Probe-to-bone test: sterile probe contacts bone. High specificity for osteomyelitis. Sensitivity ~66%, specificity ~85%. MRI is gold standard."},{q:"Contact dermatitis in wound care is most likely caused by?",opts:["Bacterial colonization","Dressing adhesive or topical agent","Nutritional deficiency","Venous hypertension"],ans:1,exp:"Allergic/irritant contact dermatitis from dressing adhesives or topical antimicrobials (neomycin) — frequently overlooked cause of periwound breakdown."}]},sysint:{1:[{q:"Which finding is most associated with autonomic dysreflexia in SCI?",opts:["Hypotension","Bradycardia with hypertension","Tachycardia","Hypothermia"],ans:1,exp:"AD (T6 or above): noxious stimulus below injury → sympathetic surge → hypertension + bradycardia (vagal reflex), pounding headache. Medical emergency."},{q:"Cancer-related fatigue differs from normal fatigue in which key way?",opts:["Responds to rest","Does not resolve with rest","Always severe","Only during treatment"],ans:1,exp:"CRF is disproportionate to activity and does not resolve with rest — multifactorial (anemia, cytokines, deconditioning, treatment effects)."},{q:"Which condition most commonly causes heterotopic ossification?",opts:["Rheumatoid arthritis","TBI or SCI","Osteoporosis","Peripheral vascular disease"],ans:1,exp:"HO most common after TBI, SCI, burns, and total hip arthroplasty. Typically develops 1–4 months post-injury, often at the hip."},{q:"Lymphedema Stage I is characterized by?",opts:["No edema","Spontaneously reversible pitting edema","Non-pitting edema","Skin changes and fibrosis"],ans:1,exp:"Stage 0 = latent. Stage I = pitting edema reversible with elevation. Stage II = non-pitting. Stage III = elephantiasis."},{q:"A diabetic patient has burning foot pain worse at night. Which systems interact primarily?",opts:["Vascular and integumentary","Peripheral nervous and metabolic","Central nervous and endocrine","Immune and musculoskeletal"],ans:1,exp:"Diabetic peripheral neuropathy: hyperglycemia + AGEs + oxidative stress damage peripheral nerves → burning, symmetric stocking distribution."}],2:[{q:"A patient post-mastectomy develops arm lymphedema. What is FIRST line intervention?",opts:["Compression garment","Manual lymphatic drainage","Exercise","Pneumatic compression"],ans:1,exp:"CDT Phase 1 (intensive): MLD + multilayer bandaging + exercise + skin care. MLD opens collateral lymphatic pathways first."},{q:"Fibromyalgia is best characterized by?",opts:["Joint inflammation","Central sensitization","Peripheral nerve damage","Autoimmune tissue destruction"],ans:1,exp:"Fibromyalgia = central sensitization disorder: amplified pain processing in CNS, not peripheral tissue damage or inflammation."},{q:"A patient with RA has C1-C2 instability. Which activity is most contraindicated?",opts:["Shoulder flexion","Cervical end-range loading","Hip strengthening","Aquatic therapy"],ans:1,exp:"C1-C2 instability from RA pannus erosion of transverse ligament. Cervical end-range loading risks spinal cord compression. Precautions mandatory."},{q:"Chvostek's sign is associated with which electrolyte imbalance?",opts:["Hyperkalemia","Hyponatremia","Hypocalcemia","Hypermagnesemia"],ans:2,exp:"Chvostek's: tapping facial nerve causes facial muscle twitching = hypocalcemia-induced neuromuscular irritability."},{q:"Which medication class most commonly causes drug-induced lupus?",opts:["Beta blockers","Hydralazine and procainamide","NSAIDs","Corticosteroids"],ans:1,exp:"Hydralazine and procainamide most commonly cause drug-induced lupus. Unlike idiopathic SLE, it spares kidneys/CNS and resolves when stopped."}],3:[{q:"Which complication of prolonged immobility is most rapidly life-threatening?",opts:["Pressure injury","DVT/PE","Muscle atrophy","Contracture"],ans:1,exp:"DVT with PE can cause sudden hemodynamic collapse and death — the most rapidly life-threatening immobility complication."},{q:"Paraneoplastic syndrome affecting the nervous system is most associated with which cancer?",opts:["Prostate","Small cell lung cancer","Colon","Breast"],ans:1,exp:"SCLC most commonly causes paraneoplastic neurological syndromes (Lambert-Eaton, sensory neuropathy, cerebellar degeneration) via antibody cross-reactivity."},{q:"Which finding suggests spinal cord involvement in cervical myelopathy?",opts:["Neck pain","Dermatomal sensory loss only","UMN signs below lesion","Shoulder weakness"],ans:2,exp:"UMN signs below the lesion (hyperreflexia, clonus, Babinski, spastic gait, bladder dysfunction) indicate cord compression."},{q:"Cushing's from exogenous steroids most commonly causes which MSK complication?",opts:["Osteoporosis and proximal myopathy","Peripheral neuropathy","Joint inflammation","Rhabdomyolysis"],ans:0,exp:"Glucocorticoid excess: osteoporosis (inhibits osteoblasts) + proximal myopathy (type II fiber atrophy). Common in long-term steroid use."},{q:"A patient with CKD has gout. Which intervention is most important to modify?",opts:["Aquatic therapy","High-impact exercise","NSAIDs for pain","Resistance training"],ans:2,exp:"NSAIDs are nephrotoxic and contraindicated in significant CKD. Critical system interaction: urate metabolism + renal clearance + analgesic choice."}]},safety:{1:[{q:"Which study design provides the strongest evidence for causation?",opts:["Case report","Cohort study","RCT","Systematic review"],ans:2,exp:"RCTs establish causation via randomization, which controls for confounding. Systematic reviews synthesize RCTs but don't collect primary data."},{q:"A patient refuses an intervention. What is the appropriate response?",opts:["Proceed anyway","Document refusal and respect autonomy","Discharge the patient","Contact family"],ans:1,exp:"Patient autonomy is foundational. A competent patient has the right to refuse. Document refusal, explain risks, continue other appropriate care."},{q:"Which error type occurs when a researcher incorrectly accepts the null hypothesis?",opts:["Type I error","Type II error","Sampling error","Random error"],ans:1,exp:"Type II (beta) error = false negative: failing to detect a real effect. Type I (alpha) = false positive. Power = ability to avoid Type II errors."},{q:"Which is NOT required for informed consent?",opts:["Nature of procedure","Risks and benefits","Cost of alternatives","Patient signature always required"],ans:3,exp:"Informed consent requires: nature of procedure, material risks/benefits, alternatives, capacity/voluntariness. Written signature is best practice but not always legally required."},{q:"HIPAA requires patients have access to records within how many days?",opts:["15","30","60","90"],ans:1,exp:"HIPAA Privacy Rule: access within 30 days of request, with one 30-day extension. Patients also have the right to request amendments."}],2:[{q:"Sensitivity of a clinical test is best defined as?",opts:["True negatives / all negatives","True positives / all with condition","True positives / all positive tests","Specificity complement"],ans:1,exp:"Sensitivity = TP/(TP+FN). High sensitivity rules OUT disease when negative (SnNout). Specificity = TN/(TN+FP) rules IN when positive (SpPin)."},{q:"Which statistical test compares means between two independent groups?",opts:["Chi-square","Pearson correlation","Independent t-test","ANOVA"],ans:2,exp:"Independent t-test compares means of two unrelated groups. ANOVA = 3+ groups. Chi-square = categorical frequencies. Pearson = linear relationship."},{q:"Which term describes correctly identifying those WITHOUT a condition?",opts:["Sensitivity","Specificity","PPV","NPV"],ans:1,exp:"Specificity = TN/(TN+FP). High specificity → SpPin (positive rules in disease). PPV/NPV are affected by prevalence; sensitivity/specificity are not."},{q:"A PT discovers a colleague practicing outside scope. What is the first action?",opts:["Report to state board immediately","Address with colleague directly","Document and ignore","Notify the patient"],ans:1,exp:"APTA Code of Ethics: first address concerns directly with the colleague. Escalate to supervisor or state board if behavior continues or poses immediate risk."},{q:"A systematic review with meta-analysis sits at which evidence level?",opts:["Level 2","Level 1","Level 3","Level 4"],ans:1,exp:"Level 1 = systematic reviews/meta-analyses of RCTs. Level 2 = individual RCTs. Level 3 = cohort. Level 4 = case-control. Sackett hierarchy."}],3:[{q:"A clinical prediction rule has LR+ of 12. How is this best interpreted?",opts:["Weak evidence","Strong evidence for diagnosis","Confirms diagnosis absolutely","No clinical utility"],ans:1,exp:"LR+ >10 = large, clinically meaningful shift in post-test probability toward diagnosis. LR+ 2–5 = small; 5–10 = moderate; >10 = strong."},{q:"NNT of 5 means?",opts:["5% respond","Treat 5 to prevent 1 additional bad outcome","5 patients per trial arm","5x more effective than placebo"],ans:1,exp:"NNT = 1/ARR. NNT of 5 = treat 5 patients to prevent 1 additional adverse outcome vs control. Lower NNT = more effective."},{q:"Which bias occurs when a researcher knows group assignment?",opts:["Selection bias","Detection bias","Attrition bias","Reporting bias"],ans:1,exp:"Detection (ascertainment) bias: knowledge of group assignment influences outcome measurement. Blinding assessors prevents this."},{q:"Which SD multiplier yields 95% confidence intervals?",opts:["1.28","1.645","1.96","2.576"],ans:2,exp:"95% CI uses z = 1.96 (±1.96 SD captures 95% of normal distribution). 90% CI = 1.645; 99% CI = 2.576."},{q:"MCID is important because?",opts:["Replaces statistical significance","Smallest change meaningful to a patient","Determines sample size","Eliminates bias"],ans:1,exp:"MCID = smallest change patients perceive as meaningful. Bridges statistics and clinical relevance — large samples can produce statistically significant but trivial changes."}]}};
-const BADGES_DEF=[{id:'first_session',cat:'Study',name:'First Steps',desc:'Log your first session',icon:'⚔️',check:s=>s.sessions.length>=1},{id:'streak3',cat:'Streaks',name:'Committed',desc:'3-day session streak',icon:'🔥',check:s=>s.anyStreak>=3},{id:'streak7',cat:'Streaks',name:'Relentless',desc:'7-day session streak',icon:'🌟',check:s=>s.anyStreak>=7},{id:'goalstreak3',cat:'Daily Goal',name:'On Target',desc:'Hit 3-hour goal 3 days',icon:'🎯',check:s=>s.goalStreak>=3},{id:'goalstreak7',cat:'Daily Goal',name:'Forge Master',desc:'Hit 3-hour goal 7 days',icon:'🏆',check:s=>s.goalStreak>=7},{id:'goalstreak30',cat:'Daily Goal',name:'Unstoppable',desc:'Hit goal 30 days',icon:'👑',check:s=>s.goalStreak>=30},{id:'mskel_lv1',cat:'Domains',name:'Bone Setter',desc:'MSK Apprentice',icon:'🦴',check:s=>getLevel(s.xp.mskel)>=1},{id:'neuro_lv1',cat:'Domains',name:'Nerve Agent',desc:'Neuro Apprentice',icon:'🧠',check:s=>getLevel(s.xp.neuro)>=1},{id:'cardio_lv1',cat:'Domains',name:'Heart Strong',desc:'Cardio Apprentice',icon:'❤️',check:s=>getLevel(s.xp.cardio)>=1},{id:'alldomains',cat:'Domains',name:'Polymath',desc:'XP in all 6 domains',icon:'🔮',check:s=>Object.values(s.xp).every(v=>v>0)},{id:'master1',cat:'Domains',name:'Domain Lord',desc:'Master in any domain',icon:'🌙',check:s=>Object.keys(s.xp).some(k=>getLevel(s.xp[k])>=4)},{id:'sessions10',cat:'Study',name:'Veteran',desc:'Log 10 study sessions',icon:'🛡️',check:s=>s.sessions.length>=10},{id:'total10k',cat:'Study',name:'Grinder',desc:'Earn 10,000 total XP',icon:'💎',check:s=>Object.values(s.xp).reduce((a,b)=>a+b,0)>=10000},{id:'toc_first',cat:'Trial of Combat',name:'Tested',desc:'Complete first trial',icon:'⚡',check:s=>s.trials.length>=1},{id:'toc_70',cat:'Trial of Combat',name:'Above Average',desc:'Score 70+ on a trial',icon:'📈',check:s=>s.trials.some(t=>t.score>=70)},{id:'toc_80',cat:'Trial of Combat',name:'Goal Achieved',desc:'Hit goal score of 80',icon:'🏅',check:s=>s.trials.some(t=>t.score>=80)},{id:'boss1',cat:'Boss Battles',name:'Boss Slayer',desc:'Win your first boss battle',icon:'💀',check:s=>s.bossWins>=1},{id:'boss5',cat:'Boss Battles',name:'Warlord',desc:'Win 5 boss battles',icon:'🗡️',check:s=>s.bossWins>=5}];
-function loadState(){try{const s=JSON.parse(localStorage.getItem('npte_forge_v4')||'{}');return{xp:s.xp||{mskel:0,neuro:0,cardio:0,integ:0,sysint:0,safety:0},confidence:s.confidence||{mskel:0,neuro:0,cardio:0,integ:0,sysint:0,safety:0},confHistory:s.confHistory||{mskel:[],neuro:[],cardio:[],integ:[],sysint:[],safety:[]},sessions:s.sessions||[],trials:s.trials||[],anyStreak:s.anyStreak||0,goalStreak:s.goalStreak||0,lastSessionDate:s.lastSessionDate||null,lastGoalDate:s.lastGoalDate||null,dailyMinutes:s.dailyMinutes||{},goalBonusAwarded:s.goalBonusAwarded||{},earnedBadges:s.earnedBadges||[],bossWins:s.bossWins||0,bossProgress:s.bossProgress||{},countdownDays:s.countdownDays!==undefined?s.countdownDays:COUNTDOWN_START,countdownDate:s.countdownDate||null,freezes:s.freezes||0,goalDaysCount:s.goalDaysCount||0};}catch(e){return{xp:{mskel:0,neuro:0,cardio:0,integ:0,sysint:0,safety:0},confidence:{mskel:0,neuro:0,cardio:0,integ:0,sysint:0,safety:0},confHistory:{mskel:[],neuro:[],cardio:[],integ:[],sysint:[],safety:[]},sessions:[],trials:[],anyStreak:0,goalStreak:0,lastSessionDate:null,lastGoalDate:null,dailyMinutes:{},goalBonusAwarded:{},earnedBadges:[],bossWins:0,bossProgress:{},countdownDays:COUNTDOWN_START,countdownDate:null,freezes:0,goalDaysCount:0};}}
-const FORGE_FIREBASE_CONFIG={apiKey:"AIzaSyA6EjnhyYUOt0iRYUaywCoqZ5POaVQmcsk",authDomain:"npte-flaschcards.firebaseapp.com",databaseURL:"https://npte-flaschcards-default-rtdb.firebaseio.com",projectId:"npte-flaschcards",storageBucket:"npte-flaschcards.firebasestorage.app",messagingSenderId:"429875976159",appId:"1:429875976159:web:04fc0eda2e758c606e966a"};
-const FORGE_USER_ID='thisisElyk';
-const FORGE_DB_KEY='forge_v4';
-let _forgeDb=null;let _forgeRef=null;let _forgeSaveTimer=null;
+window.onload = function() {
+const DECKS = [
+  { key: "msk_cards_v2",              name: "Musculoskeletal",                         dot: "#E24B4A", href: "MSK_Cards.html" },
+  { key: "neuro_cards_v1",            name: "Neurology",                               dot: "#7F77DD", href: "Neuro_Cards.html" },
+  { key: "cardiopulm_cards_v1",       name: "Cardiopulmonary",                         dot: "#D85A30", href: "Cardiopulmonary_Cards.html" },
+  { key: "integumentary_cards_v1",    name: "Integumentary",                           dot: "#1D9E75", href: "Integumentary_Cards.html" },
+  { key: "pediatric_cards_v1",        name: "Pediatrics",                              dot: "#378ADD", href: "Pediatric_Cards.html" },
+  { key: "safety_cards_v1",           name: "Safety, Research & Documentation",        dot: "#BA7517", href: "Safety_Cards.html" },
+  { key: "sysinteractions_cards_v1",  name: "System Interactions",                     dot: "#D4537E", href: "System_Interactions_Cards.html" },
+  { key: "dermamyo_cards_v1",         name: "Dermatomes, Myotomes & Brachial Plexus", dot: "#993C1D", href: "Dermatomes_Myotomes_Brachial_Plexus_Cards.html" },
+  { key: "cranial_nerve_cards_v1",    name: "Cranial Nerves",                          dot: "#534AB7", href: "Cranial_Nerve_Cards.html" },
+];
 
-function initForgeFirebase(){
-  if(typeof firebase==='undefined'){
-    setTimeout(initForgeFirebase,100);
-    return;
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA6EjnhyYUOt0iRYUaywCoqZ5POaVQmcsk",
+  authDomain: "npte-flaschcards.firebaseapp.com",
+  databaseURL: "https://npte-flaschcards-default-rtdb.firebaseio.com",
+  projectId: "npte-flaschcards",
+  storageBucket: "npte-flaschcards.firebasestorage.app",
+  messagingSenderId: "429875976159",
+  appId: "1:429875976199:web:04fc0eda2e758c606e966a"
+};
+const USER_ID = "thisisElyk";
+
+function setSyncStatus(state, msg) {
+  const dot = document.getElementById("syncDot");
+  const txt = document.getElementById("syncTxt");
+  dot.className = "sync-dot" + (state ? " " + state : "");
+  txt.textContent = msg;
+}
+
+// Build deck cards with loading state
+const list = document.getElementById("deckList");
+DECKS.forEach(d => {
+  const el = document.createElement("a");
+  el.className = "deck-card";
+  el.href = d.href;
+  el.id = "deck-" + d.key;
+  el.innerHTML = `
+    <div class="deck-top">
+      <div class="deck-left">
+        <div class="dot" style="background:${d.dot};"></div>
+        <span class="deck-name">${d.name}</span>
+      </div>
+      <span class="pos-chip" id="pos-${d.key}"></span>
+      <span class="arrow">→</span>
+    </div>
+    <div class="prog-track" id="prog-${d.key}">
+      <div class="prog-seg" style="background:var(--border);width:100%;border-radius:3px;"></div>
+    </div>
+    <div class="stat-row" id="stats-${d.key}">
+      <span class="stat-chip chip-loading">Loading...</span>
+    </div>`;
+  list.appendChild(el);
+});
+
+function renderDeck(d, state) {
+  const conf = (state && state.confidence) ? state.confidence : {};
+  const removed = new Set((state && state.removedIds) ? state.removedIds : []);
+  const savedIdx = (state && state.idx != null) ? state.idx : null;
+  let gotit = 0, almost = 0, nope = 0;
+  Object.entries(conf).forEach(([k, v]) => {
+    if (removed.has(k)) return;
+    if (v === "gotit") gotit++;
+    else if (v === "almost") almost++;
+    else if (v === "nope") nope++;
+  });
+  const mastered = removed.size;
+  const totalGotit = gotit + mastered;
+  const rated = totalGotit + almost + nope;
+  const progEl = document.getElementById("prog-" + d.key);
+  const statsEl = document.getElementById("stats-" + d.key);
+  const posEl = document.getElementById("pos-" + d.key);
+
+  // Card position
+  if (posEl && savedIdx !== null) posEl.textContent = "Card " + (savedIdx + 1);
+
+  if (rated === 0) {
+    progEl.innerHTML = `<div class="prog-seg" style="background:var(--border);width:100%;border-radius:3px;"></div>`;
+    statsEl.innerHTML = `<span class="stat-chip chip-loading">Not started</span>`;
+    return { gotit: 0, almost: 0, nope: 0 };
   }
-  try{
-    if(!firebase.apps.length)firebase.initializeApp(FORGE_FIREBASE_CONFIG);
-    _forgeDb=firebase.database();
-    _forgeRef=_forgeDb.ref('users/'+FORGE_USER_ID+'/'+FORGE_DB_KEY);
-    syncFromFirebase();
-  }catch(e){console.warn('FORGE Firebase init failed:',e);}
+  const t = rated;
+  const gp = Math.round(totalGotit / t * 100);
+  const ap = Math.round(almost / t * 100);
+  const np = Math.round(nope / t * 100);
+  const up = Math.max(0, 100 - gp - ap - np);
+  progEl.innerHTML =
+    (gp > 0 ? `<div class="prog-seg" style="background:#5DCAA5;width:${gp}%;"></div>` : "") +
+    (ap > 0 ? `<div class="prog-seg" style="background:#EF9F27;width:${ap}%;"></div>` : "") +
+    (np > 0 ? `<div class="prog-seg" style="background:#F09595;width:${np}%;"></div>` : "") +
+    (up > 0 ? `<div class="prog-seg" style="background:var(--border);width:${up}%;"></div>` : "");
+  statsEl.innerHTML =
+    (totalGotit > 0 ? `<span class="stat-chip" style="background:var(--green-bg);color:var(--green);">Got it ${totalGotit}</span>` : "") +
+    (almost > 0 ? `<span class="stat-chip" style="background:var(--amber-bg);color:var(--amber);">Almost ${almost}</span>` : "") +
+    (nope > 0 ? `<span class="stat-chip" style="background:var(--red-bg);color:var(--red);">Nope ${nope}</span>` : "");
+  return { gotit: totalGotit, almost, nope };
 }
 
-function saveState(){
-  try{localStorage.setItem('npte_forge_v4',JSON.stringify(state));}catch(e){}
-  if(!_forgeRef)return;
-  if(_forgeSaveTimer)clearTimeout(_forgeSaveTimer);
-  _forgeSaveTimer=setTimeout(()=>{
-    _forgeRef.set(state).catch(e=>console.warn('FORGE Firebase save error:',e));
-  },400);
+if (typeof firebase === "undefined") {
+  setSyncStatus("err", "Firebase failed to load");
+  DECKS.forEach(d => {
+    const s = document.getElementById("stats-" + d.key);
+    if (s) s.innerHTML = `<span class="stat-chip chip-loading">Offline</span>`;
+  });
+  return;
 }
 
-function syncFromFirebase(){
-  if(!_forgeRef)return;
-  _forgeRef.once('value').then(snap=>{
-    const fb=snap.val();
-    if(!fb)return;
-    // Merge: Firebase wins on most fields, but keep local if Firebase is empty
-    Object.assign(state,fb);
-    try{localStorage.setItem('npte_forge_v4',JSON.stringify(state));}catch(e){}
-    validateStreaks();
-    render();
-    updateSessionList();
-    buildTocPanel();
-    drawTocGraph();
-    buildBadges();
-  }).catch(e=>console.warn('FORGE Firebase sync error:',e));
+try {
+  if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+} catch(e) {}
+
+const db = firebase.database();
+const userRef = db.ref("users/" + USER_ID);
+
+userRef.once("value").then(snap => {
+  const data = snap.val() || {};
+  let tg = 0, ta = 0, tn = 0;
+  DECKS.forEach(d => {
+    const r = renderDeck(d, data[d.key]);
+    tg += r.gotit; ta += r.almost; tn += r.nope;
+  });
+  const summaryRow = document.getElementById("summaryRow");
+  if (tg + ta + tn > 0) {
+    summaryRow.innerHTML =
+      (tg > 0 ? `<span class="summary-chip" style="background:var(--green-bg);color:var(--green);">Got it ${tg}</span>` : "") +
+      (ta > 0 ? `<span class="summary-chip" style="background:var(--amber-bg);color:var(--amber);">Almost ${ta}</span>` : "") +
+      (tn > 0 ? `<span class="summary-chip" style="background:var(--red-bg);color:var(--red);">Nope ${tn}</span>` : "");
+  }
+  setSyncStatus("ok", "Progress synced");
+}).catch(e => {
+  setSyncStatus("err", "Couldn't load progress — check connection");
+  DECKS.forEach(d => {
+    const s = document.getElementById("stats-" + d.key);
+    if (s) s.innerHTML = `<span class="stat-chip chip-loading">Offline</span>`;
+  });
+});
 }
-function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/86400000);}
-function todayStr(){const n=new Date();return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;}
-function validateStreaks(){const today=todayStr();if(state.lastGoalDate&&daysBetween(state.lastGoalDate,today)>1){if(state.freezes>=1){state.freezes--;notify('Streak Freeze Used','A freeze protected your Goal Streak!');}else{state.goalStreak=0;}}if(state.lastSessionDate&&daysBetween(state.lastSessionDate,today)>1){if(state.freezes>=1){state.freezes--;notify('Streak Freeze Used','A freeze protected your Session Streak!');}else{state.anyStreak=0;}}saveState();}
-let state=loadState();validateStreaks();let bossTimer=null;let bossState={};
-function getLevel(xp){for(let i=LEVEL_THRESH.length-1;i>=0;i--){if(xp>=LEVEL_THRESH[i])return i;}return 0;}
-function getLevelProgress(xp){const lv=getLevel(xp);if(lv>=4)return 1;return(xp-LEVEL_THRESH[lv])/(LEVEL_THRESH[lv+1]-LEVEL_THRESH[lv]);}
-function getTotalXP(){return Object.values(state.xp).reduce((a,b)=>a+b,0);}
-function getReadiness(){let w=0;for(const[k,d]of Object.entries(DOMAINS)){w+=Math.min(state.xp[k]/18000,1)*d.weight;}return Math.round(w*100);}
-function calcDomainXP(mins){return Math.round((mins/30)*XP_PER_30);}
-function todayMins(){return state.dailyMinutes[todayStr()]||0;}
-function updateCountdown(){const today=todayStr();if(state.countdownDate&&state.countdownDate!==today){const daysPassed=Math.round((new Date(today)-new Date(state.countdownDate))/(1000*60*60*24));state.countdownDays=Math.max(0,state.countdownDays-daysPassed);state.countdownDate=today;saveState();}else if(!state.countdownDate){state.countdownDate=today;saveState();}const el=document.getElementById('countdown-header');if(state.countdownDays>0){el.textContent=state.countdownDays+' DAYS TO THE FINAL BATTLE — JUL 28';el.style.color='#E8593C';}else{el.textContent='THE FINAL BATTLE IS TODAY — GOOD LUCK';el.style.color='#D4A843';}}
-function addDailyMinutes(dateVal,mins){state.dailyMinutes[dateVal]=(state.dailyMinutes[dateVal]||0)+mins;const goalMet=state.dailyMinutes[dateVal]>=GOAL_MINS;const bonusAlreadyGiven=state.goalBonusAwarded[dateVal];if(goalMet&&!bonusAlreadyGiven){state.goalBonusAwarded[dateVal]=true;const lastGoal=state.lastGoalDate;const gdiff=lastGoal?(new Date(dateVal)-new Date(lastGoal))/86400000:null;if(gdiff===null||gdiff>1)state.goalStreak=1;else state.goalStreak=(state.goalStreak||0)+1;state.lastGoalDate=dateVal;// Award half a freeze — every 2 goal days = 1 freeze (max 3)
-state.goalDaysCount=(state.goalDaysCount||0)+1;if(state.goalDaysCount%2===0&&state.freezes<3){state.freezes=Math.min(state.freezes+1,3);setTimeout(()=>notify('Streak Freeze Earned!','You earned a streak freeze! Bank: '+state.freezes+'/3',true),600);}else{setTimeout(()=>notify('Daily Forge Complete!','3-hour goal hit! '+(state.goalDaysCount%2===1?'Halfway to your next freeze':''),true),600);}return true;}return false;}
-function updateDailyGoal(){const mins=todayMins();const pct=Math.min(mins/GOAL_MINS,1);const circ=2*Math.PI*24;document.getElementById('goal-ring-fill').setAttribute('stroke-dasharray',`${circ*pct} ${circ}`);document.getElementById('goal-pct').textContent=Math.round(pct*100)+'%';document.getElementById('today-min-chip').textContent=mins;document.getElementById('gs-chip').textContent=state.goalStreak;document.getElementById('h-goalstreak').textContent=state.goalStreak;const halfProgress=(state.goalDaysCount||0)%2;document.getElementById('freeze-chip').textContent=state.freezes||0;document.getElementById('half-freeze-chip').textContent=halfProgress;document.getElementById('h-freezes').textContent=(state.freezes||0);if(mins>=GOAL_MINS){const justEarned=halfProgress===0&&(state.goalDaysCount||0)>0;document.getElementById('goal-title-text').textContent='Daily forge goal complete!';document.getElementById('goal-sub-text').innerHTML=justEarned?'<span class="goal-met-text">Freeze earned! Bank: '+state.freezes+'/3</span>':'<span class="goal-met-text">Halfway to next freeze (1/2)</span>';document.getElementById('celebrate-banner').classList.add('show');}else{document.getElementById('goal-title-text').textContent="Today's forge goal: 3 hours";document.getElementById('goal-sub-text').textContent=(GOAL_MINS-mins)+' minutes remaining';document.getElementById('celebrate-banner').classList.remove('show');}}
-function updateHeader(){document.getElementById('h-anystreak').textContent=state.anyStreak;document.getElementById('h-totalxp').textContent=getTotalXP().toLocaleString();document.getElementById('h-sessions').textContent=state.sessions.length;document.getElementById('h-freezes').textContent=(state.freezes||0);}
-function buildWeeklySummary(){const ws=document.getElementById('weekly-summary');const today=new Date();const weekAgo=new Date(today);weekAgo.setDate(weekAgo.getDate()-7);const weekStr=weekAgo.toISOString().slice(0,10);const weekSessions=state.sessions.filter(s=>s.date>=weekStr);// Total minutes from dailyMinutes (includes both domain sessions and ToC trials)
-const weekTotalMins=Object.entries(state.dailyMinutes).filter(([d])=>d>=weekStr).reduce((a,[,m])=>a+m,0);const weekMins=weekTotalMins;const weekXP=weekSessions.reduce((a,s)=>a+s.xp,0);const activeDates=new Set([...weekSessions.map(s=>s.date),...state.trials.filter(t=>t.date>=weekStr&&t.mins>0).map(t=>t.date)]);const weekDays=activeDates.size;const domainMins={};for(const k of Object.keys(DOMAINS))domainMins[k]=0;for(const s of weekSessions){if(s.domains)for(const k of s.domains){domainMins[k]=(domainMins[k]||0)+Math.round(s.mins/s.domains.length);}}const maxMins=Math.max(...Object.values(domainMins),1);const h=Math.floor(weekMins/60),m=weekMins%60;ws.innerHTML=`<div class="ws-header"><div class="ws-title">WEEKLY FORGE REPORT</div><div class="ws-period">Last 7 days</div></div><div class="ws-stats"><div class="ws-stat"><div class="ws-stat-val">${h}h ${m}m</div><div class="ws-stat-lbl">Time Studied</div></div><div class="ws-stat"><div class="ws-stat-val">${weekXP.toLocaleString()}</div><div class="ws-stat-lbl">XP Earned</div></div><div class="ws-stat"><div class="ws-stat-val">${weekDays}</div><div class="ws-stat-lbl">Days Active</div></div></div><div class="ws-domains">${Object.entries(DOMAINS).map(([k,d])=>{const mins=domainMins[k]||0;const pct=Math.round((mins/maxMins)*100);const dh=Math.floor(mins/60),dm=mins%60;const label=dh>0?`${dh}h ${dm}m`:`${dm}m`;return`<div class="ws-domain-row"><div class="ws-domain-name" style="color:${d.color}">${d.short}</div><div class="ws-domain-bar-wrap"><div class="ws-domain-bar" style="width:${pct}%;background:${d.color}"></div></div><div class="ws-domain-val">${label}</div></div>`;}).join('')}</div>`;}
-function updateTree(){for(const[k]of Object.entries(DOMAINS)){const lv=getLevel(state.xp[k]);document.getElementById('lvl-'+k).textContent=LEVEL_NAMES[lv];const nc=document.getElementById('nc-'+k);if(nc&&lv>0)nc.setAttribute('stroke-width',1.5+lv*0.4);}const rings=document.getElementById('xp-rings');rings.innerHTML='';for(const[k,d]of Object.entries(DOMAINS)){const r=NODE_RADII[k]+9;const prog=getLevelProgress(state.xp[k]);const circ=2*Math.PI*r;const el=document.createElementNS('http://www.w3.org/2000/svg','circle');el.setAttribute('cx',d.cx);el.setAttribute('cy',d.cy);el.setAttribute('r',r);el.setAttribute('fill','none');el.setAttribute('stroke',d.color);el.setAttribute('stroke-width','3');el.setAttribute('stroke-dasharray',`${circ*prog} ${circ}`);el.setAttribute('stroke-dashoffset',circ*0.25);el.setAttribute('stroke-linecap','round');el.setAttribute('opacity','0.85');rings.appendChild(el);}document.getElementById('readiness-val').textContent=getReadiness()+'%';document.getElementById('readiness-fill').style.width=getReadiness()+'%';}
-function getLastStudied(k){const s=state.sessions.find(s=>s.domains&&s.domains.includes(k));if(!s)return null;const days=Math.round((new Date()-new Date(s.date))/(1000*60*60*24));if(days===0)return'Today';if(days===1)return'Yesterday';return days+'d ago';}
-function getConfTrend(k){const h=state.confHistory[k];if(!h||h.length<2)return'—';const recent=h[h.length-1].v;const prev=h[h.length-2].v;if(recent>prev)return'↑';if(recent<prev)return'↓';return'→';}
-function getTrendColor(t){if(t==='↑')return'#30D4A0';if(t==='↓')return'#E8593C';return'#D4A843';}
-function buildDomainGrid(){const grid=document.getElementById('domain-grid');grid.innerHTML='';for(const[k,d]of Object.entries(DOMAINS)){const lv=getLevel(state.xp[k]);const prog=getLevelProgress(state.xp[k]);const conf=state.confidence[k];const lastStudied=getLastStudied(k);const trend=getConfTrend(k);const totalMins=state.sessions.filter(s=>s.domains&&s.domains.includes(k)).reduce((a,s)=>a+Math.round(s.mins/(s.domains?.length||1)),0);const th=Math.floor(totalMins/60),tm=totalMins%60;const card=document.createElement('div');card.className='domain-card';card.style.setProperty('--dc',d.color);card.style.setProperty('--dc-dim',d.dim);card.onclick=()=>selectDomain(k);let dots='';for(let i=0;i<5;i++)dots+=`<div class="conf-dot ${i<conf?'filled':''}" onclick="event.stopPropagation();setConf('${k}',${i+1})"></div>`;card.innerHTML=`<div class="dc-header"><div class="dc-name">${d.short}</div><div class="dc-level">${LEVEL_NAMES[lv]}</div></div><div class="dc-xp-bar"><div class="dc-xp-fill" style="width:${Math.round(prog*100)}%"></div></div><div class="dc-row"><div class="dc-stat">XP <span>${state.xp[k].toLocaleString()}</span></div><div class="dc-stat">Time <span>${th>0?th+'h ':''} ${tm}m</span></div></div><div class="dc-meta">${lastStudied?'Last: '+lastStudied:'Not yet studied'}</div><div class="conf-row"><div class="conf-dots">${dots}</div><div class="conf-trend" style="color:${getTrendColor(trend)}">${trend}</div></div>`;grid.appendChild(card);}}
-function setConf(domain,val){state.confidence[domain]=val;if(!state.confHistory[domain])state.confHistory[domain]=[];state.confHistory[domain].push({v:val,t:todayStr()});if(state.confHistory[domain].length>20)state.confHistory[domain]=state.confHistory[domain].slice(-20);saveState();buildDomainGrid();notify('Confidence Updated',`${DOMAINS[domain].short} set to ${val}/5`);}
-function selectDomain(k){const d=DOMAINS[k];const ring=document.getElementById('sel-ring');ring.setAttribute('cx',d.cx);ring.setAttribute('cy',d.cy);ring.setAttribute('r',NODE_RADII[k]+15);ring.setAttribute('stroke',d.color);ring.setAttribute('stroke-opacity','0.6');}
-function switchTab(tab){document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['tree','log','toc','badges','boss'][i]===tab));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.getElementById('panel-'+tab).classList.add('active');if(tab==='badges')buildBadges();if(tab==='boss')buildBoss();if(tab==='toc'){buildTocPanel();drawTocGraph();}if(tab==='log')buildLogPanel();}
-function buildLogPanel(){const grid=document.getElementById('domain-time-grid');grid.innerHTML='';const confArea=document.getElementById('conf-update-area');confArea.innerHTML='';for(const[k,d]of Object.entries(DOMAINS)){const row=document.createElement('div');row.className='domain-time-row';row.innerHTML=`<div class="dtr-label" style="color:${d.color}">${d.name}</div><input class="dtr-input" id="dt-${k}" type="number" min="0" max="300" placeholder="0" oninput="updateLogPreview()"><div class="dtr-unit">min</div>`;grid.appendChild(row);const crow=document.createElement('div');crow.style.cssText='display:flex;align-items:center;gap:8px;font-size:12px';const dotHtml=[1,2,3,4,5].map(i=>`<div class="conf-dot ${i<=state.confidence[k]?'filled':''}" style="--dc:${d.color}" onclick="setConf('${k}',${i});this.parentElement.querySelectorAll('.conf-dot').forEach((x,j)=>x.classList.toggle('filled',j<${i}))"></div>`).join('');crow.innerHTML=`<span style="color:${d.color};min-width:80px;font-size:11px">${d.short}</span><span style="color:#7A7260;font-size:11px">confidence:</span>${dotHtml}`;confArea.appendChild(crow);}}
-function updateLogPreview(){const bd=document.getElementById('log-xp-breakdown');let html='';let total=0;let hasAny=false;for(const[k,d]of Object.entries(DOMAINS)){const mins=parseInt(document.getElementById('dt-'+k)?.value)||0;if(!mins)continue;const xp=calcDomainXP(mins);total+=xp;hasAny=true;html+=`<div class="xp-row"><div class="xp-domain"><div class="xp-dot" style="background:${d.color}"></div><span style="color:#B0A888">${d.short} (${mins}m)</span></div><div class="xp-amount">+${xp}</div></div>`;}if(!hasAny){bd.innerHTML='<div style="font-size:12px;color:#7A7260">Enter minutes per domain to preview XP</div>';return;}html+=`<div style="border-top:1px solid rgba(212,168,67,0.2);margin-top:6px;padding-top:6px" class="xp-row"><div style="font-weight:600">Total</div><div class="xp-amount" style="font-size:15px">+${total} XP</div></div>`;bd.innerHTML=html;}
-function logDomainSession(){const dateVal=document.getElementById('log-date').value||todayStr();let totalXP=0;let totalMins=0;let domainsStudied=[];const prevLevels={};for(const k of Object.keys(DOMAINS))prevLevels[k]=getLevel(state.xp[k]);for(const[k]of Object.entries(DOMAINS)){const mins=parseInt(document.getElementById('dt-'+k)?.value)||0;if(mins>0){const xp=calcDomainXP(mins);state.xp[k]=(state.xp[k]||0)+xp;totalXP+=xp;totalMins+=mins;domainsStudied.push(k);}}if(!totalMins){notify('Missing Info','Enter at least one domain with minutes');return;}const last=state.lastSessionDate;if(last!==dateVal){const diff=last?(new Date(dateVal)-new Date(last))/86400000:null;if(diff===null||diff>1)state.anyStreak=1;else state.anyStreak=(state.anyStreak||0)+1;state.lastSessionDate=dateVal;}addDailyMinutes(dateVal,totalMins);state.sessions.unshift({date:dateVal,mins:totalMins,xp:totalXP,domains:domainsStudied,goalMet:state.dailyMinutes[dateVal]>=GOAL_MINS});const levelUps=[];for(const k of Object.keys(DOMAINS)){const nl=getLevel(state.xp[k]);if(nl>prevLevels[k])levelUps.push({k,nl});}saveState();checkBadges();render();updateSessionList();notify('Session Forged!',`+${totalXP} XP across ${domainsStudied.length} domain${domainsStudied.length>1?'s':''}`);if(levelUps.length>0)setTimeout(()=>showLevelUp(levelUps[0].k,levelUps[0].nl),700);buildLogPanel();updateLogPreview();}
-function deleteSession(idx){if(!confirm('Delete this session?'))return;const s=state.sessions[idx];if(s.domains){for(const k of s.domains){const perDomain=calcDomainXP(Math.round(s.mins/s.domains.length));state.xp[k]=Math.max(0,state.xp[k]-perDomain);}}state.sessions.splice(idx,1);saveState();render();updateSessionList();notify('Session Deleted','Session removed from history');}
-function updateSessionList(){const list=document.getElementById('session-list');if(!state.sessions.length){list.innerHTML='<div style="font-size:12px;color:#7A7260;text-align:center;padding:16px">No sessions logged yet</div>';return;}list.innerHTML=state.sessions.slice(0,15).map((s,i)=>{const domNames=s.domains?s.domains.map(k=>DOMAINS[k].short).join(', '):'—';return`<div class="session-item"><div class="si-left"><div class="si-date">${s.date}</div><div class="si-info">${s.mins} min</div><div class="si-domains">${domNames}</div>${s.goalMet?'<div class="si-goal">Goal met</div>':''}</div><div class="si-right"><div class="si-xp">+${s.xp.toLocaleString()} XP</div><button class="btn-sm" onclick="deleteSession(${i})">✕</button></div></div>`;}).join('');}
-function playLevelUpSound(){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();[523,659,784,1047].forEach((freq,i)=>{const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(0,ctx.currentTime+i*0.12);g.gain.linearRampToValueAtTime(0.3,ctx.currentTime+i*0.12+0.05);g.gain.linearRampToValueAtTime(0,ctx.currentTime+i*0.12+0.25);o.start(ctx.currentTime+i*0.12);o.stop(ctx.currentTime+i*0.12+0.3);});}catch(e){}}
-function spawnParticles(){const colors=['#D4A843','#F0C060','#E8593C','#7C6EE8','#30D4A0'];for(let i=0;i<20;i++){const p=document.createElement('div');p.className='particle';const angle=Math.random()*Math.PI*2;const dist=80+Math.random()*120;p.style.setProperty('--tx',Math.cos(angle)*dist+'px');p.style.setProperty('--ty',Math.sin(angle)*dist+'px');p.style.left='50%';p.style.top='40%';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDuration=(0.6+Math.random()*0.4)+'s';document.body.appendChild(p);setTimeout(()=>p.remove(),1000);}}
-function showLevelUp(domainKey,newLevel){const burst=document.getElementById('levelup-burst');document.getElementById('levelup-text').textContent='LEVEL UP!';document.getElementById('levelup-sub').textContent=`${DOMAINS[domainKey].name} → ${LEVEL_NAMES[newLevel]}`;document.getElementById('levelup-sub').style.color=DOMAINS[domainKey].color;burst.classList.add('show');spawnParticles();playLevelUpSound();setTimeout(()=>{burst.style.animation='burstOut 0.4s ease forwards';setTimeout(()=>{burst.classList.remove('show');burst.style.animation='';},400);},2000);}
-function getTrialAvg(){if(!state.trials.length)return null;return Math.round(state.trials.reduce((a,t)=>a+t.score,0)/state.trials.length*10)/10;}
-function buildTocPanel(){const avg=getTrialAvg();const el=document.getElementById('toc-current');el.textContent=avg!==null?avg.toFixed(1):'—';el.style.color=avg===null?'#7A7260':avg>=80?'#30D4A0':avg>=65?'#D4A843':'#E8593C';const vsCohort=document.getElementById('toc-vs-cohort');if(avg!==null){const diff=Math.round((avg-65)*10)/10;vsCohort.textContent=diff>=0?`+${diff} vs cohort`:`${diff} vs cohort`;vsCohort.style.color=diff>=0?'#30D4A0':'#E8593C';}else{vsCohort.textContent='No data yet';vsCohort.style.color='#7A7260';}const gap=document.getElementById('toc-gap');if(avg!==null){const rem=Math.round((80-avg)*10)/10;gap.textContent=rem<=0?'Goal reached!':rem+' points away';gap.style.color=rem<=0?'#30D4A0':'#7A7260';}else{gap.textContent='Set your benchmark';gap.style.color='#7A7260';}const barYou=document.getElementById('toc-bar-you');const marker=document.getElementById('toc-you-marker');if(avg!==null){barYou.style.width=Math.min(avg,100)+'%';marker.style.left=Math.min(avg,100)+'%';marker.style.display='block';}else{barYou.style.width='0%';marker.style.display='none';}buildTocHistory();}
-function drawTocGraph(){const canvas=document.getElementById('toc-graph');const ctx=canvas.getContext('2d');const W=canvas.offsetWidth||640;const H=110;canvas.width=W;canvas.height=H;ctx.clearRect(0,0,W,H);const pad={l:32,r:16,t:10,b:24};const iw=W-pad.l-pad.r;const ih=H-pad.t-pad.b;const drawRef=(y,color,dash)=>{ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=1;ctx.setLineDash(dash);ctx.moveTo(pad.l,pad.t+ih-(y/100)*ih);ctx.lineTo(pad.l+iw,pad.t+ih-(y/100)*ih);ctx.stroke();ctx.setLineDash([]);};drawRef(65,'rgba(122,114,96,0.4)',[4,4]);drawRef(80,'rgba(48,212,160,0.4)',[4,4]);ctx.font='9px Inter';ctx.textAlign='right';ctx.fillStyle='rgba(122,114,96,0.6)';ctx.fillText('65',pad.l-4,pad.t+ih-(65/100)*ih+3);ctx.fillStyle='rgba(48,212,160,0.7)';ctx.fillText('80',pad.l-4,pad.t+ih-(80/100)*ih+3);if(!state.trials.length){ctx.fillStyle='rgba(122,114,96,0.4)';ctx.textAlign='center';ctx.font='11px Inter';ctx.fillText('No trials recorded yet',W/2,H/2);return;}const pts=state.trials.slice().reverse();const xStep=pts.length>1?iw/(pts.length-1):0;ctx.beginPath();ctx.strokeStyle='rgba(58,155,212,0.35)';ctx.lineWidth=2;ctx.setLineDash([]);pts.forEach((t,i)=>{const x=pad.l+(pts.length>1?i*xStep:iw/2);const y=pad.t+ih-(t.score/100)*ih;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();pts.forEach((t,i)=>{const x=pad.l+(pts.length>1?i*xStep:iw/2);const y=pad.t+ih-(t.score/100)*ih;const color=t.score>=80?'#30D4A0':t.score>=65?'#D4A843':'#E8593C';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();ctx.fillStyle='rgba(232,224,204,0.8)';ctx.textAlign='center';ctx.font='bold 9px Inter';ctx.fillText(t.score,x,y-7);});}
-function updateTocPreview(){const score=parseInt(document.getElementById('toc-score').value);const prev=document.getElementById('toc-preview');if(!score){prev.innerHTML='';return;}const avg=getTrialAvg();const newAvg=avg!==null?Math.round(((avg*state.trials.length+score)/(state.trials.length+1))*10)/10:score;const color=score>=80?'#30D4A0':score>=65?'#D4A843':'#E8593C';prev.innerHTML=`<div style="background:#1A1E28;border:1px solid rgba(212,168,67,0.2);border-radius:8px;padding:10px 12px;font-size:12px;display:flex;justify-content:space-between"><span style="color:#7A7260">New running average</span><span style="color:${color};font-weight:600">${newAvg.toFixed(1)} / 100</span></div>`;}
-function logTrial(){const score=parseInt(document.getElementById('toc-score').value);const dateVal=document.getElementById('toc-date').value||todayStr();const notes=document.getElementById('toc-notes').value||'';const mins=parseInt(document.getElementById('toc-mins').value)||0;if(!score||score<0||score>100){notify('Missing Info','Enter a valid score (0–100)');return;}state.trials.unshift({date:dateVal,score,notes,mins});if(mins>0){addDailyMinutes(dateVal,mins);const last=state.lastSessionDate;if(last!==dateVal){const diff=last?(new Date(dateVal)-new Date(last))/86400000:null;if(diff===null||diff>1)state.anyStreak=1;else state.anyStreak=(state.anyStreak||0)+1;state.lastSessionDate=dateVal;}}saveState();checkBadges();render();buildTocPanel();drawTocGraph();notify('Trial Recorded!',`Score: ${score}/100${mins?' · '+mins+'min added to goal':''}`);document.getElementById('toc-score').value='';document.getElementById('toc-notes').value='';document.getElementById('toc-mins').value='';document.getElementById('toc-preview').innerHTML='';}
-function deleteTrial(idx){if(!confirm('Delete this trial?'))return;state.trials.splice(idx,1);saveState();buildTocPanel();drawTocGraph();notify('Trial Deleted','Trial removed from record');}
-function buildTocHistory(){const hist=document.getElementById('toc-history');if(!state.trials.length){hist.innerHTML='<div style="font-size:12px;color:#7A7260;text-align:center;padding:16px">No trials recorded yet</div>';return;}hist.innerHTML=state.trials.map((t,i)=>{const color=t.score>=80?'#30D4A0':t.score>=65?'#D4A843':'#E8593C';return`<div class="toc-session"><div><div style="font-size:11px;color:#7A7260">${t.date}${t.mins?' · '+t.mins+'m':''}</div>${t.notes?`<div style="font-size:11px;color:#B0A888;margin-top:2px">${t.notes}</div>`:''}</div><div style="display:flex;align-items:center;gap:10px"><div class="toc-score-badge" style="color:${color}">${t.score}/100</div><button class="btn-sm" onclick="deleteTrial(${i})">✕</button></div></div>`;}).join('');}
-function buildBadges(){const cats=[...new Set(BADGES_DEF.map(b=>b.cat))];const container=document.getElementById('badges-container');container.innerHTML='';for(const cat of cats){const title=document.createElement('div');title.className='badges-section-title';title.textContent=cat;container.appendChild(title);const grid=document.createElement('div');grid.className='badges-grid';grid.innerHTML=BADGES_DEF.filter(b=>b.cat===cat).map(b=>{const earned=state.earnedBadges.includes(b.id);return`<div class="badge-card ${earned?'earned':''}"><div class="badge-icon">${b.icon}</div><div class="badge-name">${b.name}</div><div class="badge-desc">${b.desc}</div></div>`;}).join('');container.appendChild(grid);}}
-function checkBadges(){for(const b of BADGES_DEF){if(!state.earnedBadges.includes(b.id)&&b.check(state)){state.earnedBadges.push(b.id);setTimeout(()=>notify('Achievement!',`${b.icon} ${b.name}: ${b.desc}`),900);}}saveState();}
-function buildBoss(){const list=document.getElementById('boss-unlock-list');let html='';for(const[k,d]of Object.entries(DOMAINS)){const lv=getLevel(state.xp[k]);if(!BOSS_Q[k])continue;for(let t=1;t<=3;t++){const req=TIER_REQ[t];const unlocked=lv>=req;const won=state.bossProgress[`${k}_${t}`];html+=`<div class="boss-unlock-item"><div class="bui-left"><div class="bui-name" style="color:${d.color}">${d.name}<span class="boss-tier-badge tier-${t}">${TIER_LABELS[t]}</span></div><div class="bui-tier-desc">${TIER_DESC[t]}</div></div><div class="bui-status">${won?'<span class="bui-unlocked">Defeated</span>':''}${unlocked&&!won?`<button class="btn-boss" onclick="startBoss('${k}',${t})">FIGHT</button>`:''}${!unlocked?'<span class="bui-locked">Locked</span>':''}</div></div>`;}}list.innerHTML=html;}
-function startBoss(domain,tier){const qs=BOSS_Q[domain][tier];bossState={domain,tier,questions:qs,current:0,hp:3,correct:0,active:true,timeLeft:120};document.getElementById('boss-battle-area').style.display='block';document.getElementById('boss-title').textContent=`${DOMAINS[domain].short} Boss — ${TIER_LABELS[tier]}`;document.getElementById('boss-title').style.color=DOMAINS[domain].color;document.getElementById('boss-tier-desc').textContent=`Tier ${tier} · 5 questions · 2 minutes · 3 HP`;renderBossQ();startBossTimer();}
-function renderBossQ(){const q=bossState.questions[bossState.current];document.getElementById('boss-q-num').textContent=bossState.current+1;document.getElementById('boss-hp').textContent=bossState.hp;document.getElementById('boss-q-text').textContent=q.q;document.getElementById('boss-result-box').style.display='none';document.getElementById('boss-explanation').classList.remove('show');document.getElementById('boss-explanation').textContent='';document.getElementById('boss-options').innerHTML=q.opts.map((o,i)=>`<button class="boss-opt" onclick="answerBoss(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('');}
-function answerBoss(idx){if(!bossState.active)return;const q=bossState.questions[bossState.current];const opts=document.querySelectorAll('.boss-opt');opts[idx].classList.add(idx===q.ans?'correct':'wrong');if(idx!==q.ans){opts[q.ans].classList.add('correct');bossState.hp--;}else bossState.correct++;opts.forEach(o=>o.onclick=null);const exp=document.getElementById('boss-explanation');exp.textContent=q.exp;exp.classList.add('show');setTimeout(()=>{bossState.current++;if(bossState.hp<=0){endBoss(false);return;}if(bossState.current>=bossState.questions.length){endBoss(true);return;}renderBossQ();},2500);}
-function startBossTimer(){if(bossTimer)clearInterval(bossTimer);bossTimer=setInterval(()=>{bossState.timeLeft--;const m=Math.floor(bossState.timeLeft/60),s=bossState.timeLeft%60;document.getElementById('boss-timer').textContent=`${m}:${s.toString().padStart(2,'0')}`;if(bossState.timeLeft<=0){clearInterval(bossTimer);endBoss(false);}},1000);}
-function endBoss(won){clearInterval(bossTimer);bossState.active=false;document.getElementById('boss-options').innerHTML='';document.getElementById('boss-q-text').textContent='';document.getElementById('boss-explanation').classList.remove('show');document.getElementById('boss-result-box').style.display='block';if(won){state.bossProgress[`${bossState.domain}_${bossState.tier}`]=true;state.bossWins++;saveState();checkBadges();document.getElementById('boss-result-title').textContent='VICTORY!';document.getElementById('boss-result-title').style.color='#4CAF7A';document.getElementById('boss-result-sub').textContent=`${DOMAINS[bossState.domain].short} ${TIER_LABELS[bossState.tier]} defeated!`;notify('Boss Slain!',`${DOMAINS[bossState.domain].short} ${TIER_LABELS[bossState.tier]} conquered!`);setTimeout(()=>showLevelUp(bossState.domain,getLevel(state.xp[bossState.domain])),500);}else{document.getElementById('boss-result-title').textContent='DEFEATED';document.getElementById('boss-result-title').style.color='#E8593C';document.getElementById('boss-result-sub').textContent=`${bossState.correct}/5 correct. Train harder and return.`;}}
-function closeBoss(){document.getElementById('boss-battle-area').style.display='none';buildBoss();}
-let notifTimeout;
-function notify(title,body,isGoal=false){const n=document.getElementById('notif');document.getElementById('notif-title').textContent=title;document.getElementById('notif-body').textContent=body;n.className='notif'+(isGoal?' goal-notif':'');n.classList.add('show');clearTimeout(notifTimeout);notifTimeout=setTimeout(()=>n.classList.remove('show'),3500);}
-function render(){updateHeader();updateTree();buildDomainGrid();updateDailyGoal();updateCountdown();buildWeeklySummary();}
-document.getElementById('log-date').value=todayStr();
-document.getElementById('toc-date').value=todayStr();
-buildLogPanel();updateSessionList();render();
-</script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script>
-  initForgeFirebase();
 </script>
 </body>
 </html>
