@@ -494,7 +494,7 @@ activeRegions=new Set(saved?saved.activeRegions:Object.keys(REGIONS));
 activeConf=new Set(saved?saved.activeConf:Object.keys(CONF_FILTER_OPTIONS));
   removedIds=new Set(saved&&saved.removedIds?saved.removedIds:[]);
   confidence=saved&&saved.confidence?saved.confidence:{};
-  idx=saved&&saved.idx?saved.idx:0;
+  idx=(saved&&saved.idx!==undefined&&saved.idx!==null)?saved.idx:0;
   if(!_initDone){_initDone=true;
 buildFilters();rebuildDeck(true);}
   else{buildFilters();rebuildDeck(true);}
