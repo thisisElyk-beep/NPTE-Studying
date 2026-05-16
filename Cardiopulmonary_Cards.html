@@ -230,7 +230,7 @@ let _pendingSave=null;
 let _saveTimer=null;
 
 function initFirebase(storageKey){
-  if(typeof firebase==='undefined'){setSyncStatus('err','Firebase failed to load');return;}
+  if(typeof firebase==='undefined'){setTimeout(()=>initFirebase(storageKey),100);return;}
   firebase.initializeApp(FIREBASE_CONFIG);
   _db=firebase.database();
   _fbRef=_db.ref('users/'+USER_ID+'/'+storageKey);
