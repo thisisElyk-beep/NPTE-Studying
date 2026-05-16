@@ -53,8 +53,8 @@
   .stat{background:var(--bg-secondary);border-radius:var(--radius-md);padding:5px 10px;font-size:12px;color:var(--text-secondary);}
   .stat span{font-weight:500;color:var(--text-primary);}
   .prog-wrap{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
-  .prog-bg{flex:1;height:4px;background:var(--bg-secondary);border-radius:2px;}
-  .prog-fill{height:4px;background:var(--purple);border-radius:2px;transition:width 0.3s;}
+  .prog-bg{flex:1;height:6px;background:var(--bg-secondary);border-radius:3px;overflow:hidden;display:flex;gap:1px;}
+  .prog-seg{height:100%;border-radius:2px;transition:width 0.3s;}
   .prog-txt{font-size:13px;color:var(--text-secondary);white-space:nowrap;}
   .card{border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1rem;cursor:pointer;min-height:280px;display:flex;flex-direction:column;}
   .card-front{background:var(--bg-primary);border:0.5px solid var(--border);align-items:center;justify-content:center;}
@@ -84,19 +84,33 @@
   .nbtn:hover{background:var(--bg-secondary);}
   .nbtn.primary{background:var(--purple);color:#fff;border-color:var(--purple);}
   .nbtn.primary:hover{background:#534AB7;}
-  .bottom-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:6px;}
-  .shuf-btn{font-size:13px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;}
-  .reset-btn{font-size:13px;color:var(--purple);background:none;border:none;cursor:pointer;text-decoration:underline;}
+  .bottom-row{display:flex;gap:8px;justify-content:center;margin-top:6px;flex-wrap:wrap;}
+  .nbtn.secondary{background:var(--bg-primary);color:var(--text-secondary);border-color:var(--border-md);}
+  .nbtn.secondary:hover{background:var(--bg-secondary);color:var(--text-primary);}
+  .nbtn.finish{background:#FCEBEB;color:#A32D2D;border-color:#F09595;}
+  .nbtn.finish:hover{background:#f9d9d9;}
   .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-secondary);font-size:14px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1rem;background:var(--bg-primary);}
-  .empty-state strong{display:block;font-size:16px;color:var(--text-primary);margin-bottom:8px;font-weight:500;}
+  .mode-row{display:flex;gap:6px;margin-bottom:8px;}
+  .mbtn{font-size:12px;padding:5px 14px;border-radius:999px;border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-secondary);cursor:pointer;font-family:inherit;transition:all 0.15s;}
+  .mbtn.active{background:var(--purple);color:#fff;border-color:var(--purple);}
+  .sr-badge{font-size:10px;background:var(--purple-light);color:var(--purple);padding:2px 8px;border-radius:999px;margin-left:6px;font-weight:500;}
+  .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem;}
+  .fbtn{font-size:12px;padding:4px 12px;border-radius:999px;border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-secondary);cursor:pointer;font-family:inherit;}
+  .fbtn.active{border-color:transparent;}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="page-title">Cranial nerve flashcards — NPTE</div>
+  <div class="mode-row" id="modeRow">
+    <button class="mbtn active" id="mode-all" onclick="setMode('all')">All</button>
+    <button class="mbtn" id="mode-weak" onclick="setMode('weak')">Weak spots</button>
+    <button class="mbtn" id="mode-unseen" onclick="setMode('unseen')">Unseen</button>
+  </div>
+  <div class="filter-row" id="confFilters"></div>
   <div class="stats-row" id="statsRow"></div>
   <div class="prog-wrap">
-    <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-bg" id="progBar"></div>
     <div class="prog-txt" id="progTxt"></div>
   </div>
   <div id="cardArea"></div>
@@ -105,8 +119,24 @@
     <button class="nbtn primary" onclick="go(1)">Next →</button>
   </div>
   <div class="bottom-row">
-    <button class="shuf-btn" onclick="shuffle()">Shuffle deck</button>
-    <button class="reset-btn" onclick="resetDeck()">Reset deck</button>
+    <button class="nbtn secondary" onclick="shuffle()">Shuffle</button>
+    <button class="nbtn secondary" onclick="resetDeck()">Reset deck</button>
+    <a class="nbtn finish" href="#" onclick="finishStudying(event)" style="text-decoration:none;display:inline-flex;align-items:center;">Finish studying</a>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div id="toast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.2);transition:opacity 0.3s;"></div>
+
+<!-- Session summary modal -->
+<div id="summaryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:var(--bg-primary);border:0.5px solid var(--border);border-radius:16px;padding:2rem;max-width:400px;width:90%;margin:auto;">
+    <div style="font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:1.25rem;">Session complete</div>
+    <div id="summaryBody" style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:1.5rem;"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="nbtn secondary" onclick="closeSummary()">Keep studying</button>
+      <a class="nbtn finish" href="index.html" style="text-decoration:none;display:inline-flex;align-items:center;">Go to index</a>
+    </div>
   </div>
 </div>
 
@@ -153,40 +183,226 @@ const CNS=[
 const TYPE_COLORS={sensory:{bg:'#E1F5EE',color:'#0F6E56'},motor:{bg:'#FAECE7',color:'#993C1D'},both:{bg:'#EEEDFE',color:'#3C3489'}};
 const CONF_COLORS={gotit:{bg:'#E1F5EE',color:'#0F6E56'},almost:{bg:'#FAEEDA',color:'#854F0B'},nope:{bg:'#FCEBEB',color:'#A32D2D'}};
 const CONF_LABELS={gotit:'Got it',almost:'Almost',nope:'Nope'};
+const CONF_FILTER_OPTIONS={
+  nope:   {label:'Nope',   bg:'#FCEBEB',color:'#A32D2D',border:'#F09595'},
+  almost: {label:'Almost', bg:'#FAEEDA',color:'#854F0B',border:'#EF9F27'},
+  gotit:  {label:'Got it', bg:'#E1F5EE',color:'#0F6E56',border:'#5DCAA5'},
+  unrated:{label:'Unrated',bg:'#f5f4f0',color:'#6b6966',border:'#c8c6c3'},
+};
 
-let deck=[...CNS],removedIds=new Set(),confidence={},idx=0,revealed=false;
+const STORAGE_KEY='cranial_nerve_cards_v1';
+function saveState(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({confidence,removedIds:[...removedIds],activeConf:[...activeConf],idx}));}catch(e){}
+  if(!_fbRef)return;
+  if(_saveTimer)clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(()=>{_fbRef.set({confidence,removedIds:[...removedIds],activeConf:[...activeConf],idx}).catch(e=>console.warn('CN Firebase save error:',e));},300);
+}
+function loadLocal(){
+  try{const r=localStorage.getItem(STORAGE_KEY);return r?JSON.parse(r):null;}catch(e){return null;}
+}
 
-function cardId(c){return 'CN'+c.num;}
-function activeDeck(){return CNS.filter(c=>!removedIds.has(cardId(c)));}
+CNS.forEach((c,i)=>c._id='cn_'+i);
+function cid(c){return c._id;}
+
+let _fbRef=null,_saveTimer=null;
+let activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
+let deck=[],removedIds=new Set(),confidence={},idx=0,revealed=false;
+
+function applyState(saved){
+  if(!saved)return;
+  if(saved.confidence)confidence=saved.confidence;
+  if(saved.removedIds)removedIds=new Set(saved.removedIds);
+  if(saved.activeConf)activeConf=new Set(saved.activeConf);
+  if(saved.idx!==undefined)idx=saved.idx;
+}
+
+function confKey(c){return confidence[cid(c)]||'unrated';}
+function filteredCards(){
+  return CNS.filter(c=>!removedIds.has(cid(c))&&activeConf.has(confKey(c)));
+}
+
+// Load local immediately
+applyState(loadLocal());
+deck=filteredCards();
+if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+
+const WEIGHTS={gotit:1,almost:2,nope:4,unrated:3};
+const autoAdvance=true;
+let autoTimer=null;
+let history=[];           // card index history for Prev
+let sessionStart={};      // snapshot of confidence at session start
+let sessionReviewed=new Set(); // card ids reviewed this session
+
+function allRated(){
+  return deck.every(c=>confKey(c)!=='unrated');
+}
+
+function weightedNext(){
+  // Build weighted pool excluding current card
+  const pool=[];
+  deck.forEach((c,i)=>{
+    if(i===idx)return;
+    const w=WEIGHTS[confKey(c)]||1;
+    for(let j=0;j<w;j++)pool.push(i);
+  });
+  if(!pool.length)return(idx+1)%deck.length;
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+function setMode(mode){
+  document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('mode-'+mode).classList.add('active');
+  if(mode==='all'){
+    activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
+  } else if(mode==='weak'){
+    activeConf=new Set(['nope','almost']);
+  } else if(mode==='unseen'){
+    activeConf=new Set(['unrated']);
+  }
+  deck=filteredCards();idx=0;history=[];revealed=false;saveState();buildConfFilters();render();
+}
+
+
+function cancelAuto(){if(autoTimer){clearTimeout(autoTimer);autoTimer=null;}}
+function scheduleAutoAdvance(){
+  if(autoTimer)clearTimeout(autoTimer);
+  autoTimer=setTimeout(()=>{advanceCard();},0);
+}
+
+function advanceCard(){
+  cancelAuto();
+  if(deck.length===0)return;
+  history.push(idx);
+  if(history.length>50)history.shift();
+  if(allRated()){
+    idx=weightedNext();
+    // Show SR badge first time
+    const badge=document.getElementById('srBadge');
+    if(badge)badge.style.display='inline';
+  } else {
+    idx=(idx+1)%deck.length;
+  }
+  revealed=false;saveState();render();
+}
+
+function showToast(msg,duration=2500){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.display='block';t.style.opacity='1';
+  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>{t.style.display='none';},300);},duration);
+}
+
+function finishStudying(e){
+  e.preventDefault();
+  // Build summary
+  const reviewed=sessionReviewed.size;
+  if(reviewed===0){window.location.href='index.html';return;}
+  let moved=[];
+  sessionReviewed.forEach(id=>{
+    const before=sessionStart[id]||'unrated';
+    const after=confidence[id]||'unrated';
+    if(before!==after)moved.push({before,after});
+  });
+  const upgrades=moved.filter(m=>
+    (m.before==='unrated'&&m.after!=='unrated')||
+    (m.before==='nope'&&(m.after==='almost'||m.after==='gotit'))||
+    (m.before==='almost'&&m.after==='gotit')
+  ).length;
+  const downgrades=moved.filter(m=>
+    (m.before==='gotit'&&(m.after==='almost'||m.after==='nope'))||
+    (m.before==='almost'&&m.after==='nope')
+  ).length;
+  const gotit=deck.filter(c=>confidence[cid(c)]==='gotit').length;
+  const almost=deck.filter(c=>confidence[cid(c)]==='almost').length;
+  const nope=deck.filter(c=>confidence[cid(c)]==='nope').length;
+  const unrated=deck.filter(c=>confKey(c)==='unrated').length;
+  const srActive=allRated();
+  let html=`<div style="margin-bottom:10px;"><strong style="color:var(--text-primary);">Cards reviewed:</strong> ${reviewed}</div>`;
+  if(upgrades>0)html+=`<div style="color:#0F6E56;">↑ ${upgrades} card${upgrades>1?'s':''} improved</div>`;
+  if(downgrades>0)html+=`<div style="color:#A32D2D;">↓ ${downgrades} card${downgrades>1?'s':''} moved down</div>`;
+  html+=`<div style="margin-top:12px;padding-top:12px;border-top:0.5px solid var(--border);display:flex;gap:12px;flex-wrap:wrap;">`;
+  if(gotit>0)html+=`<span style="color:#0F6E56;">Got it: ${gotit}</span>`;
+  if(almost>0)html+=`<span style="color:#854F0B;">Almost: ${almost}</span>`;
+  if(nope>0)html+=`<span style="color:#A32D2D;">Nope: ${nope}</span>`;
+  if(unrated>0)html+=`<span style="color:#6b6966;">Unrated: ${unrated}</span>`;
+  html+=`</div>`;
+  if(srActive)html+=`<div style="margin-top:10px;font-size:12px;color:var(--purple);">Spaced repetition active — all cards rated.</div>`;
+  document.getElementById('summaryBody').innerHTML=html;
+  const modal=document.getElementById('summaryModal');
+  modal.style.display='flex';
+}
+
+function closeSummary(){
+  document.getElementById('summaryModal').style.display='none';
+}
+
+function buildConfFilters(){
+  const el=document.getElementById('confFilters');
+  if(!el)return;
+  el.innerHTML='';
+  Object.entries(CONF_FILTER_OPTIONS).forEach(([k,v])=>{
+    const count=CNS.filter(c=>!removedIds.has(cid(c))&&confKey(c)===k).length;
+    const b=document.createElement('button');
+    const isActive=activeConf.has(k);
+    b.className='fbtn'+(isActive?' active':'');
+    if(isActive)b.style.cssText='background:'+v.bg+';color:'+v.color+';border-color:'+v.border+';';
+    b.textContent=v.label+' ('+count+')';
+    b.onclick=()=>{activeConf.has(k)?activeConf.delete(k):activeConf.add(k);deck=filteredCards();idx=0;history=[];revealed=false;saveState();buildConfFilters();render();};
+    el.appendChild(b);
+  });
+}
+
+function updateProgressBar(){
+  const total=CNS.length;
+  const gotit=CNS.filter(c=>confidence[cid(c)]==='gotit'||removedIds.has(cid(c))).length;
+  const almost=CNS.filter(c=>!removedIds.has(cid(c))&&confidence[cid(c)]==='almost').length;
+  const nope=CNS.filter(c=>!removedIds.has(cid(c))&&confidence[cid(c)]==='nope').length;
+  const gp=Math.round(gotit/total*100);
+  const ap=Math.round(almost/total*100);
+  const np=Math.round(nope/total*100);
+  const up=Math.max(0,100-gp-ap-np);
+  const bar=document.getElementById('progBar');
+  if(bar)bar.innerHTML=
+    (gp>0?`<div class="prog-seg" style="background:#5DCAA5;width:${gp}%;"></div>`:'')+
+    (ap>0?`<div class="prog-seg" style="background:#EF9F27;width:${ap}%;"></div>`:'')+
+    (np>0?`<div class="prog-seg" style="background:#F09595;width:${np}%;"></div>`:'')+
+    (up>0?`<div class="prog-seg" style="background:var(--bg-tertiary);width:${up}%;"></div>`:'');
+  const txt=document.getElementById('progTxt');
+  if(txt)txt.textContent=(idx+1)+' / '+deck.length;
+}
 
 function render(){
   updateStats();
+  updateProgressBar();
+  buildConfFilters();
   const area=document.getElementById('cardArea');
   const navRow=document.getElementById('navRow');
-  const active=activeDeck();
-  if(active.length===0){
-    area.innerHTML='<div class="empty-state"><strong>All cards mastered!</strong>Hit "Reset deck" to bring them all back.</div>';
+  if(deck.length===0){
+    let msg=activeConf.size===0
+      ?'No confidence filters selected.'
+      :'No cards match the current filter. Adjust above or hit "Reset deck".';
+    area.innerHTML='<div class="empty-state"><strong>'+msg+'</strong></div>';
     navRow.style.display='none';
-    document.getElementById('progFill').style.width='100%';
-    document.getElementById('progTxt').textContent='0 remaining';
+    updateProgressBar();
     return;
   }
   navRow.style.display='flex';
-  if(idx>=deck.length) idx=Math.max(0,deck.length-1);
+  if(idx>=deck.length)idx=Math.max(0,deck.length-1);
   const c=deck[idx];
-  const id=cardId(c);
+  const id=cid(c);
+  sessionReviewed.add(id);
+  if(!(id in sessionStart))sessionStart[id]=confidence[id]||'unrated';
   const conf=confidence[id]||null;
-  const pct=Math.round(((idx+1)/deck.length)*100);
-  document.getElementById('progFill').style.width=pct+'%';
-  document.getElementById('progTxt').textContent=(idx+1)+' / '+deck.length;
   const tc=TYPE_COLORS[c.type];
   const canRemove=conf==='gotit';
+  const srActive=allRated();
 
   if(!revealed){
     const confBadge=conf?'<span class="conf-badge" style="background:'+CONF_COLORS[conf].bg+';color:'+CONF_COLORS[conf].color+';">'+CONF_LABELS[conf]+'</span>':'';
-    area.innerHTML='<div class="card card-front" onclick="toggle()"><div class="cn-label">Cranial nerve</div><div class="cn-num">'+c.num+'</div>'+confBadge+'<div class="hint">Tap to reveal</div></div>';
+    const srBadge=srActive?'<span class="sr-badge" id="srBadge">Spaced rep</span>':'';
+    area.innerHTML='<div class="card card-front" onclick="toggle()"><div class="cn-label">Cranial nerve'+srBadge+'</div><div class="cn-num">'+c.num+'</div>'+confBadge+'<div class="hint">Tap or press Space to reveal</div></div>';
   } else {
     const removeBtn=canRemove?'<button class="remove-btn" onclick="removeCard()">Remove</button>':'';
+    const autoHint='';
     area.innerHTML=
       '<div class="card card-back" onclick="handleBackClick(event)">'+
         '<div class="back-name">CN '+c.num+' \u2014 '+c.name+'</div>'+
@@ -205,34 +421,61 @@ function render(){
           '<button class="cbtn cbtn-gotit'+(conf==='gotit'?' selected':'')+'" onclick="rate(\'gotit\')">Got it</button>'+
           removeBtn+
         '</div>'+
-        '<div class="flip-hint">Tap card to flip back</div>'+
+        autoHint+
+        '<div class="flip-hint">Space to flip · 1 Nope · 2 Almost · 3 Got it · ← → navigate</div>'+
       '</div>';
   }
 }
 
 function handleBackClick(e){if(!e.target.closest('.confidence-row'))toggle();}
 function toggle(){revealed=!revealed;render();}
-function rate(val){confidence[cardId(deck[idx])]=val;render();}
+
+function rate(val){
+  cancelAuto();
+  const wasUnrated=confKey(deck[idx])==='unrated';
+  confidence[cid(deck[idx])]=val;
+  const wasAllUnrated=!allRated()&&wasUnrated;
+  if(!activeConf.has(val)){
+    deck=filteredCards();
+    if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+    revealed=false;saveState();buildConfFilters();render();
+    return;
+  }
+  // Check if this rating just completed all cards
+  if(wasUnrated&&allRated()){
+    showToast('All cards rated — spaced repetition now active!',3000);
+  }
+  saveState();buildConfFilters();
+  // Auto-advance: flip to back first if on front, then schedule advance
+  if(!revealed){revealed=true;render();scheduleAutoAdvance();}
+  else{render();scheduleAutoAdvance();}
+}
 
 function removeCard(){
-  const id=cardId(deck[idx]);
+  cancelAuto();
+  const id=cid(deck[idx]);
   removedIds.add(id);
-  deck=deck.filter(c=>cardId(c)!==id);
-  if(idx>=deck.length) idx=Math.max(0,deck.length-1);
-  revealed=false;render();
+  deck=filteredCards();
+  if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+  revealed=false;saveState();buildConfFilters();render();
 }
 
 function resetDeck(){
-  removedIds.clear();
-  deck=[...CNS];
-  idx=0;revealed=false;render();
+  cancelAuto();
+  removedIds.clear();confidence={};
+  activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
+  history=[];sessionStart={};sessionReviewed=new Set();
+  deck=filteredCards();idx=0;revealed=false;saveState();buildConfFilters();render();
+  // Reset mode buttons
+  document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('mode-all').classList.add('active');
 }
 
 function updateStats(){
-  const removed=CNS.length-activeDeck().length;
-  const gotit=deck.filter(c=>confidence[cardId(c)]==='gotit').length;
-  const almost=deck.filter(c=>confidence[cardId(c)]==='almost').length;
-  const nope=deck.filter(c=>confidence[cardId(c)]==='nope').length;
+  const removed=CNS.filter(c=>removedIds.has(cid(c))).length;
+  const gotit=deck.filter(c=>confidence[cid(c)]==='gotit').length;
+  const almost=deck.filter(c=>confidence[cid(c)]==='almost').length;
+  const nope=deck.filter(c=>confidence[cid(c)]==='nope').length;
   document.getElementById('statsRow').innerHTML=
     '<div class="stat">Active <span>'+deck.length+'</span></div>'+
     '<div class="stat">Mastered <span>'+removed+'</span></div>'+
@@ -242,20 +485,53 @@ function updateStats(){
 }
 
 function go(dir){
+  cancelAuto();
+  if(dir===-1&&history.length>0){
+    idx=history.pop();revealed=false;saveState();render();return;
+  }
+  if(dir===1){advanceCard();return;}
   const next=idx+dir;
   if(next<0||next>=deck.length)return;
-  idx=next;revealed=false;render();
+  idx=next;revealed=false;saveState();render();
 }
 
 function shuffle(){
-  for(let i=deck.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [deck[i],deck[j]]=[deck[j],deck[i]];
-  }
-  idx=0;revealed=false;render();
+  cancelAuto();
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+  idx=0;history=[];revealed=false;saveState();render();
 }
 
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(document.getElementById('summaryModal').style.display==='flex')return;
+  switch(e.key){
+    case ' ':case 'Spacebar':e.preventDefault();if(deck.length>0)toggle();break;
+    case 'ArrowRight':e.preventDefault();go(1);break;
+    case 'ArrowLeft':e.preventDefault();go(-1);break;
+    case '1':if(revealed)rate('nope');break;
+    case '2':if(revealed)rate('almost');break;
+    case '3':if(revealed)rate('gotit');break;
+  }
+});
+
 render();
+</script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+(function initCNFirebase(){
+  if(typeof firebase==='undefined'){setTimeout(initCNFirebase,100);return;}
+  try{
+    if(!firebase.apps.length)firebase.initializeApp({apiKey:"AIzaSyA6EjnhyYUOt0iRYUaywCoqZ5POaVQmcsk",authDomain:"npte-flaschcards.firebaseapp.com",databaseURL:"https://npte-flaschcards-default-rtdb.firebaseio.com",projectId:"npte-flaschcards",storageBucket:"npte-flaschcards.firebasestorage.app",messagingSenderId:"429875976159",appId:"1:429875976159:web:04fc0eda2e758c606e966a"});
+    _fbRef=firebase.database().ref('users/thisisElyk/cranial_nerve_cards_v1');
+    _fbRef.once('value').then(snap=>{
+      const fb=snap.val();
+      if(fb){applyState(fb);try{localStorage.setItem(STORAGE_KEY,JSON.stringify(fb));}catch(e){}}
+      deck=filteredCards();if(idx>=deck.length)idx=Math.max(0,deck.length-1);
+      render();
+    }).catch(e=>console.warn('CN Firebase load error:',e));
+  }catch(e){console.warn('CN Firebase init failed:',e);}
+})();
 </script>
 </body>
 </html>
