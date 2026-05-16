@@ -387,7 +387,7 @@ function showToast(msg,duration=2500){
 function finishStudying(e){
   e.preventDefault();
   const reviewed=sessionReviewed.size;
-  if(reviewed===0){window.location.href='index.html';return;}
+  if(reviewed===0){window.location.href='./index.html';return;}
   let moved=[];
   sessionReviewed.forEach(id=>{
     const before=sessionStart[id]||'unrated';
@@ -652,7 +652,7 @@ function shuffle(){cancelAuto();_history=[];
     <div id="summaryBody" style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:1.5rem;"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
       <button class="nbtn secondary" onclick="closeSummary()">Keep studying</button>
-      <a class="nbtn finish" href="index.html" style="text-decoration:none;display:inline-flex;align-items:center;">Go to index</a>
+      <a class="nbtn finish" href="./index.html" style="text-decoration:none;display:inline-flex;align-items:center;">Go to index</a>
     </div>
   </div>
 </div>
