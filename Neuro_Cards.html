@@ -266,15 +266,6 @@ let _db=null;
 let _fbRef=null;
 let _pendingSave=null;
 let _saveTimer=null;
-
-function initFirebase(storageKey){
-  if(typeof firebase==='undefined'){setTimeout(()=>initFirebase(storageKey),100);return;}
-  firebase.initializeApp(FIREBASE_CONFIG);
-  _db=firebase.database();
-  _fbRef=_db.ref('users/'+USER_ID+'/'+storageKey);
-  setSyncStatus('pending','Connecting...');
-}
-
 function setSyncStatus(state,msg){
   const dot=document.getElementById('syncDot');
   const txt=document.getElementById('syncTxt');
@@ -298,33 +289,45 @@ function saveState(stateObj){
 }
 
 function loadState(storageKey,callback){
-  // Try localStorage immediately for fast start
+  // Load from localStorage immediately for fast render
   let localState=null;
   try{const r=localStorage.getItem(storageKey);if(r)localState=JSON.parse(r);}catch(e){}
+  callback(localState);
 
-  if(localState)callback(localState);
-
-  // Then fetch from Firebase and update if newer/different
-  initFirebase(storageKey);
-  if(!_fbRef){callback(localState);return;}
-  _fbRef.once('value')
-    .then(snap=>{
-      const fbState=snap.val();
-      if(fbState){
-        // Update localStorage with Firebase state
-        try{localStorage.setItem(storageKey,JSON.stringify(fbState));}catch(e){}
-        setSyncStatus('ok','Synced');
-        callback(fbState);
-      } else {
-        setSyncStatus('ok','Synced');
-        if(!localState)callback(null);
-      }
-    })
-    .catch(e=>{
-      setSyncStatus('err','Offline — using local data');
-      console.warn('Firebase load error:',e);
-      if(!localState)callback(null);
-    });
+  // Then fetch from Firebase — only call callback again if idx differs
+  function tryFirebase(){
+    if(typeof firebase==='undefined'){setTimeout(tryFirebase,100);return;}
+    try{
+      if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+      _db=firebase.database();
+      _fbRef=_db.ref('users/'+USER_ID+'/'+storageKey);
+      setSyncStatus('pending','Connecting...');
+      _fbRef.once('value').then(snap=>{
+        const fbState=snap.val();
+        if(fbState){
+          try{localStorage.setItem(storageKey,JSON.stringify(fbState));}catch(e){}
+          setSyncStatus('ok','Synced');
+          // Only re-init if Firebase has a different (newer) idx than local
+          const localIdx=localState?localState.idx:null;
+          if(fbState.idx!==localIdx){callback(fbState);}
+          else{
+            // Still apply confidence/removedIds from Firebase but don't re-render deck position
+            if(typeof activeCats!=='undefined'){
+              confidence=fbState.confidence||{};
+              removedIds=new Set(fbState.removedIds||[]);
+              buildFilters();render();
+            }
+          }
+        } else {
+          setSyncStatus('ok','Synced');
+        }
+      }).catch(e=>{
+        setSyncStatus('err','Offline — using local data');
+        console.warn('Firebase load error:',e);
+      });
+    }catch(e){setSyncStatus('err','Firebase error');console.warn(e);}
+  }
+  tryFirebase();
 }
 
 let _initDone=false;
