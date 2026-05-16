@@ -293,6 +293,12 @@ function loadState(storageKey,callback){
 
 let _initDone=false;
 let activeCats,activeRegions,activeSystems,activeSubs,activeConf,deck=[],removedIds=new Set(),confidence={},idx=0,revealed=false;
+const WEIGHTS={gotit:1,almost:2,nope:4,unrated:3};
+const autoAdvance=true;
+let autoTimer=null;
+let _history=[];
+let sessionStart={};
+let sessionReviewed=new Set();
 
 let _firstLoad=true;
 
@@ -303,13 +309,7 @@ activeConf=new Set(saved?saved.activeConf:Object.keys(CONF_FILTER_OPTIONS));
   removedIds=new Set(saved&&saved.removedIds?saved.removedIds:[]);
   confidence=saved&&saved.confidence?saved.confidence:{};
   idx=saved&&saved.idx?saved.idx:0;
-  if(!_initDone){_initDone=true;const WEIGHTS={gotit:1,almost:2,nope:4,unrated:3};
-const autoAdvance=true;
-let autoTimer=null;
-let _history=[];
-let sessionStart={};
-let sessionReviewed=new Set();
-
+  if(!_initDone){_initDone=true;
 function allRated(){return deck.length>0&&deck.every(c=>confKey(c)!=='unrated');}
 
 function weightedNext(){
@@ -541,7 +541,7 @@ function render(){
   const c=deck[idx];
   const id=cid(c);
   sessionReviewed.add(id);
-  if(!(id in sessionStart))sessionStart[id]=confidence[id]||\'unrated\';
+  if(!(id in sessionStart))sessionStart[id]=confidence[id]||'unrated';
   const conf=confidence[id]||null;
   const pct=Math.round(((idx+1)/deck.length)*100);
   
@@ -586,14 +586,20 @@ function render(){
 
 function handleBackClick(e){if(!e.target.closest('.confidence-row'))toggle();}
 function toggle(){revealed=!revealed;render();}
+
 function rate(val){
+  cancelAuto();
+  const _wasUnrated=!confidence[cid(deck[idx])]||confidence[cid(deck[idx])]==='unrated';
   confidence[cid(deck[idx])]=val;
+  if(_wasUnrated&&allRated()){showToast('All cards rated — spaced repetition now active!',3000);}
   if(!activeConf.has(val)){
     deck=filteredCards();
     if(idx>=deck.length)idx=Math.max(0,deck.length-1);
-    revealed=false;
+    revealed=false;saveState(getState());buildFilters();render();return;
   }
-  saveState(getState());buildFilters();render();
+  saveState(getState());buildFilters();
+  if(!revealed){revealed=true;render();scheduleAutoAdvance();}
+  else{render();scheduleAutoAdvance();}
 }
 function removeCard(){
   const id=cid(deck[idx]);
