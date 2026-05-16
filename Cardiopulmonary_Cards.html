@@ -83,8 +83,6 @@
   .sync-dot.err{background:#F09595;}
   .sync-dot.pending{background:#EF9F27;}
 </style>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -302,14 +300,6 @@ let sessionReviewed=new Set();
 
 let _firstLoad=true;
 
-function initDeck(saved){
-activeCats=new Set(saved?saved.activeCats:Object.keys(CATS));
-activeSystems=new Set(saved?saved.activeSystems:Object.keys(SYSTEMS));
-activeConf=new Set(saved?saved.activeConf:Object.keys(CONF_FILTER_OPTIONS));
-  removedIds=new Set(saved&&saved.removedIds?saved.removedIds:[]);
-  confidence=saved&&saved.confidence?saved.confidence:{};
-  idx=saved&&saved.idx?saved.idx:0;
-  if(!_initDone){_initDone=true;
 function allRated(){return deck.length>0&&deck.every(c=>confKey(c)!=='unrated');}
 
 function weightedNext(){
@@ -409,6 +399,15 @@ document.addEventListener('keydown',e=>{
   }
 });
 
+
+function initDeck(saved){
+activeCats=new Set(saved?saved.activeCats:Object.keys(CATS));
+activeSystems=new Set(saved?saved.activeSystems:Object.keys(SYSTEMS));
+activeConf=new Set(saved?saved.activeConf:Object.keys(CONF_FILTER_OPTIONS));
+  removedIds=new Set(saved&&saved.removedIds?saved.removedIds:[]);
+  confidence=saved&&saved.confidence?saved.confidence:{};
+  idx=saved&&saved.idx?saved.idx:0;
+  if(!_initDone){_initDone=true;
 buildFilters();rebuildDeck();}
   else{buildFilters();rebuildDeck();}
 }
@@ -647,5 +646,7 @@ function shuffle(){cancelAuto();_history=[];
     </div>
   </div>
 </div>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </body>
 </html>
