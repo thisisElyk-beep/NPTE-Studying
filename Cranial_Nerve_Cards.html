@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%237F77DD'/><text y='75' x='50' text-anchor='middle' font-size='65'>📚</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cranial Nerve Flashcards — NPTE</title>
 <style>
   :root {
@@ -97,6 +98,10 @@
   .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem;}
   .fbtn{font-size:12px;padding:4px 12px;border-radius:999px;border:0.5px solid var(--border-md);background:var(--bg-primary);color:var(--text-secondary);cursor:pointer;font-family:inherit;}
   .fbtn.active{border-color:transparent;}
+  .star-btn{position:absolute;top:12px;right:12px;background:none;border:none;font-size:24px;cursor:pointer;color:#c8c6c3;transition:color 0.2s,transform 0.15s;line-height:1;padding:0;}
+  .star-btn.starred{color:#F0C060;text-shadow:0 0 6px rgba(240,192,96,0.4);}
+  .star-btn:hover{color:#F0C060;transform:scale(1.2);}
+  .card-front{position:relative;}
 </style>
 </head>
 <body>
@@ -232,6 +237,7 @@ let autoTimer=null;
 let history=[];           // card index history for Prev
 let sessionStart={};      // snapshot of confidence at session start
 let sessionReviewed=new Set(); // card ids reviewed this session
+let starredIds=new Set();
 
 function allRated(){
   return deck.every(c=>confKey(c)!=='unrated');
@@ -370,6 +376,36 @@ function updateProgressBar(){
   if(txt)txt.textContent=(idx+1)+' / '+deck.length;
 }
 
+// ── STARRED CARDS ──
+const DECK_KEY_STAR = 'cranial_nerve_cards_v1';
+let _starRef = null;
+
+function initStarRef() {
+  if(typeof _db === 'undefined' || !_db) return;
+  _starRef = _db.ref('users/' + USER_ID + '/starred/' + DECK_KEY_STAR);
+  _starRef.once('value').then(snap => {
+    const data = snap.val();
+    if(data) starredIds = new Set(Object.values(data));
+    render();
+  }).catch(e => console.warn('Star load error:', e));
+}
+
+function toggleStar(cardId, e) {
+  if(e) { e.stopPropagation(); e.preventDefault(); }
+  if(starredIds.has(cardId)) { starredIds.delete(cardId); }
+  else { starredIds.add(cardId); }
+  saveStars();
+  render();
+}
+
+function saveStars() {
+  try {
+    const obj = {};
+    [...starredIds].forEach((id, i) => { obj['s' + i] = id; });
+    if(_starRef) _starRef.set(obj).catch(e => console.warn('Star save error:', e));
+  } catch(e) {}
+}
+
 function render(){
   updateStats();
   updateProgressBar();
@@ -393,7 +429,7 @@ function render(){
   if(!(id in sessionStart))sessionStart[id]=confidence[id]||'unrated';
   const conf=confidence[id]||null;
   const tc=TYPE_COLORS[c.type];
-  const canRemove=conf==='gotit';
+  const canRemove=conf==='gotit' || (confidence[cid(deck[idx])]==='gotit');
   const srActive=allRated();
 
   if(!revealed){

@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%237F77DD'/><text y='75' x='50' text-anchor='middle' font-size='65'>📚</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Safety Flashcards — NPTE</title>
 <style>
   :root{--bg-primary:#ffffff;--bg-secondary:#f5f4f0;--bg-tertiary:#edecea;--text-primary:#1a1a1a;--text-secondary:#6b6966;--text-tertiary:#a09d9a;--border:rgba(0,0,0,0.12);--border-md:rgba(0,0,0,0.22);--radius-md:8px;--radius-lg:12px;--purple:#7F77DD;}
@@ -71,6 +72,10 @@
   .sync-dot.ok{background:#5DCAA5;}
   .sync-dot.err{background:#F09595;}
   .sync-dot.pending{background:#EF9F27;}
+  .star-btn{position:absolute;top:12px;right:12px;background:none;border:none;font-size:24px;cursor:pointer;color:#c8c6c3;transition:color 0.2s,transform 0.15s;line-height:1;padding:0;}
+  .star-btn.starred{color:#F0C060;text-shadow:0 0 6px rgba(240,192,96,0.4);}
+  .star-btn:hover{color:#F0C060;transform:scale(1.2);}
+  .card-front{position:relative;}
 </style>
 </head>
 <body>
@@ -289,6 +294,7 @@ let autoTimer=null;
 let _history=[];
 let sessionStart={};
 let sessionReviewed=new Set();
+let starredIds=new Set();
 
 let _firstLoad=true;
 
@@ -305,14 +311,14 @@ function weightedNext(){
   return pool[Math.floor(Math.random()*pool.length)];
 }
 
-function setMode(mode){
+function setMode(mode,preserveIdx){
   document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('active'));
   const mb=document.getElementById('mode-'+mode);if(mb)mb.classList.add('active');
   if(mode==='all'){activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));}
   else if(mode==='weak'){activeConf=new Set(['nope','almost']);}
   else if(mode==='unseen'){activeConf=new Set(['unrated']);}
-  _history=[];revealed=false;
-  buildFilters();rebuildDeck();saveState(getState());
+  if(!preserveIdx){_history=[];revealed=false;}
+  buildFilters();rebuildDeck(preserveIdx);saveState(getState());
 }
 
 function cancelAuto(){if(autoTimer){clearTimeout(autoTimer);autoTimer=null;}}
@@ -400,6 +406,7 @@ activeConf=new Set(saved?saved.activeConf:Object.keys(CONF_FILTER_OPTIONS));
   confidence=saved&&saved.confidence?saved.confidence:{};
   idx=(saved&&saved.idx!==undefined&&saved.idx!==null)?saved.idx:0;
   if(!_initDone){_initDone=true;
+const _mb=document.getElementById('mode-all');if(_mb)_mb.classList.add('active');
 buildFilters();rebuildDeck(true);}
   else{buildFilters();rebuildDeck(true);}
 }
@@ -497,6 +504,36 @@ function updateProgressBar(){
   const txt=document.getElementById('progTxt');
   if(txt)txt.textContent=(idx+1)+' / '+deck.length;
 }
+// ── STARRED CARDS ──
+const DECK_KEY_STAR = 'safety_cards_v1';
+let _starRef = null;
+
+function initStarRef() {
+  if(typeof _db === 'undefined' || !_db) return;
+  _starRef = _db.ref('users/' + USER_ID + '/starred/' + DECK_KEY_STAR);
+  _starRef.once('value').then(snap => {
+    const data = snap.val();
+    if(data) starredIds = new Set(Object.values(data));
+    render();
+  }).catch(e => console.warn('Star load error:', e));
+}
+
+function toggleStar(cardId, e) {
+  if(e) { e.stopPropagation(); e.preventDefault(); }
+  if(starredIds.has(cardId)) { starredIds.delete(cardId); }
+  else { starredIds.add(cardId); }
+  saveStars();
+  render();
+}
+
+function saveStars() {
+  try {
+    const obj = {};
+    [...starredIds].forEach((id, i) => { obj['s' + i] = id; });
+    if(_starRef) _starRef.set(obj).catch(e => console.warn('Star save error:', e));
+  } catch(e) {}
+}
+
 function render(){
   updateStats();
   updateProgressBar();
@@ -531,7 +568,7 @@ function render(){
   const cat=CATS[c.cat];
   const subLabel=SUBS[c.sub];
   const subColor=SUB_COLORS[c.sub];
-  const canRemove=conf==='gotit';
+  const canRemove=conf==='gotit' || (confidence[cid(deck[idx])]==='gotit');
 
   if(!revealed){
     const confBadge=conf?'<span class="conf-badge" style="background:'+CONF_COLORS[conf].bg+';color:'+CONF_COLORS[conf].color+';">'+CONF_LABELS[conf]+'</span>':'';
@@ -540,6 +577,7 @@ function render(){
       <div class="front-sub" style="color:${subColor};">${subLabel}</div>
       <div class="front-title">${c.front}</div>
       ${confBadge}
+      <button class="star-btn" id="star-btn-${id}" onclick="toggleStar(id,event)">${starredIds.has(id)?'★':'☆'}</button>
       <div class="hint">Tap to reveal</div>
     </div>`;
   } else {
