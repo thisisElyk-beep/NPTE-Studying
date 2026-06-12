@@ -209,7 +209,7 @@ function loadLocal(){
 CNS.forEach((c,i)=>c._id='cn_'+i);
 function cid(c){return c._id;}
 
-let _fbRef=null,_saveTimer=null;
+let _fbRef=null,_saveTimer=null,_db=null;
 let activeConf=new Set(Object.keys(CONF_FILTER_OPTIONS));
 let deck=[],removedIds=new Set(),confidence={},idx=0,revealed=false;
 
@@ -560,6 +560,8 @@ render();
   try{
     if(!firebase.apps.length)firebase.initializeApp({apiKey:"AIzaSyA6EjnhyYUOt0iRYUaywCoqZ5POaVQmcsk",authDomain:"npte-flaschcards.firebaseapp.com",databaseURL:"https://npte-flaschcards-default-rtdb.firebaseio.com",projectId:"npte-flaschcards",storageBucket:"npte-flaschcards.firebasestorage.app",messagingSenderId:"429875976159",appId:"1:429875976159:web:04fc0eda2e758c606e966a"});
     _fbRef=firebase.database().ref('users/thisisElyk/cranial_nerve_cards_v1');
+    _db=firebase.database();
+    initStarRef();
     _fbRef.once('value').then(snap=>{
       const fb=snap.val();
       if(fb){applyState(fb);try{localStorage.setItem(STORAGE_KEY,JSON.stringify(fb));}catch(e){}}

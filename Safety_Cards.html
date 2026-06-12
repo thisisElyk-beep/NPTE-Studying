@@ -257,6 +257,7 @@ function loadState(storageKey,callback){
       if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
       _db=firebase.database();
       _fbRef=_db.ref('users/'+USER_ID+'/'+storageKey);
+      initStarRef();
       setSyncStatus('pending','Connecting...');
       _fbRef.once('value').then(snap=>{
         const fbState=snap.val();
