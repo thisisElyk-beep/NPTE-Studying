@@ -666,7 +666,7 @@ function render(){
   
   
   const cat=CATS[c.cat];
-  const canRemove=conf==='gotit' || (confidence[cid(deck[idx])]==='gotit');
+  const canRemove=conf==='gotit';
 
   if(!revealed){
     const confBadge=conf?'<span class="conf-badge" style="background:'+CONF_COLORS[conf].bg+';color:'+CONF_COLORS[conf].color+';">'+CONF_LABELS[conf]+'</span>':'';
@@ -675,11 +675,11 @@ function render(){
       <div class="front-num">${c.front}</div>
       <div class="front-sub">${c.sub}</div>
       ${confBadge}
-      <button class="star-btn" id="star-btn-${id}" onclick="toggleStar(id,event)">${starredIds.has(id)?'★':'☆'}</button>
+      <button class="star-btn${starredIds.has(id)?' starred':''}" onclick="toggleStar('${id}',event)">${starredIds.has(id)?'★':'☆'}</button>
       <div class="hint">Tap to reveal</div>
     </div>`;
   } else {
-    const removeBtn=canRemove?'<button class="remove-btn" onclick="removeCard()">Remove</button>':'';
+    const removeBtn=canRemove?'<button class="remove-btn" onclick="removeCard()">Remove from deck</button><button class="nbtn secondary" style="font-size:12px;padding:5px 14px;" onclick="advanceCard()">Continue →</button>':'';
     area.innerHTML=`<div class="card card-back" style="background:${cat.bg};border:0.5px solid ${cat.border};" onclick="handleBackClick(event)">
       <div class="back-title" style="color:${cat.text};">${c.front} — ${c.sub}</div>
       <div class="badge-row">
@@ -721,8 +721,13 @@ function rate(val){
     revealed=false;saveState(getState());buildFilters();render();return;
   }
   saveState(getState());buildFilters();
-  if(!revealed){revealed=true;render();scheduleAutoAdvance();}
-  else{render();scheduleAutoAdvance();}
+  if(val==='gotit'){
+    // Show card back with remove prompt — don't auto-advance
+    revealed=true;render();
+  } else {
+    if(!revealed){revealed=true;render();scheduleAutoAdvance();}
+    else{render();scheduleAutoAdvance();}
+  }
 }
 function removeCard(){
   const id=cid(deck[idx]);removedIds.add(id);
